@@ -1,6 +1,6 @@
 #include <stdio.h>
 
 int main() {
-	printf("NESulator");	
+	printf("NESulator");
 	return 0;
 }
