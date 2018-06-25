@@ -17,3 +17,6 @@
 byte address[16 * 1024] = {0}; // 16KBytes of memory address
 
 
+void wmem(unsigned short amountBytes, unsigned short initialPosition, byte **content) {
+
+}

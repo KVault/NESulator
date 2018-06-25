@@ -1,6 +1,5 @@
 #include "nes.h"
 
-
 int isRunning;
 
 /**
