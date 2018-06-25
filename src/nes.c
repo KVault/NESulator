@@ -1,5 +1,6 @@
 #include "nes.h"
 
+
 int isRunning;
 
 /**
@@ -18,7 +19,7 @@ int main() {
 
 	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
 	//control this with a debugger, or an UI. But for now, it simply runs forever
-	while(isRunning){
+	while (isRunning) {
 		cpu_cycle();
 		ppu_cycle();
 		apu_cycle();
