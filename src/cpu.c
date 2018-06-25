@@ -1,15 +1,16 @@
 #include "cpu.h"
-#include "nes.h"
 
 // CPU struct
 struct cpu {
 	// Registers
-	BYTE A;     // Accumulator, deal with carry, overflow and so on...
-	BYTE X;     // General purpose
-	BYTE Y;     // General purpose
-	NIBBLE PC;  // Program Counter
-	BYTE SP;    // Stack Pointer
-	BYTE P;     // Status register, CPU flags
+	byte A;     // Accumulator, deal with carry, overflow and so on...
+	byte X;     // General purpose
+	byte Y;     // General purpose
+	nibble PC;  // Program Counter
+	byte SP;    // Stack Pointer
+	byte P;     // Status register, CPU flags
+
+	
 };
 
 void cpu_cycle() {
