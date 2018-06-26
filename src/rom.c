@@ -56,6 +56,8 @@ struct ROM *loadROM(char *filePath) {
 	bytesRead = fread(&rom.flags7, 1, 1, file);
 	bytesRead = fread(&rom.endOfHeader, 8, 1, file);
 
+	//int b = rom.flags6 ^ '\x4';
+
 	return &rom;
 }
 
