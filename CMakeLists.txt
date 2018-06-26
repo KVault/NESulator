@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.10)
 project(NESulator)
 set(CMAKE_C_STANDARD 11)
 add_subdirectory(src)

@@ -1,6 +1,8 @@
 #ifndef NESULATOR_CPU_H
 #define NESULATOR_CPU_H
 
+#include "nes.h"
+
 /**
  * Fetch the next X bytes (TBD) from where the PC is pointing to. It will map it and decide which opcode is
  * to be executed.
