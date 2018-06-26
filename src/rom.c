@@ -1,9 +1,9 @@
 #include "rom.h"
 
-struct ROM{
+struct ROM {
 
 	//Header
-	char* nesTitle; //Bytes 0-3 of the ROM
+	byte nesTitle[3]; //Bytes 0-3 of the ROM
 	byte numROMPages;  //Byte4. Number of 16384 byte program ROM pages. Byte4
 	byte numCHRPages; //Byte5. Number of 8192 byte character ROM pages (0 indicates CHR RAM).
 	/*	NNNN FTBM
@@ -31,8 +31,10 @@ struct ROM{
 	//CHR
 };
 
+struct ROM rom = {};
 
-void loadROM(char *filePath) {
+
+struct ROM *loadROM(char *filePath) {
 	//Open the file
 	//Figure out the total size of the file
 	//Allocate memory for a byte[] of that same size
@@ -44,8 +46,18 @@ void loadROM(char *filePath) {
 	fseek(file, 0L, SEEK_END);//Go to the end of the file
 	long fSize = ftell(file);//get the size
 	rewind(file);//Get back to the beginning.
-}
 
+	int bytesRead = 0;
+
+	bytesRead = fread(&rom.nesTitle, 3, 1, file);
+	bytesRead = fread(&rom.numROMPages, 1, 1, file);
+	bytesRead = fread(&rom.numCHRPages, 1, 1, file);
+	bytesRead = fread(&rom.flags6, 1, 1, file);
+	bytesRead = fread(&rom.flags7, 1, 1, file);
+	bytesRead = fread(&rom.endOfHeader, 8, 1, file);
+
+	return &rom;
+}
 
 
 void printHeaderDebugInfo(byte *fileData[]) {

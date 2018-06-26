@@ -9,8 +9,6 @@ struct cpu {
 	nibble PC;  // Program Counter
 	byte SP;    // Stack Pointer
 	byte P;     // Status register, CPU flags
-
-	
 };
 
 void cpu_cycle() {

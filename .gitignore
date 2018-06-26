@@ -55,3 +55,6 @@ dkms.conf
 /Debug
 *.vcxproj
 *.vcxproj.*
+
+# NES stuff
+*.nes
