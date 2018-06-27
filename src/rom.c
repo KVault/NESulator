@@ -52,6 +52,7 @@ struct ROM *loadROM(char *filePath) {
 	int bytesRead = 0;
 
 	bytesRead += fread(&rom.nesTitle, 3, 1, file);
+	bytesRead += fread(&rom.numROMPages, 1, 1, file); // Sorry, I don't know how to move one position without fread
 	bytesRead += fread(&rom.numROMPages, 1, 1, file);
 	bytesRead += fread(&rom.numCHRPages, 1, 1, file);
 	bytesRead += fread(&rom.flags6, 1, 1, file);
@@ -59,8 +60,8 @@ struct ROM *loadROM(char *filePath) {
 	bytesRead += fread(&rom.endOfHeader, 8, 1, file);
 
 	//Figure out the mapper number
-	int lowerBits = (rom.flags6 & 0b00001111) << 4; // extract lower 4 bits of the flag6
-	int upperBits = (rom.flags7 & 0b11110000) >> 4; // extract upper 4 bits of the flag7
+	int lowerBits = (rom.flags6 & 0b11110000) >> 4; // extract lower 4 bits of the flag6
+	int upperBits = (rom.flags7 & 0b00001111); // extract upper 4 bits of the flag7
 
 	rom.mapper = lowerBits + upperBits;
 
