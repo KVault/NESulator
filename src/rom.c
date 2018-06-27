@@ -1,4 +1,4 @@
-#include <malloc.h>
+#include <stdlib.h>
 #include "rom.h"
 
 struct ROM {
@@ -59,14 +59,17 @@ struct ROM *loadROM(char *filePath) {
 	bytesRead += fread(&rom.endOfHeader, 8, 1, file);
 
 	//Figure out the mapper number
-	int lowerBits =
+	int lowerBits = (rom.flags6 & 0b00001111) << 4; // extract lower 4 bits of the flag6
+	int upperBits = (rom.flags7 & 0b11110000) >> 4; // extract upper 4 bits of the flag7
+
+	rom.mapper = lowerBits + upperBits;
 
 	//Check the third bit to check if the ROM has a trainer
-	int hasTrainer = rom.flags6 & 4;//4 is 100 in binary so it masks 00000100
-	if(hasTrainer || 1){ //if the trainer is there, then it's 512 bytes long. Always.
-		rom.trainer = (byte *)malloc(512);
-		for(int i = 0; i < 512; i++){
-			fread(&rom.trainer[i], 1, 1,file);
+	int hasTrainer = rom.flags6 & 0b00000100;
+	if (hasTrainer) { //if the trainer is there, then it's 512 bytes long. Always.
+		rom.trainer = (byte *) malloc(512);
+		for (int i = 0; i < 512; i++) {
+			fread(&rom.trainer[i], 1, 1, file);
 		}
 	}
 
