@@ -2,10 +2,10 @@
 #define NESULATOR_TYPES_H
 
 typedef unsigned char byte;
-typedef unsigned short nibble;
+typedef unsigned short word;
 // TODO typedef unsigned ??? WORD. Should be 3 bytes.
 
 #define BYTE 1;
-#define NIBBLE 2;
+#define WORD 2;
 
 #endif //NESULATOR_TYPES_H
