@@ -18,5 +18,12 @@ byte address[16 * 1024] = {0}; // 16KBytes of memory address
 
 
 void wmem(unsigned short amountBytes, unsigned short initialPosition, byte **content) {
+	int i = 0;
+	for(int j = initialPosition; j < amountBytes; j++, i++){
+		address[i] = *content[j];
+	}
+}
+
+void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny[]){
 
 }

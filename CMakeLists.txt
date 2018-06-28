@@ -5,4 +5,4 @@ add_subdirectory(src)
 add_subdirectory(test)
 enable_testing()
 
-add_test(Testulator test/TestingTests.c)
+add_test(Testulator test/TestMain.c)
