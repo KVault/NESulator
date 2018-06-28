@@ -10,7 +10,7 @@
  * @param initialPosition
  * @param content
  */
-void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *content[]);
+void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *content);
 
 /**
  * Read content from a specific memory address and write to destiny
@@ -19,6 +19,11 @@ void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *cont
  * @param destiny
  */
 void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny[]);
+
+/**
+ * Fills in the memory with zeroes. Just so we know what an empty memory looks like instead of garbage
+ */
+void zeroMemory();
 
 #endif //NESULATOR_MEMORY_H
 

@@ -7,8 +7,6 @@
 #include "apu.h"
 #include <stdio.h>
 
-
-
 void stopEmulation();
 
 int main();

@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "TestMemory.c"
+#include "TestMemory.h"
 
 int main(){
 	testWrite();
