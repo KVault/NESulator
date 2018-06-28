@@ -25,5 +25,9 @@ int main() {
 
 		//TODO At some point we would need to run the cpu and ppu independently. Different frequencies
 	}
+
+	//Cleans up our stuff
+	cleanupROM();
+
 	return 0;
 }

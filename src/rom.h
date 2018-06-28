@@ -9,4 +9,9 @@
  */
 struct ROM *loadROM(char *filePath);
 
+/**
+ * Cleans up the memory from the ROM. Basically it releases the mallocs
+ */
+void cleanupROM();
+
 #endif //NESULATOR_ROM_H

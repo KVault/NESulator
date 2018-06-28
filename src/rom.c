@@ -4,6 +4,7 @@
 struct ROM {
 	//Header
 	byte nesTitle[3]; //Bytes 0-3 of the ROM
+	byte fileFormat;// for iNES format it should always be 0xA1 (26)
 	byte numROMPages;  //Byte4. Number of 16384 byte program ROM pages. Byte4
 	byte numCHRPages; //Byte5. Number of 8192 byte character ROM pages (0 indicates CHR RAM).
 
@@ -27,6 +28,7 @@ struct ROM {
 	int mapper;
 
 	//TRAINER 0 or 512 bytes
+	int trainerSize;//We need to keep track of the size for when we free up the memory
 	byte *trainer;
 
 	//ROM
@@ -52,7 +54,7 @@ struct ROM *loadROM(char *filePath) {
 	int bytesRead = 0;
 
 	bytesRead += fread(&rom.nesTitle, 3, 1, file);
-	bytesRead += fread(&rom.numROMPages, 1, 1, file); // Sorry, I don't know how to move one position without fread
+	bytesRead += fread(&rom.fileFormat, 1, 1, file);
 	bytesRead += fread(&rom.numROMPages, 1, 1, file);
 	bytesRead += fread(&rom.numCHRPages, 1, 1, file);
 	bytesRead += fread(&rom.flags6, 1, 1, file);
@@ -68,11 +70,20 @@ struct ROM *loadROM(char *filePath) {
 	//Check the third bit to check if the ROM has a trainer
 	int hasTrainer = rom.flags6 & 0b00000100;
 	if (hasTrainer) { //if the trainer is there, then it's 512 bytes long. Always.
-		rom.trainer = (byte *) malloc(512);
-		for (int i = 0; i < 512; i++) {
+		rom.trainerSize = 512;
+		rom.trainer = (byte *) malloc(rom.trainerSize);
+		for (int i = 0; i < rom.trainerSize; i++) {
 			fread(&rom.trainer[i], 1, 1, file);
 		}
 	}
 
+	fflush(file);
+	fclose(file);
 	return &rom;
+}
+
+void cleanupROM(){
+	free(rom.trainer);
+	free(rom.romData);
+	free(rom.chrData);
 }
