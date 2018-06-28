@@ -14,15 +14,24 @@
  * $4020-$FFFF    $BFE0  Cartridge space: PRG ROM, PRG RAM, and mapper registers
  */
 
-byte address[16 * 1024] = {0}; // 16KBytes of memory address
 
 void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *content) {
 	int i = 0;
-	for(int j = initialPosition; j < amountBytes; j++, i++){
-		address[i] = content[j];
+	for(int j = initialPosition; i < amountBytes; j++, i++){
+		address[j] = content[i];
 	}
 }
 
-void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny[]){
+void rmem(unsigned short amountBytes, unsigned short initialPosition, byte **destiny){
+	int i = 0;
+	for(int j = initialPosition; i < amountBytes; i++, j++){
+		*destiny[i] = address[j];
+	}
 
+}
+
+void zeroMemory(){
+	for(int i = 0; i < MEM_SIZE; i++){
+		address[i] = 0;
+	}
 }
