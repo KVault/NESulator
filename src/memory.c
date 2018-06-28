@@ -14,22 +14,32 @@
  * $4020-$FFFF    $BFE0  Cartridge space: PRG ROM, PRG RAM, and mapper registers
  */
 
-
 void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *content) {
 	int i = 0;
 	for(int j = initialPosition; i < amountBytes; j++, i++){
 		address[j] = content[i];
 	}
+
+	//TODO mirroring
 }
 
+/**
+ * I don't fully understand why we need a double pointer to make this work. But we do.
+ * @param amountBytes
+ * @param initialPosition
+ * @param destiny
+ */
 void rmem(unsigned short amountBytes, unsigned short initialPosition, byte **destiny){
 	int i = 0;
 	for(int j = initialPosition; i < amountBytes; i++, j++){
 		*destiny[i] = address[j];
 	}
-
+	//TODO mirroring
 }
 
+/**
+ * Zeroes the memory, pum, bam, gone, stiff, cold.
+ */
 void zeroMemory(){
 	for(int i = 0; i < MEM_SIZE; i++){
 		address[i] = 0;

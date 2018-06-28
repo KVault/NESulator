@@ -37,15 +37,36 @@ void testWrite() {
 void testRead() {
 	zeroMemory();
 
-	//Test one byte write
-	byte *readData = malloc(1);
-	rmem(BYTE, 0, &readData);
-	assert(readData[0] == 0);
+	//Test one byte read
+	//Test the empty values
+	byte *readSingleByte = malloc(1);
+	rmem(BYTE, 0, &readSingleByte);
+	assert(readSingleByte[0] == 0);
+	//Fill in the test data
 	byte data = 'd';
 	wmem(BYTE, 0, &data);
-	rmem(BYTE, 0, &readData);
-	assert(readData[0] == 'd');
-	free(readData);
+	//Make sure the test data is in there
+	rmem(BYTE, 0, &readSingleByte);
+	assert(readSingleByte[0] == 'd');
+	free(readSingleByte);
+
+	//Test three bytes read
+	//Test the empty values
+	zeroMemory();
+	byte *readMultipleBytes = malloc(3);
+	rmem(3, 512, &readMultipleBytes);
+	assert(readMultipleBytes[0] == 0);
+	assert(readMultipleBytes[1] == 0);
+	assert(readMultipleBytes[2] == 0);
+	//Fill in the test data
+	byte *nesData = "NES";
+	wmem(3, 512, &nesData);
+	//Make sure the test data is in there
+	rmem(3, 512, &readMultipleBytes);
+	assert(readMultipleBytes[0] == 'N');
+	assert(readMultipleBytes[1] == 'E');
+	assert(readMultipleBytes[2] == 'S');
+	free(readMultipleBytes);
 
 	printf("Read memory test passed!\n");
 }
