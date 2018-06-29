@@ -26,7 +26,7 @@ void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *cont
  * @param initialPosition
  * @param destiny
  */
-void rmem(unsigned short amountBytes, unsigned short initialPosition, byte **destiny);
+void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny);
 
 
 #endif //NESULATOR_MEMORY_H

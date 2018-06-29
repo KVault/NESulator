@@ -29,10 +29,10 @@ void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *cont
  * @param initialPosition
  * @param destiny
  */
-void rmem(unsigned short amountBytes, unsigned short initialPosition, byte **destiny){
+void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny){
 	int i = 0;
-	for(int j = initialPosition; i < amountBytes; i++, j++){
-		*destiny[i] = address[j];
+	for(int j = initialPosition; i < amountBytes; destiny++, i++, j++){
+		*destiny = address[j];
 	}
 	//TODO mirroring
 }
