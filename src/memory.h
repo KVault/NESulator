@@ -2,7 +2,8 @@
 #define NESULATOR_MEMORY_H
 
 #include "nes.h"
-#define MEM_SIZE 16384
+
+#define MEM_SIZE 65535
 
 byte memoryBank[MEM_SIZE];
 
