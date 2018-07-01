@@ -14,9 +14,34 @@
  * $4020-$FFFF    $BFE0  Cartridge space: PRG ROM, PRG RAM, and mapper registers
  */
 
-byte address[16 * 1024] = {0}; // 16KBytes of memory address
+void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *content) {
+	int i = 0;
+	for(int j = initialPosition; i < amountBytes; j++, i++){
+		memoryBank[j] = content[i];
+	}
 
+	//TODO mirroring
+}
 
-void wmem(unsigned short amountBytes, unsigned short initialPosition, byte **content) {
+/**
+ *
+ * @param amountBytes
+ * @param initialPosition
+ * @param destiny
+ */
+void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny){
+	int i = 0;
+	for(int j = initialPosition; i < amountBytes;i++, j++){
+		destiny[i] = memoryBank[j];
+	}
+	//TODO mirroring
+}
 
+/**
+ * Zeroes the memory, pum, bam, gone, stiff, cold, dead.
+ */
+void zeroMemory(){
+	for(int i = 0; i < MEM_SIZE; i++){
+		memoryBank[i] = 0;
+	}
 }
