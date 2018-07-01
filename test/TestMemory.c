@@ -9,23 +9,23 @@ void testWrite() {
 	zeroMemory();
 
 	//Test one byte write
-	assert(address[0] == 0);
+	assert(memoryBank[0] == 0);
 	byte data = 'd';
 	wmem(BYTE, 0, &data);
-	assert(address[0] == 'd');
+	assert(memoryBank[0] == 'd');
 
 	zeroMemory();
 
 	//Test two byte write on random positions
-	assert(address[512] == 0);
-	assert(address[513] == 0);
-	assert(address[514] == 0);
+	assert(memoryBank[512] == 0);
+	assert(memoryBank[513] == 0);
+	assert(memoryBank[514] == 0);
 	byte* nesText= "NES";
 	wmem(3, 512, nesText);
 
-	assert(address[512] == 'N');
-	assert(address[513] == 'E');
-	assert(address[514] == 'S');
+	assert(memoryBank[512] == 'N');
+	assert(memoryBank[513] == 'E');
+	assert(memoryBank[514] == 'S');
 
 	printf("Write memory test passed!\n");
 }

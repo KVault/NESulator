@@ -2,6 +2,7 @@
 #define NESULATOR_CPU_H
 
 #include "nes.h"
+typedef int (*gen_opcode_func)(void);
 
 /**
  * Fetch the next X bytes (TBD) from where the PC is pointing to. It will map it and decide which opcode is
@@ -20,5 +21,8 @@ void exeOpcode();
  * In  the future it would also have to call some routine to match the original cpu speed
  */
 void cpu_cycle();
+
+
+void brk();
 
 #endif //NESULATOR_CPU_H

@@ -4,7 +4,7 @@
 #include "nes.h"
 #define MEM_SIZE 16384
 
-byte address[MEM_SIZE];
+byte memoryBank[MEM_SIZE];
 
 /**
  * Fills in the memory with zeroes. Just so we know what an empty memory looks like instead of garbage

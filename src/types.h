@@ -3,7 +3,7 @@
 
 typedef unsigned char byte;
 typedef unsigned short word;
-// TODO typedef unsigned ??? WORD. Should be 3 bytes.
+// TODO typedef unsigned ??? 3 bytes or more?
 
 #define BYTE 1
 #define WORD 2

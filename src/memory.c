@@ -17,31 +17,31 @@
 void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *content) {
 	int i = 0;
 	for(int j = initialPosition; i < amountBytes; j++, i++){
-		address[j] = content[i];
+		memoryBank[j] = content[i];
 	}
 
 	//TODO mirroring
 }
 
 /**
- * I don't fully understand why we need a double pointer to make this work. But we do.
+ *
  * @param amountBytes
  * @param initialPosition
  * @param destiny
  */
 void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny){
 	int i = 0;
-	for(int j = initialPosition; i < amountBytes; destiny++, i++, j++){
-		*destiny = address[j];
+	for(int j = initialPosition; i < amountBytes;i++, j++){
+		destiny[i] = memoryBank[j];
 	}
 	//TODO mirroring
 }
 
 /**
- * Zeroes the memory, pum, bam, gone, stiff, cold.
+ * Zeroes the memory, pum, bam, gone, stiff, cold, dead.
  */
 void zeroMemory(){
 	for(int i = 0; i < MEM_SIZE; i++){
-		address[i] = 0;
+		memoryBank[i] = 0;
 	}
 }
