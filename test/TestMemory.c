@@ -27,6 +27,15 @@ void testWrite() {
 	assert(memoryBank[513] == 'E');
 	assert(memoryBank[514] == 'S');
 
+	//Test the memory write repeat
+	zeroMemory();
+	assert(memoryBank[512] == 0);
+	assert(memoryBank[513] == 0);
+	wmem_const(WORD, 512, 'S');
+	assert(memoryBank[512] == 'S');
+	assert(memoryBank[513] == 'S');
+
+
 	printf("Write memory test passed!\n");
 }
 

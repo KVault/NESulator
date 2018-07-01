@@ -5,6 +5,12 @@
 typedef int (*gen_opcode_func)(void);
 
 /**
+ * Initializes a CPU with the specified clock speed. This will set every register and pointer
+ * to the right value. Basically it simulates switching on the NES.
+ */
+void power_up(int clockSpeed);
+
+/**
  * Fetch the next X bytes (TBD) from where the PC is pointing to. It will map it and decide which opcode is
  * to be executed.
  */

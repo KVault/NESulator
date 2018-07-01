@@ -14,20 +14,18 @@ void zeroMemory();
 /**
  * Write from content in a specific memory address
  * It also deals with memory mirroring
- * @param amountBytes
- * @param initialPosition
- * @param content
  */
 void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *content);
 
 /**
+ * Writes the same `repeatedValue` starting at `initialPosition` during `amountBytes` bytes
+ */
+void wmem_const(unsigned short amountBytes, unsigned short initialPosition, byte const_val);
+
+/**
  * Read content from a specific memory address and write to destiny
- * @param amountBytes
- * @param initialPosition
- * @param destiny
  */
 void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny);
-
 
 #endif //NESULATOR_MEMORY_H
 

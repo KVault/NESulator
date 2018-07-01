@@ -23,12 +23,13 @@ void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *cont
 	//TODO mirroring
 }
 
-/**
- *
- * @param amountBytes
- * @param initialPosition
- * @param destiny
- */
+void wmem_const(unsigned short amountBytes, unsigned short initialPosition, byte const_val) {
+	int i = 0;
+	for(int j = initialPosition; i < amountBytes; j++, i++){
+		memoryBank[j] = const_val;
+	}
+}
+
 void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny){
 	int i = 0;
 	for(int j = initialPosition; i < amountBytes;i++, j++){
