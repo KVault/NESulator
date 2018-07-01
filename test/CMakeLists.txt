@@ -1,1 +1,1 @@
-add_executable(TEStulator ../src/types.h ../src/memory.c TestMemory.c TestMain.c TestCPU.c TestCPU.h)
+add_executable(TEStulator ../src/Utils.h ../src/memory.c TestMemory.c TestCPU.c TestCPU.h TestMain.c)

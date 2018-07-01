@@ -8,4 +8,6 @@ typedef unsigned short word;
 #define BYTE 1
 #define WORD 2
 
+int bit_test(byte b, byte bitPos);
+
 #endif //NESULATOR_TYPES_H

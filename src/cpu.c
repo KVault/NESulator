@@ -1,15 +1,6 @@
 #include "cpu.h"
 #include "memory.h"
 
-byte A;     // Accumulator, deal with carry, overflow and so on...
-byte X;     // General purpose
-byte Y;     // General purpose
-word PC;    // Program Counter
-byte SP;    // Stack Pointer
-byte P;     // Status register, CPU flags
-int cyclesThisSec; //Counter of elapsed cycles (Hz) this current second.
-int speed;  //Speed of the CPU in Hz. Used to slow down the emulation to match the NES's clock speed
-
 /**
  * More info here http://wiki.nesdev.com/w/index.php/CPU_power_up_state
  *
