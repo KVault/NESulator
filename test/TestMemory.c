@@ -85,21 +85,21 @@ void testIndirectXAddr() {
     word addr = 0;
     // First test
     zeroMemory();
-    wmem_const(BYTE, 112, 11);
-    wmem_const(BYTE, 113, 69);
+    wmem_const(BYTE, 112, 0x30);
+    wmem_const(BYTE, 113, 0xAC);
 
     X = 100;
     addr = indirectx_addr(12);
-    assert(addr == 91);
+    assert(addr == 0xAC30);
 
     // Second test
     zeroMemory();
-    wmem_const(BYTE, 126, 42);
-    wmem_const(BYTE, 127, 13);
+    wmem_const(BYTE, 126, 0x74);
+    wmem_const(BYTE, 127, 0x20);
 
     X = 100;
     addr = indirectx_addr(26);
-    assert(addr == 218);
+    assert(addr == 0x2074);
 
     printf("testIndirectXAddr test passed!\n");
 }

@@ -45,14 +45,16 @@ void zeroMemory() {
     wmem_const(MEM_SIZE, 0, 0);
 }
 
+/**
+ * Basically the way it works, it gets the value of the parameter, adds the register X to it. That is an
+ * address from which we get one byte, shift it left by 8 bits, read the next position and add t hat to the
+ * shifted value. THAT is the indirectX address of it
+ */
 word indirectx_addr(byte b) {
     byte memContent[2] = {0};
-
     b += X;
+
     rmem(WORD, b, &memContent);
 
-    int upperBits = (memContent[1] & 0b00001111) << 4;
-    int lowerBits = (memContent[0] & 0b00001111);
-
-    return upperBits + lowerBits;
+    return (memContent[1] << 8)+ memContent[0];
 }
