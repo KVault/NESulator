@@ -7,6 +7,7 @@ int main() {
     testUtils();
     testWrite();
     testRead();
+    testIndirectXAddr();
     testOpcodes();
 }
 

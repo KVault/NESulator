@@ -77,3 +77,29 @@ void testRead() {
 
     printf("Read memory test passed!\n");
 }
+
+/**
+ * Tests how the indexed indirect mode works
+ */
+void testIndirectXAddr() {
+    word addr = 0;
+    // First test
+    zeroMemory();
+    wmem_const(BYTE, 112, 11);
+    wmem_const(BYTE, 113, 69);
+
+    X = 100;
+    addr = indirectx_addr(12);
+    assert(addr == 91);
+
+    // Second test
+    zeroMemory();
+    wmem_const(BYTE, 126, 42);
+    wmem_const(BYTE, 127, 13);
+
+    X = 100;
+    addr = indirectx_addr(26);
+    assert(addr == 218);
+
+    printf("testIndirectXAddr test passed!\n");
+}

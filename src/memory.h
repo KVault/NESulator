@@ -28,5 +28,11 @@ void wmem_const(unsigned short amountBytes, unsigned short initialPosition, byte
  */
 void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny);
 
+/**
+ * Indexed indirect addressing takes a single byte as an operand and adds the value of the X register to it to give the
+ * address of the least significant byte of the target address.
+ */
+word indirectx_addr(byte b);
+
 #endif //NESULATOR_MEMORY_H
 

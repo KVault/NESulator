@@ -44,3 +44,15 @@ void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *dest
 void zeroMemory() {
     wmem_const(MEM_SIZE, 0, 0);
 }
+
+word indirectx_addr(byte b) {
+    byte memContent[2] = {0};
+
+    b += X;
+    rmem(WORD, b, &memContent);
+
+    int upperBits = (memContent[1] & 0b00001111) << 4;
+    int lowerBits = (memContent[0] & 0b00001111);
+
+    return upperBits + lowerBits;
+}

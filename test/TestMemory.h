@@ -5,6 +5,9 @@
 #include <stdlib.h>
 
 void testWrite();
+
 void testRead();
+
+void testIndirectXAddr();
 
 #endif //NESULATOR_TESTMEMORY_H
