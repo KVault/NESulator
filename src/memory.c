@@ -51,14 +51,25 @@ void zeroMemory() {
  */
 word indirectx_addr(byte b) {
     byte memContent[2] = {0};
-    b += X;
+    b = zeropagex_addr(b);
 
     rmem(WORD, b, &memContent);
 
-    return (memContent[1] << 8)+ memContent[0];
+    return (memContent[1] << 8) + memContent[0];
 }
 
 word indirecty_addr(byte b) {
+    return 0;
+}
 
-	return 0;
+word zeropagex_addr(byte b) {
+    return (X + b) & 0x00FF;
+}
+
+word zeropagey_addr(byte b) {
+    return (Y + b) & 0x00FF;;
+}
+
+word zeropage_addr(word w) {
+    return w & 0x00FF;
 }

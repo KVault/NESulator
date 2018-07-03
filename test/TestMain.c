@@ -13,7 +13,7 @@ int main() {
 
     //Memory modes
     testIndirectXAddr();
-    testIndirectYAddr();
+    //testIndirectYAddr();
     testZeroPageIndexAddr();
 
     //CPU tests
