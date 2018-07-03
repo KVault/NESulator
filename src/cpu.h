@@ -54,6 +54,27 @@ void exeOpcode();
 void cpu_cycle();
 
 
+/**
+ * BRK causes a non-maskable interrupt and increments the program counter by one.
+ * Therefore an RTI will go to the address of the BRK +2 so that BRK may be used to replace a two-byte instruction
+ * for debugging and the subsequent RTI will be correct.
+ */
 void brk();
+
+/**
+ * An inclusive OR is performed, bit by bit, on the accumulator contents using the contents of a byte of memory.
+ * Flags Z and N affected
+ */
+void ora(byte b);
+
+/**
+ * Bitwise OR with accumulator
+ */
+void ora_ind_x();
+
+/**
+ * Bitwise OR with accumulator
+ */
+void ora_ind_y();
 
 #endif //NESULATOR_CPU_H

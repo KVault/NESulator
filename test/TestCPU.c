@@ -6,6 +6,7 @@
 void testOpcodes() {
     power_up(0);
     test_BRK();
+    test_ORA();
 }
 
 /**
@@ -17,11 +18,33 @@ void test_BRK() {
     int cachedCyclesThisSec = cyclesThisSec;
     bit_clear(&P, 4);
     assert(bit_test(P, 4) == 0);
-    wmem_const(BYTE, PC, 0x00);
+    wmem_const(BYTE, PC, 0x00); // brk opcode injected
     cpu_cycle();
     assert(cachedPC + 1 == PC);
     assert(bit_test(P, 4) == 1);
     assert(bit_test(P, 1) == 1);
     assert(cachedCyclesThisSec + 7 == cyclesThisSec);
     printf("test_BRK test passed!\n");
+}
+
+/**
+ * For this test to succeed, PC has to increase by two or three and only Z and N flags can be modified
+ */
+void test_ORA() {
+    // Testing ora_ind_x() through ora()
+    int cachedPC = PC;
+    int cachedCyclesThisSec = cyclesThisSec;
+    wmem_const(BYTE, PC, 0x01); // ora_ind_x opcode injected
+    wmem_const(BYTE, PC + 1, 0x42); // value injected at the next PC position
+    A = 0x80;
+    word addr = indirectx_addr(0x42);
+    wmem_const(BYTE, addr, 0x58);
+    cpu_cycle();
+    assert(cachedPC + 2 == PC);
+    assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+    assert(bit_test(P, 7) == 1);
+    assert(A == 0xD8);
+    printf("test_ORA_ind_x test passed!\n");
+    // TODO Test ora_ind_y() through ora()
+
 }

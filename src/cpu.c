@@ -31,11 +31,6 @@ void power_up(int clockSpeed) {
     //TODO LFSR stuff
 }
 
-/**
- * BRK causes a non-maskable interrupt and increments the program counter by one.
- * Therefore an RTI will go to the address of the BRK +2 so that BRK may be used to replace a two-byte instruction
- * for debugging and the subsequent RTI will be correct.
- */
 void brk() {
     int cycles = 7;
     PC++;
@@ -46,10 +41,35 @@ void brk() {
     byte *param;
     byte *data;
 
-    rmem(BYTE, PC+1, &param);
+    rmem(BYTE, PC + 1, &param);
     word addr = indirectx_addr(param);
     rmem(BYTE, addr, &data);
 }
+
+void ora(byte b) {
+    A = A | b;
+    if (A == 0x00) bit_set(&P, 1);
+    if (bit_test(A, 7)) bit_set(&P, 7);
+}
+
+void ora_ind_x() {
+    int cycles = 6;
+    cyclesThisSec += cycles;
+    byte *param;
+    byte *data;
+
+    rmem(BYTE, PC + 1, &param);
+    word addr = indirectx_addr(param);
+    rmem(BYTE, addr, &data);
+
+    ora(data);
+    PC += 2;
+}
+
+void ora_ind_y() {
+    int cycles = 5; // TODO +1 if page crossed
+}
+
 
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
@@ -62,9 +82,9 @@ void brk() {
  * https://stackoverflow.com/a/7670827/6265003
  */
 gen_opcode_func *opcodeFunctions[256] = {
-        //Opcode      Syntax        Description                     Len     Tim
-        &brk,   //$00         BRK           BReaK                           1       7
-        0,      //$01         ORA ($44, X)  bitwise OR with Accumulator     2       6
+        //                Opcode    Syntax        Description                     Len     Tim
+        &brk,           //$00       BRK           BReaK                           1       7
+        &ora_ind_x,     //$01       ORA ($44, X)  bitwise OR with Accumulator     2       6
         0,
         0,
         0,
