@@ -35,7 +35,6 @@ void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *dest
     for (int j = initialPosition; i < amountBytes; i++, j++) {
         destiny[i] = memoryBank[j];
     }
-    //TODO mirroring
 }
 
 /**
@@ -57,4 +56,9 @@ word indirectx_addr(byte b) {
     rmem(WORD, b, &memContent);
 
     return (memContent[1] << 8)+ memContent[0];
+}
+
+word indirecty_addr(byte b) {
+
+	return 0;
 }

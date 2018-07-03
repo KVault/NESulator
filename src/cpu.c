@@ -42,6 +42,13 @@ void brk() {
     bit_set(&P, 1); // Z flag
     bit_set(&P, 4); // B flag
     cyclesThisSec += cycles;
+
+    byte *param;
+    byte *data;
+
+    rmem(BYTE, PC+1, &param);
+    word addr = indirectx_addr(param);
+    rmem(BYTE, addr, &data);
 }
 
 /**

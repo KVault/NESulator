@@ -34,5 +34,13 @@ void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *dest
  */
 word indirectx_addr(byte b);
 
+/**
+ * This mode is only used with the Y register. It differs in the order that
+ * Y is applied to the indirectly fetched address.
+ *  To calculate the target address, the CPU will first fetch the address stored at zero page location $XX.
+ *  That address will be added to register Y to get the final target address
+ */
+word indirecty_addr(byte b);
+
 #endif //NESULATOR_MEMORY_H
 

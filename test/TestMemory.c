@@ -101,5 +101,18 @@ void testIndirectXAddr() {
     addr = indirectx_addr(26);
     assert(addr == 0x2074);
 
-    printf("testIndirectXAddr test passed!\n");
+    printf("Test IndirectXAddr passed!\n");
+}
+
+void testIndirectYAddr() {
+	//First test
+	zeroMemory();
+	wmem_const(BYTE, 86, 0x28);
+    wmem_const(BYTE, 87, 0x40);
+    Y = 10;
+    word addr = indirecty_addr(0x86);
+
+    assert(addr == 0x4038);
+
+	printf("Test IndirectYAddr passed!\n");
 }

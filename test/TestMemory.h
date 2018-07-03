@@ -10,4 +10,6 @@ void testRead();
 
 void testIndirectXAddr();
 
+void testIndirectYAddr();
+
 #endif //NESULATOR_TESTMEMORY_H
