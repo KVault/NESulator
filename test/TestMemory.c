@@ -92,7 +92,7 @@ void testIndirectXAddr() {
     addr = indirectx_addr(12);
     assert(addr == 0xAC30);
 
-    // Second test
+    // Second test. Example got from here http://www.emulator101.com/6502-addressing-modes.html
     zeroMemory();
     wmem_const(BYTE, 126, 0x74);
     wmem_const(BYTE, 127, 0x20);
@@ -105,7 +105,7 @@ void testIndirectXAddr() {
 }
 
 void testIndirectYAddr() {
-	//First test
+	//First test. Example got from here http://www.emulator101.com/6502-addressing-modes.html
 	zeroMemory();
 	wmem_const(BYTE, 86, 0x28);
     wmem_const(BYTE, 87, 0x40);
@@ -115,4 +115,10 @@ void testIndirectYAddr() {
     assert(addr == 0x4038);
 
 	printf("Test IndirectYAddr passed!\n");
+}
+
+void testZeroPageIndexAddr(){
+    //First test. http://www.emulator101.com/6502-addressing-modes.html
+    zeroMemory();
+
 }

@@ -4,10 +4,19 @@
 #include "TestCPU.h"
 
 int main() {
+	//Good old utils :3
     testUtils();
+
+    //Memory tests
     testWrite();
     testRead();
+
+    //Memory modes
     testIndirectXAddr();
+    testIndirectYAddr();
+    testZeroPageIndexAddr();
+
+    //CPU tests
     testOpcodes();
 }
 

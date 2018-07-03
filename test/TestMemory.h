@@ -12,4 +12,6 @@ void testIndirectXAddr();
 
 void testIndirectYAddr();
 
+void testZeroPageIndexAddr();
+
 #endif //NESULATOR_TESTMEMORY_H
