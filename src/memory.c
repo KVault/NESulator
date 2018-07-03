@@ -59,7 +59,12 @@ word indirectx_addr(byte b) {
 }
 
 word indirecty_addr(byte b) {
-    return 0;
+    byte memContent[2] = {0};
+
+    rmem(WORD, b, &memContent);
+    word addr = (memContent[1] << 8) + memContent[0];
+
+    return addr + Y;
 }
 
 word zeropagex_addr(byte b) {

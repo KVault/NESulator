@@ -4,7 +4,7 @@
 #include "TestCPU.h"
 
 int main() {
-	//Good old utils :3
+    //Good old utils :3
     testUtils();
 
     //Memory tests
@@ -13,7 +13,7 @@ int main() {
 
     //Memory modes
     testIndirectXAddr();
-    //testIndirectYAddr();
+    testIndirectYAddr();
     testZeroPageIndexAddr();
 
     //CPU tests

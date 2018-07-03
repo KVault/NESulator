@@ -107,9 +107,9 @@ void testIndirectXAddr() {
 void testIndirectYAddr() {
     //First test. Example got from here http://www.emulator101.com/6502-addressing-modes.html
     zeroMemory();
-    wmem_const(BYTE, 86, 0x28);
-    wmem_const(BYTE, 87, 0x40);
-    Y = 10;
+    wmem_const(BYTE, 0x86, 0x28);
+    wmem_const(BYTE, 0x87, 0x40);
+    Y = 0x10;
     word addr = indirecty_addr(0x86);
 
     assert(addr == 0x4038);
