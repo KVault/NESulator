@@ -20,10 +20,11 @@ int main() {
     testIndirectXAddr();
     testIndirectYAddr();
     testZeroPageAddr();
-	testAbsoluteAddr();
+    testAbsoluteAddr();
 
     //CPU tests
     testOpcodes();
+    printf("\n*** All test passed! ***\n");
 }
 
 void testUtils() {

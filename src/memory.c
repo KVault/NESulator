@@ -51,7 +51,7 @@ void zeroMemory() {
  */
 word indirectx_addr(byte b) {
     byte memContent[2] = {0};
-    b = zeropagex_addr(b);
+    b = (byte) zeropagex_addr(b);
 
     rmem(WORD, b, memContent);
 
@@ -84,21 +84,21 @@ word zeropage_addr(word w) {
  * seems rather random and probably confusing in the future
  */
 word absolute_addr(byte *b) {
-    return to_mem_addr(&b);
+    return to_mem_addr(b);
 }
 
 word absolutex_addr(byte *b) {
-    word addr = to_mem_addr(&b);
+    word addr = to_mem_addr(b);
     addr += X;
     return addr;
 }
 
 word absolutey_addr(byte *b) {
-    word addr = to_mem_addr(&b);
+    word addr = to_mem_addr(b);
     addr += Y;
     return addr;
 }
 
 word to_mem_addr(byte *content) {
-	return (content[1] << 8) + content[0];
+    return (content[1] << 8) + content[0];
 }

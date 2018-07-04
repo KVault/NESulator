@@ -143,22 +143,23 @@ void testZeroPageAddr() {
 void testAbsoluteAddr() {
     //First test. Absolute. I know, silly but necessary
     zeroMemory();
-    word addr = 0x6969;
-    addr = absolute_addr(addr);
+    word addr;
+    byte param = (byte) 0x6969;
+    addr = absolute_addr(&param);
     assert(addr == 0x6969);
 
     //Second test. Absolute X
     zeroMemory();
-    addr = 0x6959;
+    param = (byte) 0x6959;
     X = 0x10;
-    addr = absolutex_addr(addr);
+    addr = absolutex_addr(&param);
     assert(addr == 0x6969);
 
     //Third test. Absolute Y
     zeroMemory();
-    addr = 0x6949;
+    param = (byte) 0x6949;
     Y = 0x20;
-    addr = absolutey_addr(addr);
+    addr = absolutey_addr(&param);
     assert(addr == 0x6969);
 
     printf("Test AbsoluteAddr passed! \n");
