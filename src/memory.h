@@ -66,19 +66,19 @@ word zeropage_addr(word w);
 /**
  * Instructions using absolute addressing contain a full 16 bit address to identify the target location.
  */
-word absolute_addr(word w);
+word absolute_addr(byte *b);
 
 /**
  * The address to be accessed by an instruction using X register indexed absolute addressing
  * is computed by taking the 16 bit address from the instruction and added the contents of the X register.
  */
-word absolutex_addr(word w);
+word absolutex_addr(byte *b);
 
 /**Y
  * The address to be accessed by an instruction using Y register indexed absolute addressing
  * is computed by taking the 16 bit address from the instruction and added the contents of the Y register.
  */
-word absolutey_addr(word w);
+word absolutey_addr(byte *b);
 
 
 #endif //NESULATOR_MEMORY_H

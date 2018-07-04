@@ -63,6 +63,10 @@ void cpu_cycle();
  */
 void brk();
 
+//////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////ORA REGION////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * An inclusive OR is performed, bit by bit, on the accumulator contents using the contents of a byte of memory.
  * Flags Z and N affected
@@ -108,6 +112,40 @@ void ora_absolute_y();
  * Bitwise OR with accumulator
  */
 void ora_absolute_x();
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////ASL (Arithmetic Shift Left) REGION/////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Arithmetic Shift Left on the accumulator
+ */
+void asl(byte *b, int cycles, int pcIncrease);
+
+/**
+ * Arithmetic Shift Left on the accumulator
+ */
+void asl_accumulator();
+
+/**
+ * Arithmetic Shift Left on the accumulator
+ */
+void asl_zpage();
+
+/**
+ * Arithmetic Shift Left on the accumulator
+ */
+void asl_zpage_x();
+
+/**
+ * Arithmetic Shift Left on the accumulator
+ */
+void asl_absolute();
+
+/**
+ * Arithmetic Shift Left on the accumulator
+ */
+void asl_absolute_x();
 
 
 #endif //NESULATOR_CPU_H

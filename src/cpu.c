@@ -151,7 +151,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&ora_zpage,     //$05       ORA $44       bitwise OR with Accumulator     2       3
-		0,
+		&asl_zpage,     //$06       ASL $44       Arithmetic Shift Left           2       5
 		0,
 		0,
 		&ora_immediate, //$09       ORA #$44      bitwise OR with Accumulator     2       2

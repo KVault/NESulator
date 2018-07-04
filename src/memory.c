@@ -83,16 +83,20 @@ word zeropage_addr(word w) {
  * Yes, this one does basically nothing, but we can't simply not use a function to use this mode. It
  * seems rather random and probably confusing in the future
  */
-word absolute_addr(word w) {
-    return w;
+word absolute_addr(byte *b) {
+    return to_mem_addr(&b);
 }
 
-word absolutex_addr(word w) {
-    return 0;
+word absolutex_addr(byte *b) {
+    word addr = to_mem_addr(&b);
+    addr += X;
+    return addr;
 }
 
-word absolutey_addr(word w) {
-    return 0;
+word absolutey_addr(byte *b) {
+    word addr = to_mem_addr(&b);
+    addr += Y;
+    return addr;
 }
 
 word to_mem_addr(byte *content) {

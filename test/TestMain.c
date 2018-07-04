@@ -20,6 +20,7 @@ int main() {
     testIndirectXAddr();
     testIndirectYAddr();
     testZeroPageAddr();
+	testAbsoluteAddr();
 
     //CPU tests
     testOpcodes();

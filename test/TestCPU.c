@@ -44,7 +44,6 @@ void test_ORA() {
     assert(cachedCyclesThisSec + 6 == cyclesThisSec);
     assert(bit_test(P, 7) == 1);
     assert(A == 0xD8);
-    printf("Test ORAIndX passed!\n");
-    // TODO Test ora_ind_y() through ora()
 
+    printf("Test ORAIndX passed!\n");
 }
