@@ -117,7 +117,7 @@ void testIndirectYAddr() {
     printf("Test IndirectYAddr passed!\n");
 }
 
-void testZeroPageIndexAddr() {
+void testZeroPageAddr() {
     //First test. http://www.emulator101.com/6502-addressing-modes.html
     zeroMemory();
     word addr = 0;
@@ -138,4 +138,28 @@ void testZeroPageIndexAddr() {
     addr = zeropage_addr(0x6969);
     assert(0x0069 == addr);
     printf("Test ZeroPageAddr passed!\n");
+}
+
+void testAbsoluteAddr() {
+    //First test. Absolute. I know, silly but necessary
+    zeroMemory();
+    word addr = 0x6969;
+    addr = absolute_addr(addr);
+    assert(addr == 0x6969);
+
+    //Second test. Absolute X
+    zeroMemory();
+    addr = 0x6959;
+    X = 0x10;
+    addr = absolutex_addr(addr);
+    assert(addr == 0x6969);
+
+    //Third test. Absolute Y
+    zeroMemory();
+    addr = 0x6949;
+    Y = 0x20;
+    addr = absolutey_addr(addr);
+    assert(addr == 0x6969);
+
+    printf("Test AbsoluteAddr passed! \n");
 }

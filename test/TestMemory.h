@@ -12,6 +12,14 @@ void testIndirectXAddr();
 
 void testIndirectYAddr();
 
-void testZeroPageIndexAddr();
+/**
+ * Includes the tests for three modes. Zero Page X, Zero Page Y and Zero Page.
+ */
+void testZeroPageAddr();
+
+/**
+ * Includes the tests for three modes. Absolute X, Absolute Y and Zero Page.
+ */
+void testAbsoluteAddr();
 
 #endif //NESULATOR_TESTMEMORY_H

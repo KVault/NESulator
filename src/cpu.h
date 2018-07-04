@@ -77,4 +77,14 @@ void ora_ind_x();
  */
 void ora_ind_y();
 
+/**
+ * Bitwise OR with accumulator
+ */
+void ora_zpage();
+
+/**
+ * Bitwise OR with accumulator
+ */
+void ora_immediate();
+
 #endif //NESULATOR_CPU_H

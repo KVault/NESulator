@@ -68,6 +68,40 @@ void ora_ind_x() {
 
 void ora_ind_y() {
     int cycles = 5; // TODO +1 if page crossed
+    byte *param;
+    byte *data;
+
+    rmem(BYTE, PC+1, &param);
+    word addr = indirecty_addr(param);
+    rmem(BYTE, addr, &data);
+
+    ora(data);
+    PC += 2;
+    cyclesThisSec += cycles;
+}
+
+void ora_zpage() {
+    int cycles = 2;
+    byte *param;
+    byte *data;
+
+    rmem(BYTE, PC+1, &param);
+    word addr = zeropage_addr(param);
+    rmem(BYTE, addr, &data);
+
+    ora(data);
+    PC+=2;
+    cyclesThisSec += cycles;
+}
+
+void ora_immediate() {
+    int cycles = 2;
+    byte *data;
+    rmem(BYTE, PC+1, &data);
+
+    ora(data);
+    PC+=2;
+    cyclesThisSec += cycles;
 }
 
 
@@ -88,13 +122,13 @@ gen_opcode_func *opcodeFunctions[256] = {
         0,
         0,
         0,
+        &ora_zpage,     //$05       ORA $44       bitwise OR with Accumulator     2       2
         0,
         0,
         0,
+        &ora_immediate,
         0,
-        0,
-        0,
-        0,
+        &ora_ind_y,     //$11       ORA ($44), Y  bitwise OR with Accumulator     2       6
         0,
         0,
         0,

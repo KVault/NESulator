@@ -14,7 +14,7 @@ int main() {
     //Memory modes
     testIndirectXAddr();
     testIndirectYAddr();
-    testZeroPageIndexAddr();
+    testZeroPageAddr();
 
     //CPU tests
     testOpcodes();

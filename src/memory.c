@@ -78,3 +78,19 @@ word zeropagey_addr(byte b) {
 word zeropage_addr(word w) {
     return w & 0x00FF;
 }
+
+/**
+ * Yes, this one does basically nothing, but we can't simply not use a function to use this mode. It
+ * seems rather random and probably confusing in the future
+ */
+word absolute_addr(word w) {
+    return w;
+}
+
+word absolutex_addr(word w) {
+    return 0;
+}
+
+word absolutey_addr(word w) {
+    return 0;
+}

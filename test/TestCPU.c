@@ -36,8 +36,8 @@ void test_ORA() {
     int cachedCyclesThisSec = cyclesThisSec;
     wmem_const(BYTE, PC, 0x01); // ora_ind_x opcode injected
     wmem_const(BYTE, PC + 1, 0x42); // value injected at the next PC position
-    A = 0x80;
-    word addr = indirectx_addr(0x42);
+    A = 0x80; //Inject a value in the acumulator to do the "OR" with
+    word addr = indirectx_addr(0x42);//ora_x will use this addr to get the value. So put it there
     wmem_const(BYTE, addr, 0x58);
     cpu_cycle();
     assert(cachedPC + 2 == PC);
