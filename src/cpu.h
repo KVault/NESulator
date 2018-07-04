@@ -4,6 +4,8 @@
 #include "nes.h"
 #include "Utils.h"
 
+#define OPCODE_COUNT 256
+
 typedef int (*gen_opcode_func)(void);
 
 byte A;     // Accumulator, deal with carry, overflow and so on...
@@ -65,7 +67,7 @@ void brk();
  * An inclusive OR is performed, bit by bit, on the accumulator contents using the contents of a byte of memory.
  * Flags Z and N affected
  */
-void ora(byte b);
+void ora(byte b, int cycles, int pcIncrease);
 
 /**
  * Bitwise OR with accumulator
@@ -86,5 +88,26 @@ void ora_zpage();
  * Bitwise OR with accumulator
  */
 void ora_immediate();
+
+/**
+ * Bitwise OR with accumulator
+ */
+void ora_absolute();
+
+/**
+ * Bitwise OR with accumulator
+ */
+void ora_zpage_x();
+
+/**
+ * Bitwise OR with accumulator
+ */
+void ora_absolute_y();
+
+/**
+ * Bitwise OR with accumulator
+ */
+void ora_absolute_x();
+
 
 #endif //NESULATOR_CPU_H

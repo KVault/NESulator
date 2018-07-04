@@ -10,4 +10,5 @@ void testOpcodes();
 
 void test_BRK();
 
+void test_ORA();
 #endif //NESULATOR_TESTCPU_H

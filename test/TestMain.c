@@ -3,6 +3,11 @@
 #include "TestMemory.h"
 #include "TestCPU.h"
 
+/**
+ * Tests the utils, we'll put this here for now
+ */
+void testUtils();
+
 int main() {
     //Good old utils :3
     testUtils();
@@ -19,11 +24,6 @@ int main() {
     //CPU tests
     testOpcodes();
 }
-
-/**
- * Tests the utils, we'll put this here for now
- */
-void testUtils();
 
 void testUtils() {
     byte testVal = 0b00000000;

@@ -55,14 +55,14 @@ word indirectx_addr(byte b) {
 
     rmem(WORD, b, &memContent);
 
-    return (memContent[1] << 8) + memContent[0];
+    return to_mem_addr(memContent);
 }
 
 word indirecty_addr(byte b) {
     byte memContent[2] = {0};
 
     rmem(WORD, b, &memContent);
-    word addr = (memContent[1] << 8) + memContent[0];
+    word addr = to_mem_addr(memContent);
 
     return addr + Y;
 }
@@ -93,4 +93,8 @@ word absolutex_addr(word w) {
 
 word absolutey_addr(word w) {
     return 0;
+}
+
+word to_mem_addr(byte *content) {
+	return (content[1] << 8) + content[0];
 }

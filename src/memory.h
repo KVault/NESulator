@@ -29,6 +29,12 @@ void wmem_const(unsigned short amountBytes, unsigned short initialPosition, byte
 void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny);
 
 /**
+ * returns the byte data as a memory address value. Basically it joins the bytes as it should to give back
+ * a valid word
+ */
+word to_mem_addr(byte *content);
+
+/**
  * Indexed indirect addressing takes a single byte as an operand and adds the value of the X register to it to give the
  * address of the least significant byte of the target address.
  */
