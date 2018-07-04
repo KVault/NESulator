@@ -24,7 +24,7 @@ void test_BRK() {
     assert(bit_test(P, 4) == 1);
     assert(bit_test(P, 1) == 1);
     assert(cachedCyclesThisSec + 7 == cyclesThisSec);
-    printf("test_BRK test passed!\n");
+    printf("Test BRK passed!\n");
 }
 
 /**
@@ -44,7 +44,7 @@ void test_ORA() {
     assert(cachedCyclesThisSec + 6 == cyclesThisSec);
     assert(bit_test(P, 7) == 1);
     assert(A == 0xD8);
-    printf("test_ORA_ind_x test passed!\n");
+    printf("Test ORAIndX passed!\n");
     // TODO Test ora_ind_y() through ora()
 
 }

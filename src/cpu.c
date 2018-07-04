@@ -26,7 +26,8 @@ void power_up(int clockSpeed) {
 	rmem(BYTE, 0xFFFC, &tmpFFFC);
 	rmem(BYTE, 0xFFFD, &tmpFFFD);
 
-	PC = tmpFFFD * 256 + tmpFFFC;
+	PC = (word) (tmpFFFD * 256 + tmpFFFC);
+	speed = clockSpeed;
 	//TODO IRQ stuff
 	//TODO LFSR stuff
 }
@@ -37,18 +38,11 @@ void brk() {
 	bit_set(&P, 1); // Z flag
 	bit_set(&P, 4); // B flag
 	cyclesThisSec += cycles;
-
-	byte *param;
-	byte *data;
-
-	rmem(BYTE, PC + 1, &param);
-	word addr = indirectx_addr(param);
-	rmem(BYTE, addr, &data);
 }
 
-void ora(byte b, int cycles, int pcIncrease) {
-	//Do the actual or operation, saving the result in the acumulator
-	A = A | b;
+void ora(byte *b, int cycles, int pcIncrease) {
+	//Do the actual or operation, saving the result in the accumulator
+	A = A | *b;
 	//Set the flags
 	if (A == 0x00) bit_set(&P, 1);
 	if (bit_test(A, 7)) bit_set(&P, 7);
@@ -59,84 +53,84 @@ void ora(byte b, int cycles, int pcIncrease) {
 }
 
 void ora_ind_x() {
-	byte *param, *data;
+	byte param, data;
 
 	rmem(BYTE, PC + 1, &param);
 	word addr = indirectx_addr(param);
 	rmem(BYTE, addr, &data);
 
-	ora(data, 6, 2);
+	ora(&data, 6, 2);
 }
 
 void ora_ind_y() {
-	byte *param, *data;
+	byte param, data;
 
 	rmem(BYTE, PC + 1, &param);
 	word addr = indirecty_addr(param);
 	rmem(BYTE, addr, &data);
 
 	// TODO +1 if page crossed
-	ora(data, 5, 2);
+	ora(&data, 5, 2);
 }
 
 void ora_zpage() {
-	byte *param, *data;
+	byte param, data;
 
 	rmem(BYTE, PC + 1, &param);
 	word addr = zeropage_addr(param);
 	rmem(BYTE, addr, &data);
 
-	ora(data, 2, 2);
+	ora(&data, 2, 2);
 }
 
 void ora_zpage_x() {
-	byte *param, *data;
+	byte param, data;
 
 	rmem(BYTE, PC + 1, &param);
 	word addr = zeropagex_addr(param);
 	rmem(BYTE, addr, &data);
 
-	ora(data, 4, 2);
+	ora(&data, 4, 2);
 }
 
 void ora_immediate() {
-	byte *data;
+	byte data;
 	rmem(BYTE, PC + 1, &data);
 
-	ora(data, 2, 2);
+	ora(&data, 2, 2);
 }
 
 void ora_absolute() {
 	byte param[2];
-	byte *data;
+	byte data;
 
-	rmem(WORD, PC + 1, &param);
+	rmem(WORD, PC + 1, param);
 	word addr = absolute_addr(to_mem_addr(param));
 	rmem(BYTE, addr, &data);
 
-	ora(data, 4, 3);
+	ora(&data, 4, 3);
 }
 
 void ora_absolute_x() {
 	byte param[2];
-	byte *data;
+	byte data;
 
-	rmem(WORD, PC + 1, &param);
+	rmem(WORD, PC + 1, param);
 	word addr = absolutex_addr(to_mem_addr(param));
 	rmem(BYTE, addr, &data);
 
-	ora(data, 4, 3);
+	ora(&data, 4, 3);
 }
 
 void ora_absolute_y() {
 	byte param[2];
-	byte *data;
+	byte data;
 
-	rmem(WORD, PC + 1, &param);
+	rmem(WORD, PC + 1, param);
 	word addr = absolutey_addr(to_mem_addr(param));
 	rmem(BYTE, addr, &data);
 
-	ora(data, 4, 3);
+	ora(&data, 4, 3);
 }
 
 /**
@@ -149,7 +143,7 @@ void ora_absolute_y() {
  * Casting one function pointer type to another and then back again is guaranteed to preserve the value.
  * https://stackoverflow.com/a/7670827/6265003
  */
-gen_opcode_func* opcodeFunctions[OPCODE_COUNT] = {
+gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		//                Opcode    Syntax        Description                     Len     Tim
 		&brk,           //$00       BRK           BReaK                           1       7
 		&ora_ind_x,     //$01       ORA ($44, X)  bitwise OR with Accumulator     2       6
@@ -328,5 +322,5 @@ void decOpcode() {
 }
 
 void exeOpcode() {
-	((gen_opcode_func) opcodeFunctions[currentOpcode])();
+	((gen_opcode_func)opcodeFunctions[currentOpcode])();
 }

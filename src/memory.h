@@ -16,17 +16,17 @@ void zeroMemory();
  * Write from content in a specific memory address
  * It also deals with memory mirroring
  */
-void wmem(unsigned short amountBytes, unsigned short initialPosition, byte *content);
+void wmem(unsigned short amountBytes, unsigned int initialPosition, byte *content);
 
 /**
  * Writes the same `repeatedValue` starting at `initialPosition` during `amountBytes` bytes
  */
-void wmem_const(unsigned short amountBytes, unsigned short initialPosition, byte const_val);
+void wmem_const(unsigned short amountBytes, unsigned int initialPosition, byte const_val);
 
 /**
  * Read content from a specific memory address and write to destiny
  */
-void rmem(unsigned short amountBytes, unsigned short initialPosition, byte *destiny);
+void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destiny);
 
 /**
  * returns the byte data as a memory address value. Basically it joins the bytes as it should to give back
