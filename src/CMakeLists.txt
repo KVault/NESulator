@@ -1,1 +1,1 @@
-add_executable(NESulator nes.c nes.h rom.c rom.h cpu.c cpu.h ppu.c ppu.h apu.c apu.h memory.c memory.h types.h)
+add_executable(NESulator nes.c nes.h rom.c rom.h cpu.c cpu.h ppu.c ppu.h apu.c apu.h memory.c memory.h Utils.h Utils.c)
