@@ -17,13 +17,13 @@ void testOpcodes() {
 void test_BRK() {
 	int cachedPC = PC;
 	int cachedCyclesThisSec = cyclesThisSec;
-	bit_clear(&P, 4);
-	assert(bit_test(P, 4) == 0);
+	bit_clear(&P, flagB);
+	assert(bit_test(P, flagB) == 0);
 	wmem_const(BYTE, PC, 0x00); // brk opcode injected
 	cpu_cycle();
 	assert(cachedPC + 1 == PC);
-	assert(bit_test(P, 4) == 1);
-	assert(bit_test(P, 1) == 1);
+	assert(bit_test(P, flagB) == 1);
+	assert(bit_test(P, flagZ) == 1);
 	assert(cachedCyclesThisSec + 7 == cyclesThisSec);
 	printf("Test BRK passed!\n");
 }
@@ -43,7 +43,7 @@ void test_ORA() {
 	cpu_cycle();
 	assert(cachedPC + 2 == PC);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
-	assert(bit_test(P, 7) == 1);
+	assert(bit_test(P, flagN) == 1);
 	assert(A == 0xD8);
 
 	//testing ora_absolute_x
@@ -59,7 +59,7 @@ void test_ORA() {
 	cpu_cycle();
 	assert(cachedPC + 3 == PC);
 	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
-	assert(bit_test(P, 7) == 1);
+	assert(bit_test(P, flagN) == 1);
 	assert(A == 0xD8);
 
 	printf("Test ORA passed!\n");

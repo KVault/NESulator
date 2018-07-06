@@ -35,8 +35,8 @@ void power_up(int clockSpeed) {
 void brk() {
 	int cycles = 7;
 	PC++;
-	bit_set(&P, 1); // Z flag
-	bit_set(&P, 4); // B flag
+	bit_set(&P, flagZ);
+	bit_set(&P, flagB);
 	cyclesThisSec += cycles;
 }
 
