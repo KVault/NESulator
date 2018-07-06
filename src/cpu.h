@@ -121,7 +121,7 @@ void ora_absolute_x();
 /**
  * Arithmetic Shift Left on the accumulator
  */
-byte asl(byte *b, int cycles, int pcIncrease);
+void asl(byte *b, int cycles, int pcIncrease);
 
 /**
  * Arithmetic Shift Left on the accumulator
