@@ -45,5 +45,37 @@ void test_ORA() {
     assert(bit_test(P, 7) == 1);
     assert(A == 0xD8);
 
+    //testing ora_absolute_x
+    cachedPC = PC;
+    cachedCyclesThisSec = cyclesThisSec;
+    wmem_const(BYTE, PC, 0x19);
+    word param = 0x6959;
+	wmem(WORD, PC+1, (byte*)&param);
+	Y = 0x10;
+	addr = absolutey_addr((byte*)&param);
+	wmem_const(WORD, addr, 0x58);
+	A = 0x80;
+	cpu_cycle();
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
+	assert(bit_test(P, 7) == 1);
+	assert(A == 0xD8);
+
     printf("Test ORAIndX passed!\n");
+}
+
+void test_ASL(){
+	// Testing ora_ind_x() through ora()
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+	wmem_const(BYTE, PC, 0x01); // ora_ind_x opcode injected
+	wmem_const(BYTE, PC + 1, 0x42); // value injected at the next PC position
+	A = 0x80; //Inject a value in the accumulator to do the "OR" with
+	word addr = indirectx_addr(0x42);//ora_x will use this addr to get the value. So put it there
+	wmem_const(BYTE, addr, 0x58);
+	cpu_cycle();
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+	assert(bit_test(P, 7) == 1);
+	assert(A == 0xD8);
 }

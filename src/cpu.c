@@ -40,13 +40,21 @@ void brk() {
     cyclesThisSec += cycles;
 }
 
-/*********** ORA SECTION **************/
+//////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////ORA REGION////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This is the one actually doing the magic. The result of the operation will be saved in A and after doing that
+ * if the acumulator is zero, then we have to set the FlagZ to one. If the acumulator is negative then we set
+ * the flagN to one.
+ */
 void ora(byte *b, int cycles, int pcIncrease) {
     //Do the actual or operation, saving the result in the accumulator
     A = A | *b;
     //Set the flags
-    if (A == 0x00) bit_set(&P, 1);
-    if (bit_test(A, 7)) bit_set(&P, 7);
+    if (A == 0x00) bit_set(&P, flagZ);
+    if (bit_test(A, 7)) bit_set(&P, flagN);
 
     //Update cycles and pc
     cyclesThisSec += cycles;
@@ -135,15 +143,24 @@ void ora_absolute_y() {
     ora(&data, 4, 3);
 }
 
-/*********** ASL SECTION **************/
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////ASL (Arithmetic Shift Left) REGION/////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * The one really doing the hard work here. First, if the most significant bit is set, then it would overflow after
+ * the shifting, so we set the carry flag.
+ *
+ * if the number is negative AFTER the shifting the we set the negative flag.
+ */
 byte asl(byte *b, int cycles, int pcIncrease) {
-    if (bit_test(*b, 7)) {
-        bit_set(&P, 0);
+    if (bit_test(*b, flagN)) {
+        bit_set(&P, flagC);
     }
 
     byte shifted = *b << 1;
     if (bit_test(shifted, 7)) {
-        bit_set(&P, 7);
+        bit_set(&P, flagN);
     }
 
     PC += pcIncrease;
@@ -152,7 +169,39 @@ byte asl(byte *b, int cycles, int pcIncrease) {
 }
 
 void asl_zpage() {
+	byte param, data;
 
+	rmem(BYTE, PC + 1, &param);
+	word addr = zeropage_addr(param);
+	rmem(BYTE, addr, &data);
+
+	asl(&data, 5, 2);
+}
+
+void asl_accumulator(){
+    asl(&A, 2, 1);
+}
+
+void asl_zpage_x(){
+    byte param, data;
+
+    rmem(BYTE, PC + 1, &param);
+    word addr = zeropagex_addr(param);
+    rmem(BYTE, addr, &data);
+
+    asl(&data, 6, 2);
+}
+
+void asl_absolute(){
+    byte param[2];
+    byte data;
+
+    rmem(WORD, PC + 1, param);
+
+    word addr = absolute_addr(param);
+    rmem(BYTE, addr, &data);
+
+    asl(&data, 6, 3);
 }
 
 /**
@@ -177,11 +226,11 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
         0,
         0,
         &ora_immediate, //$09       ORA #$44      bitwise OR with Accumulator     2       2
-        0,
+        &asl_accumulator,//$0A      ASL A         Arithmetic Shift Left           1       2
         0,
         0,
         &ora_absolute,  //$0D       ORA $4400     bitwise OR with Accumulator     3       4
-        0,
+        &asl_absolute,  //$0E       ASL $4400     Arithmetic Shift Left           3       6
         0,
         0,
         &ora_ind_y,     //$11       ORA ($44), Y  bitwise OR with Accumulator     2       6
@@ -189,7 +238,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
         0,
         0,
         &ora_zpage_x,   //$15       ORA ($44), X  bitwise OR with Accumulator     2       4
-        0,
+        &asl_zpage_x,   //$16       ASL $44, X    Arithmetic Shift Left           2       6
         0,
         0,
         &ora_absolute_y,//$19       ORA $4400, Y  bitwise OR with Accumulator     3       4+
