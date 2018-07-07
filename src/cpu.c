@@ -224,6 +224,15 @@ void asl_absolute_x() {
 	wmem(BYTE, addr, &data);
 }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////JSR (Jump to SubRoutine) REGION////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void jsr_absolute() {
+
+}
+
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
  *
@@ -268,7 +277,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_absolute_x,//$1D       ORA $4400, X  bitwise OR with Accumulator     3       4+
 		&asl_absolute_x,//$1E       ASL $4400, X  Arithmetic Shift Left           3       7
 		0,
-		0,
+		&jsr_absolute,  //20        JSR $4400     Jump to SubRoutine              3       6
 		0,
 		0,
 		0,

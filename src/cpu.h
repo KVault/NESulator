@@ -7,13 +7,16 @@
 #define OPCODE_COUNT 256
 
 typedef void (*gen_opcode_func)();
-enum StateFlagEnum {flagC = 0, flagZ = 1, flagI = 2, flagD = 3, flagB = 4, flagV = 6, flagN = 7};
+
+enum StateFlagEnum {
+	flagC = 0, flagZ = 1, flagI = 2, flagD = 3, flagB = 4, flagV = 6, flagN = 7
+};
 
 byte A;     // Accumulator, deal with carry, overflow and so on...
 byte X;     // General purpose
 byte Y;     // General purpose
 word PC;    // Program Counter
-byte SP;    // Stack Pointer
+byte SP;    // Stack Pointer, from 0x100 to 0x1FF address
 
 /*
  * Flags of the status register:
@@ -147,6 +150,16 @@ void asl_absolute();
  * Arithmetic Shift Left on the accumulator
  */
 void asl_absolute_x();
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////JSR (Jump to SubRoutine) REGION////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Jump to SubRoutine
+ */
+void jsr_absolute();
 
 
 #endif //NESULATOR_CPU_H

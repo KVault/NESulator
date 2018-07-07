@@ -15,6 +15,7 @@ void testOpcodes() {
  * the B flag and the Z flag have both to be 1
  */
 void test_BRK() {
+	assert(0); // We did something wrong with the BRK opcode function, need to be fixed
 	int cachedPC = PC;
 	int cachedCyclesThisSec = cyclesThisSec;
 	bit_clear(&P, flagB);
@@ -120,3 +121,22 @@ void test_ASL() {
 
 	printf("Test ASL passed!\n");
 }
+
+void test_JSR() {
+	int cachedPC = PC;
+	int cachedSP = SP;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	byte param[2] = {0x69, 0x69};
+
+	wmem_const(BYTE, PC, 0x20);
+	wmem(WORD, PC + 1, param);
+	cpu_cycle();
+
+	assert(PC == 0x6969);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+
+	printf("Test JSR passed!\n");
+}
+

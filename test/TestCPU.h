@@ -14,4 +14,6 @@ void test_ORA();
 
 void test_ASL();
 
+void test_JSR();
+
 #endif //NESULATOR_TESTCPU_H

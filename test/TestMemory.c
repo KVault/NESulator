@@ -79,6 +79,27 @@ void testRead() {
 }
 
 /**
+ * Tests how the stack works
+ */
+void testStack() {
+	power_up(0);
+	zeroMemory();
+	byte pushParam[2] = {0x69, 0x42};
+	byte popParam[2] = {};
+	int cachedSP = SP;
+
+	push(WORD, pushParam);
+	assert(SP == 0xFB);
+	assert(memoryBank[0x01FD] == 0x69);
+	assert(memoryBank[0x01FC] == 0x42);
+	pop(WORD, popParam);
+	assert(to_mem_addr(popParam) == 0x6942);
+	assert(SP == 0xFD);
+
+	printf("Stack memory test passed!\n");
+}
+
+/**
  * Tests how the indexed indirect mode works
  */
 void testIndirectXAddr() {

@@ -15,33 +15,47 @@
  */
 
 void wmem(unsigned short amountBytes, unsigned int initialPosition, byte *content) {
-    int i = 0;
-    for (int j = initialPosition; i < amountBytes; j++, i++) {
-        memoryBank[j] = content[i];
-    }
+	int i = 0;
+	for (int j = initialPosition; i < amountBytes; j++, i++) {
+		memoryBank[j] = content[i];
+	}
 
-    //TODO mirroring
+	//TODO mirroring
 }
 
 void wmem_const(unsigned short amountBytes, unsigned int initialPosition, byte const_val) {
-    int i = 0;
-    for (int j = initialPosition; i < amountBytes; j++, i++) {
-        memoryBank[j] = const_val;
-    }
+	int i = 0;
+	for (int j = initialPosition; i < amountBytes; j++, i++) {
+		memoryBank[j] = const_val;
+	}
 }
 
 void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destiny) {
-    int i = 0;
-    for (int j = initialPosition; i < amountBytes; i++, j++) {
-        destiny[i] = memoryBank[j];
-    }
+	int i = 0;
+	for (int j = initialPosition; i < amountBytes; i++, j++) {
+		destiny[i] = memoryBank[j];
+	}
+}
+
+void pop(unsigned short amountBytes, byte *destiny) {
+	unsigned int bankPointer = SP + 1 + 0x100; // The stack is between 0x100 and 0x1FF
+	rmem(amountBytes, bankPointer, destiny);
+	SP += amountBytes;
+}
+
+void push(unsigned short amountBytes, byte *content) {
+	unsigned int bankPointer = 0; // The stack is between 0x100 and 0x1FF
+	for (int i = 0; i < amountBytes; i++, SP--) {
+		bankPointer = SP + 0x100;
+		wmem_const(BYTE, bankPointer, content[i]);
+	}
 }
 
 /**
  * Zeroes the memory, pum, bam, gone, stiff, cold, dead.
  */
 void zeroMemory() {
-    wmem_const(MEM_SIZE, 0, 0);
+	wmem_const(MEM_SIZE, 0, 0);
 }
 
 /**
@@ -50,33 +64,33 @@ void zeroMemory() {
  * shifted value. THAT is the indirectX address of it
  */
 word indirectx_addr(byte b) {
-    byte memContent[2] = {0};
-    b = (byte) zeropagex_addr(b);
+	byte memContent[2] = {0};
+	b = (byte) zeropagex_addr(b);
 
-    rmem(WORD, b, memContent);
+	rmem(WORD, b, memContent);
 
-    return to_mem_addr(memContent);
+	return to_mem_addr(memContent);
 }
 
 word indirecty_addr(byte b) {
-    byte memContent[2] = {0};
+	byte memContent[2] = {0};
 
-    rmem(WORD, b, memContent);
-    word addr = to_mem_addr(memContent);
+	rmem(WORD, b, memContent);
+	word addr = to_mem_addr(memContent);
 
-    return addr + Y;
+	return addr + Y;
 }
 
 word zeropagex_addr(byte b) {
-    return (word) ((X + b) & 0x00FF);
+	return (word) ((X + b) & 0x00FF);
 }
 
 word zeropagey_addr(byte b) {
-    return (word) ((Y + b) & 0x00FF);
+	return (word) ((Y + b) & 0x00FF);
 }
 
 word zeropage_addr(word w) {
-    return (word) (w & 0x00FF);
+	return (word) (w & 0x00FF);
 }
 
 /**
@@ -84,21 +98,21 @@ word zeropage_addr(word w) {
  * seems rather random and probably confusing in the future
  */
 word absolute_addr(byte *b) {
-    return to_mem_addr(b);
+	return to_mem_addr(b);
 }
 
 word absolutex_addr(byte *b) {
-    word addr = to_mem_addr(b);
-    addr += X;
-    return addr;
+	word addr = to_mem_addr(b);
+	addr += X;
+	return addr;
 }
 
 word absolutey_addr(byte *b) {
-    word addr = to_mem_addr(b);
-    addr += Y;
-    return addr;
+	word addr = to_mem_addr(b);
+	addr += Y;
+	return addr;
 }
 
 word to_mem_addr(byte *content) {
-    return (content[1] << 8) + content[0];
+	return (content[1] << 8) + content[0];
 }

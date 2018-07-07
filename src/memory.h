@@ -29,6 +29,17 @@ void wmem_const(unsigned short amountBytes, unsigned int initialPosition, byte c
 void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destiny);
 
 /**
+ * Pop from stack, deals with the stack pointer and the memory address for you
+ */
+void pop(unsigned short amountBytes, byte *destiny);
+
+/**
+ * Push to stack, deals with the stack pointer and the memory address for you
+ */
+void push(unsigned short amountBytes, byte *content);
+
+
+/**
  * returns the byte data as a memory address value. Basically it joins the bytes as it should to give back
  * a valid word
  */
