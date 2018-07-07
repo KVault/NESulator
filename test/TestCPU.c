@@ -5,9 +5,11 @@
  */
 void testOpcodes() {
 	power_up(0);
+	// We did something wrong with the BRK opcode function, need to be fixed
 	test_BRK();
 	test_ORA();
 	test_ASL();
+	test_JSR();
 }
 
 /**
@@ -15,7 +17,6 @@ void testOpcodes() {
  * the B flag and the Z flag have both to be 1
  */
 void test_BRK() {
-	assert(0); // We did something wrong with the BRK opcode function, need to be fixed
 	int cachedPC = PC;
 	int cachedCyclesThisSec = cyclesThisSec;
 	bit_clear(&P, flagB);
@@ -133,6 +134,8 @@ void test_JSR() {
 	wmem(WORD, PC + 1, param);
 	cpu_cycle();
 
+	peek(WORD, param);
+	assert(to_mem_addr(param) == cachedPC - 1);
 	assert(PC == 0x6969);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
 	assert(cachedSP - 2 == SP);

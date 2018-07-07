@@ -230,6 +230,12 @@ void asl_absolute_x() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void jsr_absolute() {
+	byte param[2];
+	word cachedPC = (word) (PC - 0x01);
+	rmem(WORD, PC + 1, param);
+
+	word addr = absolute_addr(param);
+	push(WORD, &cachedPC);
 
 }
 
