@@ -86,7 +86,6 @@ void testStack() {
 	zeroMemory();
 	byte pushParam[2] = {0x69, 0x42};
 	byte popParam[2] = {};
-	int cachedSP = SP;
 
 	push(WORD, pushParam);
 	assert(SP == 0xFB);
