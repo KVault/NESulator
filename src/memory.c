@@ -43,6 +43,12 @@ void pop(unsigned short amountBytes, byte *destiny) {
 	SP += amountBytes;
 }
 
+void peek(unsigned short amountByte, byte *destiny) {
+	byte cachedSP = SP;
+	pop(amountByte, destiny);
+	SP = cachedSP;
+}
+
 void push(unsigned short amountBytes, byte *content) {
 	unsigned int bankPointer = 0; // The stack is between 0x100 and 0x1FF
 	for (int i = 0; i < amountBytes; i++, SP--) {

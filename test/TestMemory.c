@@ -86,11 +86,15 @@ void testStack() {
 	zeroMemory();
 	byte pushParam[2] = {0x69, 0x42};
 	byte popParam[2] = {};
+	byte peekParam[2] = {};
 
 	push(WORD, pushParam);
 	assert(SP == 0xFB);
 	assert(memoryBank[0x01FD] == 0x69);
 	assert(memoryBank[0x01FC] == 0x42);
+	peek(WORD, peekParam);
+	assert(to_mem_addr(peekParam) == 0x6942);
+	assert(SP == 0xFB);
 	pop(WORD, popParam);
 	assert(to_mem_addr(popParam) == 0x6942);
 	assert(SP == 0xFD);

@@ -135,8 +135,7 @@ void test_JSR() {
 
 	assert(PC == 0x6969);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
-
-
+	assert(cachedSP - 2 == SP);
 	printf("Test JSR passed!\n");
 }
 

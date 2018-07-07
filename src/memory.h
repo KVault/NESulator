@@ -34,6 +34,11 @@ void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destin
 void pop(unsigned short amountBytes, byte *destiny);
 
 /**
+ * Peek pop a value from stack but do not modified the SP
+ */
+void peek(unsigned short amountByte, byte *destiny);
+
+/**
  * Push to stack, deals with the stack pointer and the memory address for you
  */
 void push(unsigned short amountBytes, byte *content);
