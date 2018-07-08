@@ -21,7 +21,7 @@ void test_BRK() {
 	int cachedCyclesThisSec = cyclesThisSec;
 	bit_clear(&P, flagB);
 	assert(bit_test(P, flagB) == 0);
-	wmem_const(BYTE, PC, 0x00); // brk opcode injected
+	wmem_b(PC, 0x00); // brk opcode injected
 	cpu_cycle();
 	assert(cachedPC + 1 == PC);
 	assert(bit_test(P, flagB) == 1);
@@ -37,11 +37,11 @@ void test_ORA() {
 	// Testing ora_ind_x() through ora()
 	int cachedPC = PC;
 	int cachedCyclesThisSec = cyclesThisSec;
-	wmem_const(BYTE, PC, 0x01); // ora_ind_x opcode injected
-	wmem_const(BYTE, PC + 1, 0x42); // value injected at the next PC position
+	wmem_b(PC, 0x01); // ora_ind_x opcode injected
+	wmem_b(PC + 1, 0x42); // value injected at the next PC position
 	A = 0x80; //Inject a value in the acumulator to do the "OR" with
 	word addr = indirectx_addr(0x42);//ora_x will use this addr to get the value. So put it there
-	wmem_const(BYTE, addr, 0x58);
+	wmem_b(addr, 0x58);
 	cpu_cycle();
 	assert(cachedPC + 2 == PC);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
@@ -51,12 +51,12 @@ void test_ORA() {
 	//testing ora_absolute_x
 	cachedPC = PC;
 	cachedCyclesThisSec = cyclesThisSec;
-	wmem_const(BYTE, PC, 0x19);
+	wmem_b(PC, 0x19);
 	word param = 0x6959;
-	wmem(WORD, PC + 1, (byte *) &param);
+	wmem_w(PC + 1, 0x6959);
 	Y = 0x10;
-	addr = absolutey_addr((byte *) &param);
-	wmem_const(WORD, addr, 0x58);
+	addr = absolutey_addr(param);
+	wmem_w(addr, 0x0058);
 	A = 0x80;
 	cpu_cycle();
 	assert(cachedPC + 3 == PC);
@@ -72,7 +72,7 @@ void test_ASL() {
 	int cachedPC = PC;
 	int cachedCyclesThisSec = cyclesThisSec;
 	P = 0;
-	wmem_const(BYTE, PC, 0x0A); // asl_accumulator opcode injected
+	wmem_b(PC, 0x0A); // asl_accumulator opcode injected
 	A = 0b01000101;
 	cpu_cycle();
 	assert(cachedPC + 1 == PC);
@@ -85,13 +85,12 @@ void test_ASL() {
 	cachedPC = PC;
 	cachedCyclesThisSec = cyclesThisSec;
 	P = 0;
-	wmem_const(BYTE, PC, 0x06); // asl_zage opcode injected
-	wmem_const(BYTE, PC + 1, 0x56); // where the data is save
+	wmem_b(PC, 0x06); // asl_zage opcode injected
+	wmem_b(PC + 1, 0x56); // where the data is save
 	word addr = zeropage_addr((word) 0x56);
-	wmem_const(BYTE, addr, 0b10000101);
+	wmem_b(addr, 0b10000101);
 	cpu_cycle();
-	byte result = 0;
-	rmem(BYTE, addr, &result);
+	byte result = rmem_b(addr);
 	assert(cachedPC + 2 == PC);
 	assert(cachedCyclesThisSec + 5 == cyclesThisSec);
 	assert(bit_test(P, flagN) == 0);
@@ -104,14 +103,13 @@ void test_ASL() {
 	cachedCyclesThisSec = cyclesThisSec;
 	P = 0;
 	A = 0;
-	byte param[2] = {0x59, 0x59};
-
-	wmem_const(BYTE, PC, 0x0E); // asl_absolute opcode injected
-	wmem(WORD, PC + 1, param);
+	word param = 0x5959;
+	wmem_b(PC, 0x0E); // asl_absolute opcode injected
+	wmem_w(PC + 1, param);
 	addr = absolute_addr(param);
-	wmem_const(BYTE, addr, 0b00100101);
+	wmem_b(addr, 0b00100101);
 	cpu_cycle();
-	rmem(BYTE, addr, &result);
+	result = rmem_b(addr);
 
 	assert(cachedPC + 3 == PC);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
@@ -128,14 +126,13 @@ void test_JSR() {
 	int cachedSP = SP;
 	int cachedCyclesThisSec = cyclesThisSec;
 
-	byte param[2] = {0x69, 0x69};
+	word param = 0x6969;
 
-	wmem_const(BYTE, PC, 0x20);
-	wmem(WORD, PC + 1, param);
+	wmem_b(PC, 0x20);
+	wmem_w(PC + 1, param);
 	cpu_cycle();
 
-	peek(WORD, param);
-	assert(to_mem_addr(param) == cachedPC - 1);
+	assert(peek_w() == cachedPC - 1);
 	assert(PC == 0x6969);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
 	assert(cachedSP - 2 == SP);

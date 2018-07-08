@@ -75,7 +75,7 @@ void brk();
  * An inclusive OR is performed, bit by bit, on the accumulator contents using the contents of a byte of memory.
  * Flags Z and N affected
  */
-void ora(byte *b, int cycles, int pcIncrease);
+void ora(byte b, int cycles, int pcIncrease);
 
 /**
  * Bitwise OR with accumulator

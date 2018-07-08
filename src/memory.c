@@ -1,6 +1,19 @@
 #include "nes.h"
 #include "memory.h"
 
+////// This functions are defined here so that when other file includes the .h, they won't be able to see this ones
+
+/**
+ * Write from content in a specific memory address
+ * It also deals with memory mirroring
+ */
+void wmem(unsigned short amountBytes, unsigned int initialPosition, byte *content);
+
+/**
+ * Read content from a specific memory address and write to destiny
+ */
+void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destiny);
+
 /*
  * Address range  Size  Device
  * $0000-$07FF    $0800  2KB internal RAM
@@ -23,13 +36,6 @@ void wmem(unsigned short amountBytes, unsigned int initialPosition, byte *conten
 	//TODO mirroring
 }
 
-void wmem_const(unsigned short amountBytes, unsigned int initialPosition, byte const_val) {
-	int i = 0;
-	for (int j = initialPosition; i < amountBytes; j++, i++) {
-		memoryBank[j] = const_val;
-	}
-}
-
 void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destiny) {
 	int i = 0;
 	for (int j = initialPosition; i < amountBytes; i++, j++) {
@@ -37,31 +43,76 @@ void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destin
 	}
 }
 
-void pop(unsigned short amountBytes, byte *destiny) {
+byte rmem_b(unsigned int address){
+	byte destiny = 0;
+	rmem(BYTE, address, &destiny);
+	return destiny;
+}
+
+/**
+ * Reads two bytes from the starting position and returns it as a memory address.
+ * It will do the calculation for you, that's how nice this bad boy is
+ */
+word rmem_w(unsigned int address){
+	byte destiny[2] = {0};
+	rmem(WORD, address, destiny);
+	return to_mem_addr(destiny);
+}
+
+void wmem_b(unsigned int address, byte content){
+	wmem(BYTE, address, &content);
+}
+
+void wmem_w(unsigned int address, word content){
+	byte *wordVal = 0;
+	wordVal = to_mem_bytes(content);
+	wmem(WORD, address, wordVal);
+}
+
+byte pop_b() {
 	unsigned int bankPointer = SP + 1 + 0x100; // The stack is between 0x100 and 0x1FF
-	rmem(amountBytes, bankPointer, destiny);
-	SP += amountBytes;
+	SP++;
+	return rmem_b(bankPointer);
 }
 
-void peek(unsigned short amountByte, byte *destiny) {
-	byte cachedSP = SP;
-	pop(amountByte, destiny);
+word pop_w(){
+	unsigned int bankPointer = SP + 1 + 0x100; // The stack is between 0x100 and 0x1FF
+	SP += 2;
+	return rmem_w(bankPointer);
+}
+
+byte peek_b() {
+	byte cachedSP = SP; // The stack is between 0x100 and 0x1FF
+	byte value = pop_b();
 	SP = cachedSP;
+	return value;
 }
 
-void push(unsigned short amountBytes, byte *content) {
-	unsigned int bankPointer = 0; // The stack is between 0x100 and 0x1FF
-	for (int i = 0; i < amountBytes; i++, SP--) {
-		bankPointer = SP + 0x100;
-		wmem_const(BYTE, bankPointer, content[i]);
-	}
+word peek_w(){
+	byte cachedSP = SP; // The stack is between 0x100 and 0x1FF
+	word value = pop_w();
+	SP = cachedSP;
+	return value;
+}
+
+void push_b(byte content) {
+	unsigned int bankPointer = SP + 0x100; // The stack is between 0x100 and 0x1FF
+	wmem_b(bankPointer, content);
+}
+
+void push_w(word content){
+	//TODO. this is wrong, but atm I just want to make it compile
+	unsigned int bankPointer = SP + 100;
+	wmem_w(bankPointer, content);
 }
 
 /**
  * Zeroes the memory, pum, bam, gone, stiff, cold, dead.
  */
 void zeroMemory() {
-	wmem_const(MEM_SIZE, 0, 0);
+	for(unsigned int i = 0; i < MEM_SIZE; i++){
+		wmem_b(i, 0);
+	}
 }
 
 /**
@@ -103,22 +154,29 @@ word zeropage_addr(word w) {
  * Yes, this one does basically nothing, but we can't simply not use a function to use this mode. It
  * seems rather random and probably confusing in the future
  */
-word absolute_addr(byte *b) {
-	return to_mem_addr(b);
+word absolute_addr(word w) {
+	return w;
 }
 
-word absolutex_addr(byte *b) {
-	word addr = to_mem_addr(b);
-	addr += X;
-	return addr;
+word absolutex_addr(word w) {
+	w += X;
+	return w;
 }
 
-word absolutey_addr(byte *b) {
-	word addr = to_mem_addr(b);
-	addr += Y;
-	return addr;
+word absolutey_addr(word w) {
+	w += Y;
+	return w;
 }
 
 word to_mem_addr(byte *content) {
 	return (content[1] << 8) + content[0];
+}
+
+byte* to_mem_bytes(word content){
+	byte mostSigByte = (byte) ((content & 0xFF00) >> 8);
+	byte leastSigByte = (byte)(content & 0x00FF);
+	byte result[2] = {0};
+	result[0] = leastSigByte;
+	result[1] = mostSigByte;
+	return result;
 }

@@ -13,42 +13,68 @@ byte memoryBank[MEM_SIZE];
 void zeroMemory();
 
 /**
- * Write from content in a specific memory address
- * It also deals with memory mirroring
+ * Reads one byte from the specified memory position
  */
-void wmem(unsigned short amountBytes, unsigned int initialPosition, byte *content);
+byte rmem_b(unsigned int address);
 
 /**
- * Writes the same `repeatedValue` starting at `initialPosition` during `amountBytes` bytes
+ * Reads a words starting at the specified memory position
  */
-void wmem_const(unsigned short amountBytes, unsigned int initialPosition, byte const_val);
+word rmem_w(unsigned int startAddress);
 
 /**
- * Read content from a specific memory address and write to destiny
+ * Writes one byte at the specified memory position
  */
-void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destiny);
+void wmem_b(unsigned int address, byte content);
 
 /**
- * Pop from stack, deals with the stack pointer and the memory address for you
+ * Writes two bytes starting at the specified memory position
  */
-void pop(unsigned short amountBytes, byte *destiny);
+void wmem_w(unsigned int address, word content);
 
 /**
- * Peek pop a value from stack but do not modified the SP
+ * Pops a byte from the stack
  */
-void peek(unsigned short amountByte, byte *destiny);
+byte pop_b();
 
 /**
- * Push to stack, deals with the stack pointer and the memory address for you
+ * Pops a word from the stack
  */
-void push(unsigned short amountBytes, byte *content);
+word pop_w();
+
+/**
+ * Peeks a byte from stack, it doesn't modify the SP
+ */
+byte peek_b();
+
+/**
+ * Peeks a word from stack, it doesn't modify the SP
+ */
+word peek_w();
+
+/**
+ * Pushes a byte to the stack
+ */
+void push_b(byte content);
+
+/**
+ * Pushes a word to the stack
+ */
+void push_w(word content);
 
 
 /**
  * returns the byte data as a memory address value. Basically it joins the bytes as it should to give back
- * a valid word
+ * a valid word.
+ * This operation is the inverse as to_mem_addr
  */
 word to_mem_addr(byte *content);
+
+/**
+ * Returns the memory address stored in the word as a byte array that can be written in the memory bank
+ * This operation is the inverse as to_mem_addr
+ */
+byte* to_mem_bytes(word content);
 
 /**
  * Indexed indirect addressing takes a single byte as an operand and adds the value of the X register to it to give the
@@ -82,19 +108,19 @@ word zeropage_addr(word w);
 /**
  * Instructions using absolute addressing contain a full 16 bit address to identify the target location.
  */
-word absolute_addr(byte *b);
+word absolute_addr(word w);
 
 /**
  * The address to be accessed by an instruction using X register indexed absolute addressing
  * is computed by taking the 16 bit address from the instruction and added the contents of the X register.
  */
-word absolutex_addr(byte *b);
+word absolutex_addr(word w);
 
 /**Y
  * The address to be accessed by an instruction using Y register indexed absolute addressing
  * is computed by taking the 16 bit address from the instruction and added the contents of the Y register.
  */
-word absolutey_addr(byte *b);
+word absolutey_addr(word w);
 
 
 #endif //NESULATOR_MEMORY_H

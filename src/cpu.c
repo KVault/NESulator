@@ -18,15 +18,13 @@ void power_up(int clockSpeed) {
 	A = X = Y = 0;
 	P = 0x34; //00110100
 	SP = 0xFD;
-	wmem_const(BYTE, 0x4015, 0);
-	wmem_const(BYTE, 0x4017, 0);
-	wmem_const(16, 0x4000, 0);
+	wmem_b(0x4015, 0);
+	wmem_b(0x4017, 0);
+	for (int i = 0x4000; i <= 0x400F; ++i) {
+		wmem_b(i, 0);
+	}
 
-	byte tmpFFFC, tmpFFFD;
-	rmem(BYTE, 0xFFFC, &tmpFFFC);
-	rmem(BYTE, 0xFFFD, &tmpFFFD);
-
-	PC = (word) (tmpFFFD * 256 + tmpFFFC);
+	PC = rmem_w(0xFFFC);
 	speed = clockSpeed;
 	//TODO IRQ stuff
 	//TODO LFSR stuff
@@ -49,9 +47,9 @@ void brk() {
  * if the acumulator is zero, then we have to set the FlagZ to one. If the acumulator is negative then we set
  * the flagN to one.
  */
-void ora(byte *b, int cycles, int pcIncrease) {
+void ora(byte b, int cycles, int pcIncrease) {
 	//Do the actual or operation, saving the result in the accumulator
-	A = A | *b;
+	A = A | b;
 	//Set the flags
 	if (A == 0x00) bit_set(&P, flagZ);
 	if (bit_test(A, 7)) bit_set(&P, flagN);
@@ -62,85 +60,43 @@ void ora(byte *b, int cycles, int pcIncrease) {
 }
 
 void ora_ind_x() {
-	byte param, data;
-
-	rmem(BYTE, PC + 1, &param);
-	word addr = indirectx_addr(param);
-	rmem(BYTE, addr, &data);
-
-	ora(&data, 6, 2);
+	word addr = indirectx_addr(rmem_b(PC+1));
+	ora(rmem_b(addr), 6, 2);
 }
 
 void ora_ind_y() {
-	byte param, data;
-
-	rmem(BYTE, PC + 1, &param);
-	word addr = indirecty_addr(param);
-	rmem(BYTE, addr, &data);
-
+	word addr = indirecty_addr(rmem_b(PC+1));
 	// TODO +1 if page crossed
-	ora(&data, 5, 2);
+	ora(rmem_b(addr), 5, 2);
 }
 
 void ora_zpage() {
-	byte param, data;
-
-	rmem(BYTE, PC + 1, &param);
-	word addr = zeropage_addr(param);
-	rmem(BYTE, addr, &data);
-
-	ora(&data, 2, 2);
+	word addr = zeropage_addr(rmem_b(PC+1));
+	ora(rmem_b(addr), 2, 2);
 }
 
 void ora_zpage_x() {
-	byte param, data;
-
-	rmem(BYTE, PC + 1, &param);
-	word addr = zeropagex_addr(param);
-	rmem(BYTE, addr, &data);
-
-	ora(&data, 4, 2);
+	word addr = zeropagex_addr(rmem_b(PC+1));
+	ora(rmem_b(addr), 4, 2);
 }
 
 void ora_immediate() {
-	byte data;
-	rmem(BYTE, PC + 1, &data);
-
-	ora(&data, 2, 2);
+	ora(rmem_b(PC+1), 2, 2);
 }
 
 void ora_absolute() {
-	byte param[2];
-	byte data;
-
-	rmem(WORD, PC + 1, param);
-
-	word addr = absolute_addr(param);
-	rmem(BYTE, addr, &data);
-
-	ora(&data, 4, 3);
+	word addr = absolute_addr(rmem_w(PC+1));
+	ora(rmem_b(addr), 4, 3);
 }
 
 void ora_absolute_x() {
-	byte param[2];
-	byte data;
-
-	rmem(WORD, PC + 1, param);
-	word addr = absolutex_addr(param);
-	rmem(BYTE, addr, &data);
-
-	ora(&data, 4, 3);
+	word addr = absolutex_addr(rmem_w(PC+1));
+	ora(rmem_b(addr), 4, 3);
 }
 
 void ora_absolute_y() {
-	byte param[2];
-	byte data;
-
-	rmem(WORD, PC + 1, param);
-	word addr = absolutey_addr(param);
-	rmem(BYTE, addr, &data);
-
-	ora(&data, 4, 3);
+	word addr = absolutey_addr(rmem_w(PC + 1));
+	ora(rmem_b(addr), 4, 3);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -172,14 +128,10 @@ void asl(byte *b, int cycles, int pcIncrease) {
 }
 
 void asl_zpage() {
-	byte param, data;
-
-	rmem(BYTE, PC + 1, &param);
-	word addr = zeropage_addr(param);
-	rmem(BYTE, addr, &data);
-
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	byte data = rmem_b(addr);
 	asl(&data, 5, 2);
-	wmem(BYTE, addr, &data);
+	wmem_b(addr, data);
 }
 
 void asl_accumulator() {
@@ -187,41 +139,25 @@ void asl_accumulator() {
 }
 
 void asl_zpage_x() {
-	byte param, data;
-
-	rmem(BYTE, PC + 1, &param);
-	word addr = zeropagex_addr(param);
-	rmem(BYTE, addr, &data);
-
+	word addr = zeropagex_addr(rmem_b(PC + 1));
+	byte data = rmem_b(addr);
 	asl(&data, 6, 2);
-	wmem(BYTE, addr, &data);
+	wmem_b(addr, data);
 }
 
 void asl_absolute() {
-	byte param[2];
-	byte data;
-
-	rmem(WORD, PC + 1, param);
-
-	word addr = absolute_addr(param);
-	rmem(BYTE, addr, &data);
-
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
 	asl(&data, 6, 3);
-	wmem(BYTE, addr, &data);
+	wmem_b(addr, data);
 }
 
 
 void asl_absolute_x() {
-	byte param[2];
-	byte data;
-
-	rmem(WORD, PC + 1, param);
-
-	word addr = absolutex_addr(param);
-	rmem(BYTE, addr, &data);
-
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
 	asl(&data, 7, 3);
-	wmem(BYTE, addr, &data);
+	wmem_w(addr, data);
 }
 
 
@@ -230,13 +166,10 @@ void asl_absolute_x() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void jsr_absolute() {
-	byte param[2];
-	word cachedPC = (word) (PC - 0x01);
-	rmem(WORD, PC + 1, param);
-
-	word addr = absolute_addr(param);
-	push(WORD, &cachedPC);
-
+	//byte param[2];
+	//word cachedPC = (word) (PC - 0x01);
+	//word addr = absolute_addr(rmem_w(PC + 1));
+	//push(WORD, &cachedPC);
 }
 
 /**

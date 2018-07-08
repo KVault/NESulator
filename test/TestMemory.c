@@ -10,8 +10,7 @@ void testWrite() {
 
 	//Test one byte write
 	assert(memoryBank[0] == 0);
-	byte data = 'd';
-	wmem(BYTE, 0, &data);
+	wmem_b(0, 'd');
 	assert(memoryBank[0] == 'd');
 
 	zeroMemory();
@@ -20,21 +19,15 @@ void testWrite() {
 	assert(memoryBank[512] == 0);
 	assert(memoryBank[513] == 0);
 	assert(memoryBank[514] == 0);
-	byte *nesText = "NES";
-	wmem(3, 512, nesText);
+	wmem_w(512, (word) "NE");
 
 	assert(memoryBank[512] == 'N');
 	assert(memoryBank[513] == 'E');
-	assert(memoryBank[514] == 'S');
 
 	//Test the memory write repeat
 	zeroMemory();
 	assert(memoryBank[512] == 0);
 	assert(memoryBank[513] == 0);
-	wmem_const(WORD, 512, 'S');
-	assert(memoryBank[512] == 'S');
-	assert(memoryBank[513] == 'S');
-
 
 	printf("Write memory test passed!\n");
 }
@@ -47,33 +40,19 @@ void testRead() {
 	zeroMemory();
 
 	//Test one byte read
-	//Test the empty values
-	byte readSingleByte[1];
-	rmem(BYTE, 0, readSingleByte);
-	assert(readSingleByte[0] == 0);
+	assert(rmem_b(0) == 0);
 	//Fill in the test data
-	byte data = 'd';
-	wmem(BYTE, 0, &data);
+	wmem_b(0, 'd');
 	//Make sure the test data is in there
-	rmem(BYTE, 0, readSingleByte);
-	assert(readSingleByte[0] == 'd');
+	assert(rmem_b(0) == 'd');
 
 	//Test three bytes read
 	//Test the empty values
 	zeroMemory();
-	byte readMultipleBytes[3];
-	rmem(3, 512, readMultipleBytes);
-	assert(readMultipleBytes[0] == 0);
-	assert(readMultipleBytes[1] == 0);
-	assert(readMultipleBytes[2] == 0);
+	assert(rmem_w(512) == 0x0000);
 	//Fill in the test data
-	byte *nesData = "NES";
-	wmem(3, 512, nesData);
-	//Make sure the test data is in there
-	rmem(3, 512, readMultipleBytes);
-	assert(readMultipleBytes[0] == 'N');
-	assert(readMultipleBytes[1] == 'E');
-	assert(readMultipleBytes[2] == 'S');
+	wmem_w(512, (word) "NE");
+	assert(rmem_w(512) == "NE");
 
 	printf("Read memory test passed!\n");
 }
@@ -84,19 +63,15 @@ void testRead() {
 void testStack() {
 	power_up(0);
 	zeroMemory();
-	byte pushParam[2] = {0x69, 0x42};
-	byte popParam[2] = {};
-	byte peekParam[2] = {};
+	word pushParam = 0x6942;
 
-	push(WORD, pushParam);
+	push_w(pushParam);
 	assert(SP == 0xFB);
 	assert(memoryBank[0x01FD] == 0x69);
 	assert(memoryBank[0x01FC] == 0x42);
-	peek(WORD, peekParam);
-	assert(to_mem_addr(peekParam) == 0x6942);
+	assert(peek_w() == 0x6942);
 	assert(SP == 0xFB);
-	pop(WORD, popParam);
-	assert(to_mem_addr(popParam) == 0x6942);
+	assert(pop_w() == 0x6942);
 	assert(SP == 0xFD);
 
 	printf("Stack memory test passed!\n");
@@ -109,18 +84,14 @@ void testIndirectXAddr() {
 	word addr = 0;
 	// First test
 	zeroMemory();
-	wmem_const(BYTE, 112, 0x30);
-	wmem_const(BYTE, 113, 0xAC);
-
+	wmem_w(112, 0xAC30);
 	X = 100;
 	addr = indirectx_addr(12);
 	assert(addr == 0xAC30);
 
 	// Second test. Example got from here http://www.emulator101.com/6502-addressing-modes.html
 	zeroMemory();
-	wmem_const(BYTE, 126, 0x74);
-	wmem_const(BYTE, 127, 0x20);
-
+	wmem_w(126, 0x2074);
 	X = 100;
 	addr = indirectx_addr(26);
 	assert(addr == 0x2074);
@@ -131,13 +102,10 @@ void testIndirectXAddr() {
 void testIndirectYAddr() {
 	//First test. Example got from here http://www.emulator101.com/6502-addressing-modes.html
 	zeroMemory();
-	wmem_const(BYTE, 0x86, 0x28);
-	wmem_const(BYTE, 0x87, 0x40);
+	wmem_w(0x86,0x4038);
 	Y = 0x10;
 	word addr = indirecty_addr(0x86);
-
 	assert(addr == 0x4038);
-
 	printf("Test IndirectYAddr passed!\n");
 }
 
