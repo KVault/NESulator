@@ -19,10 +19,10 @@ void testWrite() {
 	assert(memoryBank[512] == 0);
 	assert(memoryBank[513] == 0);
 	assert(memoryBank[514] == 0);
-	wmem_w(512, (word) "NE");
+	wmem_w(512, 0x6969);
 
-	assert(memoryBank[512] == 'N');
-	assert(memoryBank[513] == 'E');
+	assert(memoryBank[512] == 0x69);
+	assert(memoryBank[513] == 0x69);
 
 	//Test the memory write repeat
 	zeroMemory();
