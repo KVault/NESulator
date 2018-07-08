@@ -51,8 +51,8 @@ void testRead() {
 	zeroMemory();
 	assert(rmem_w(512) == 0x0000);
 	//Fill in the test data
-	wmem_w(512, (word) "NE");
-	assert(rmem_w(512) == "NE");
+	wmem_w(512, (word) 0x6942);
+	assert(rmem_w(512) == 0x6942);
 
 	printf("Read memory test passed!\n");
 }
@@ -102,7 +102,7 @@ void testIndirectXAddr() {
 void testIndirectYAddr() {
 	//First test. Example got from here http://www.emulator101.com/6502-addressing-modes.html
 	zeroMemory();
-	wmem_w(0x86,0x4038);
+	wmem_w(0x86, 0x4028);
 	Y = 0x10;
 	word addr = indirecty_addr(0x86);
 	assert(addr == 0x4038);
@@ -136,22 +136,22 @@ void testAbsoluteAddr() {
 	//First test. Absolute. I know, silly but necessary
 	zeroMemory();
 	word addr;
-	byte param[2] = {0x69, 0x69};
-	addr = absolute_addr(&param[0]);
+	word param = 0x6969;
+	addr = absolute_addr(param);
 	assert(addr == 0x6969);
 
 	//Second test. Absolute X
 	zeroMemory();
-	byte param2[2] = {0x59, 0x69};
+	word param2 = 0x6959;
 	X = 0x10;
-	addr = absolutex_addr(&param2[0]);
+	addr = absolutex_addr(param2);
 	assert(addr == 0x6969);
 
 	//Third test. Absolute Y
 	zeroMemory();
-	byte param3[2] = {0x49, 0x69};
+	word param3 = 0x6949;
 	Y = 0x20;
-	addr = absolutey_addr(&param3[0]);
+	addr = absolutey_addr(param3);
 	assert(addr == 0x6969);
 
 	printf("Test AbsoluteAddr passed! \n");

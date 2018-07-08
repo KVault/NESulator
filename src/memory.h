@@ -74,7 +74,7 @@ word to_mem_addr(byte *content);
  * Returns the memory address stored in the word as a byte array that can be written in the memory bank
  * This operation is the inverse as to_mem_addr
  */
-byte* to_mem_bytes(word content);
+void to_mem_bytes(word content, byte *result);
 
 /**
  * Indexed indirect addressing takes a single byte as an operand and adds the value of the X register to it to give the
