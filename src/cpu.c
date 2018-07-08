@@ -60,37 +60,37 @@ void ora(byte b, int cycles, int pcIncrease) {
 }
 
 void ora_ind_x() {
-	word addr = indirectx_addr(rmem_b(PC+1));
+	word addr = indirectx_addr(rmem_b(PC + 1));
 	ora(rmem_b(addr), 6, 2);
 }
 
 void ora_ind_y() {
-	word addr = indirecty_addr(rmem_b(PC+1));
+	word addr = indirecty_addr(rmem_b(PC + 1));
 	// TODO +1 if page crossed
 	ora(rmem_b(addr), 5, 2);
 }
 
 void ora_zpage() {
-	word addr = zeropage_addr(rmem_b(PC+1));
+	word addr = zeropage_addr(rmem_b(PC + 1));
 	ora(rmem_b(addr), 2, 2);
 }
 
 void ora_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC+1));
+	word addr = zeropagex_addr(rmem_b(PC + 1));
 	ora(rmem_b(addr), 4, 2);
 }
 
 void ora_immediate() {
-	ora(rmem_b(PC+1), 2, 2);
+	ora(rmem_b(PC + 1), 2, 2);
 }
 
 void ora_absolute() {
-	word addr = absolute_addr(rmem_w(PC+1));
+	word addr = absolute_addr(rmem_w(PC + 1));
 	ora(rmem_b(addr), 4, 3);
 }
 
 void ora_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC+1));
+	word addr = absolutex_addr(rmem_w(PC + 1));
 	ora(rmem_b(addr), 4, 3);
 }
 
@@ -357,7 +357,7 @@ void cpu_cycle() {
 }
 
 void decOpcode() {
-	rmem(BYTE, PC, &currentOpcode);
+	currentOpcode = rmem_b(PC);
 }
 
 void exeOpcode() {
