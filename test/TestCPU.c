@@ -139,3 +139,80 @@ void test_JSR() {
 	printf("Test JSR passed!\n");
 }
 
+void test_PHP(){ //Hehehe.... PHP..... :'D
+	int cachedPC = PC;
+	int cachedSP = SP;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	P = 0b01101010;//Push a random status vector on to the register
+	wmem_b(PC,0x08);//Inject the opcode
+	cpu_cycle();
+	assert(peek_b() == P);
+	assert(cachedPC + 1 == PC);
+	assert(cachedSP -1 == SP);
+	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
+}
+
+void test_PLP(){
+	int cachedPC = PC;
+	int cachedSP = SP;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	byte testValue = P = 0b01101111;
+	push_b(P);
+	P = 0b11111111;//Now change it to prove that it does it's job correctly
+	wmem_b(PC, 0x28);// Inject the opcode
+	cpu_cycle();
+	assert(P == testValue);
+	assert(cachedPC + 1 == PC);
+	assert(cachedSP + 1 == SP);
+	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
+}
+
+void test_PLA(){
+	int cachedPC = PC;
+	int cachedSP = SP;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	//Test Zero flag
+	byte testValue = A = 0b00000000;
+	push_b(A);
+	A = 0x05;//Overwrite with a random value. It doesn't matter
+	wmem_b(PC, 0x68);//Inject the opcode
+	cpu_cycle();
+
+	assert(A == testValue);
+	assert(bit_test(A, flagZ) == 1);
+	assert(bit_test(A, flagN) == 0);
+	assert(cachedPC + 1 == PC);
+	assert(cachedSP + 1 == SP);
+	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
+
+	//Test negative flag
+	testValue = A = 0b11001001;
+	push_b(A);
+	A = 0x05;//Overwrite with a random value. It doesn't matter
+	wmem_b(PC, 0x68);
+	cpu_cycle();
+	assert(A == testValue);
+	assert(bit_test(A, flagZ) == 0);
+	assert(bit_test(A, flagN) == 1);
+	assert(cachedPC + 1 == PC);
+	assert(cachedSP + 1 == SP);
+	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
+}
+
+void test_PHA(){
+	int cachedPC = PC;
+	int cachedSP = SP;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	A = 0x69;
+	wmem_b(PC, 0x48);//Inject the opcode
+	cpu_cycle();
+	assert(peek_b() == A);
+	assert(cachedPC + 1 == PC);
+	assert(cachedSP - 1 == SP);
+	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
+
+}

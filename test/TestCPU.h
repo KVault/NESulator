@@ -16,4 +16,12 @@ void test_ASL();
 
 void test_JSR();
 
+void test_PHP();
+
+void test_PHA();
+
+void test_PLA();
+
+void test_PLP();
+
 #endif //NESULATOR_TESTCPU_H
