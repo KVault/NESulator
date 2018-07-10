@@ -13,6 +13,7 @@ void testOpcodes() {
 	test_PHP();
 	test_PLP();
 	test_PLA();
+	test_PHA();
 }
 
 /**
@@ -228,6 +229,8 @@ void test_PHA() {
 	assert(cachedPC + 1 == PC);
 	assert(cachedSP - 1 == SP);
 	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
+
+	printf("Test PHA passed!\n");
 }
 
 void test_AND() {
