@@ -214,5 +214,40 @@ void test_PHA(){
 	assert(cachedPC + 1 == PC);
 	assert(cachedSP - 1 == SP);
 	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
+}
 
+void test_AND(){
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	//Immediate test
+	A = 0x05;
+	wmem_b(PC, 0x29);
+	wmem_b(PC + 1, 0x0A);
+	cpu_cycle();
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+	assert(A == 0x0F);
+
+	//Zero page Test
+	A = 0b00000111;
+	wmem_b(PC, 0x25);
+	wmem_b(PC + 1, 0xFD);
+	wmem_b(0xFD, 0b01111000);
+	cpu_cycle();
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
+	assert(A == 0);
+	assert(bit_test(P, flagZ)); //In this case A should be zero so we're testing the flag
+
+	//Absolute test
+	A = 0b10000111;
+	wmem_b(PC, 0x2D);
+	wmem_w(PC + 1, 0x1234);
+	wmem_b(0x1234, 0b10000000);
+	cpu_cycle();
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
+	assert(A == 0b10000000);
+	assert(bit_test(P, flagN));
 }

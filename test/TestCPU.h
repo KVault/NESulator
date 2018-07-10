@@ -24,4 +24,6 @@ void test_PLA();
 
 void test_PLP();
 
+void test_AND();
+
 #endif //NESULATOR_TESTCPU_H
