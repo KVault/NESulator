@@ -10,6 +10,7 @@ void testOpcodes() {
 	test_ORA();
 	test_ASL();
 	test_JSR();
+	test_PHP();
 }
 
 /**
@@ -139,21 +140,22 @@ void test_JSR() {
 	printf("Test JSR passed!\n");
 }
 
-void test_PHP(){ //Hehehe.... PHP..... :'D
+void test_PHP() { //Hehehe.... PHP..... :'D
 	int cachedPC = PC;
 	int cachedSP = SP;
 	int cachedCyclesThisSec = cyclesThisSec;
 
 	P = 0b01101010;//Push a random status vector on to the register
-	wmem_b(PC,0x08);//Inject the opcode
+	wmem_b(PC, 0x08);//Inject the opcode
 	cpu_cycle();
 	assert(peek_b() == P);
 	assert(cachedPC + 1 == PC);
-	assert(cachedSP -1 == SP);
+	assert(cachedSP - 1 == SP);
 	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
+	printf("Test PHP passed!\n");
 }
 
-void test_PLP(){
+void test_PLP() {
 	int cachedPC = PC;
 	int cachedSP = SP;
 	int cachedCyclesThisSec = cyclesThisSec;
@@ -169,7 +171,7 @@ void test_PLP(){
 	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
 }
 
-void test_PLA(){
+void test_PLA() {
 	int cachedPC = PC;
 	int cachedSP = SP;
 	int cachedCyclesThisSec = cyclesThisSec;
@@ -202,7 +204,7 @@ void test_PLA(){
 	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
 }
 
-void test_PHA(){
+void test_PHA() {
 	int cachedPC = PC;
 	int cachedSP = SP;
 	int cachedCyclesThisSec = cyclesThisSec;
@@ -216,7 +218,7 @@ void test_PHA(){
 	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
 }
 
-void test_AND(){
+void test_AND() {
 	int cachedPC = PC;
 	int cachedCyclesThisSec = cyclesThisSec;
 

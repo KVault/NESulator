@@ -174,6 +174,16 @@ void jsr_absolute() {
 	cyclesThisSec += 6;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////PHP (PusH Processor status) REGION/////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void php() {
+	push_b(P);
+	PC++;
+	cyclesThisSec += 3;
+}
+
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
  *
@@ -194,7 +204,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_zpage,     //$05       ORA $44       bitwise OR with Accumulator     2       3
 		&asl_zpage,     //$06       ASL $44       Arithmetic Shift Left           2       5
 		0,
-		0,
+		&php,
 		&ora_immediate, //$09       ORA #$44      bitwise OR with Accumulator     2       2
 		&asl_accumulator,//$0A      ASL A         Arithmetic Shift Left           1       2
 		0,
