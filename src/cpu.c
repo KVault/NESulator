@@ -184,6 +184,36 @@ void php() {
 	cyclesThisSec += 3;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////PLP (PuLl Processor status) REGION/////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void plp() {
+	P = pop_b();
+	PC++;
+	cyclesThisSec += 4;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////PLA (PuLl Acumulator) REGION/////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * PuLl Acumulator makes a pull from the stack onto the acumulator register
+ */
+void pla() {
+	A = pop_b();
+	if (A == 0) {
+		bit_set(&P, flagZ);
+	}
+	if (bit_test(A, 7)) {
+		bit_set(&P, flagN);
+	}
+	PC++;
+	cyclesThisSec += 4;
+
+}
+
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
  *
@@ -204,7 +234,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_zpage,     //$05       ORA $44       bitwise OR with Accumulator     2       3
 		&asl_zpage,     //$06       ASL $44       Arithmetic Shift Left           2       5
 		0,
-		&php,
+		&php,           //$08       PHP           PusH Processor status           1       3
 		&ora_immediate, //$09       ORA #$44      bitwise OR with Accumulator     2       2
 		&asl_accumulator,//$0A      ASL A         Arithmetic Shift Left           1       2
 		0,
@@ -228,7 +258,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_absolute_x,//$1D       ORA $4400, X  bitwise OR with Accumulator     3       4+
 		&asl_absolute_x,//$1E       ASL $4400, X  Arithmetic Shift Left           3       7
 		0,
-		&jsr_absolute,  //20        JSR $4400     Jump to SubRoutine              3       6
+		&jsr_absolute,  //$20       JSR $4400     Jump to SubRoutine              3       6
 		0,
 		0,
 		0,
@@ -236,6 +266,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&plp,           //$28       PLP           PuLl to status                  1       4
 		0,
 		0,
 		0,
@@ -299,8 +330,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
-		0,
+		&pla,           //$68       PLA           PuLl Acumulator                  1       4
 		0,
 		0,
 		0,
