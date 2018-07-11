@@ -10,6 +10,10 @@ void testOpcodes() {
 	test_ORA();
 	test_ASL();
 	test_JSR();
+	test_PHP();
+	test_PLP();
+	test_PLA();
+	test_PHA();
 }
 
 /**
@@ -139,39 +143,43 @@ void test_JSR() {
 	printf("Test JSR passed!\n");
 }
 
-void test_PHP(){ //Hehehe.... PHP..... :'D
+void test_PHP() { //Hehehe.... PHP..... :'D
 	int cachedPC = PC;
 	int cachedSP = SP;
 	int cachedCyclesThisSec = cyclesThisSec;
 
 	P = 0b01101010;//Push a random status vector on to the register
-	wmem_b(PC,0x08);//Inject the opcode
+	wmem_b(PC, 0x08);//Inject the opcode
 	cpu_cycle();
 	assert(peek_b() == P);
 	assert(cachedPC + 1 == PC);
-	assert(cachedSP -1 == SP);
+	assert(cachedSP - 1 == SP);
 	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
+	printf("Test PHP passed!\n");
 }
 
-void test_PLP(){
+void test_PLP() {
 	int cachedPC = PC;
-	int cachedSP = SP;
+	int cachedSP;
 	int cachedCyclesThisSec = cyclesThisSec;
 
 	byte testValue = P = 0b01101111;
 	push_b(P);
 	P = 0b11111111;//Now change it to prove that it does it's job correctly
 	wmem_b(PC, 0x28);// Inject the opcode
+	cachedSP = SP;
 	cpu_cycle();
+
 	assert(P == testValue);
 	assert(cachedPC + 1 == PC);
 	assert(cachedSP + 1 == SP);
 	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
+	printf("Test PLP passed!\n");
 }
 
-void test_PLA(){
+void test_PLA() {
 	int cachedPC = PC;
-	int cachedSP = SP;
+	int cachedSP;
 	int cachedCyclesThisSec = cyclesThisSec;
 
 	//Test Zero flag
@@ -179,30 +187,37 @@ void test_PLA(){
 	push_b(A);
 	A = 0x05;//Overwrite with a random value. It doesn't matter
 	wmem_b(PC, 0x68);//Inject the opcode
+	cachedSP = SP;
 	cpu_cycle();
 
 	assert(A == testValue);
-	assert(bit_test(A, flagZ) == 1);
-	assert(bit_test(A, flagN) == 0);
+	assert(bit_test(P, flagZ) == 1);
+	assert(bit_test(P, flagN) == 0);
 	assert(cachedPC + 1 == PC);
 	assert(cachedSP + 1 == SP);
 	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
 
 	//Test negative flag
+	P = 0;
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
 	testValue = A = 0b11001001;
 	push_b(A);
 	A = 0x05;//Overwrite with a random value. It doesn't matter
 	wmem_b(PC, 0x68);
+	cachedSP = SP;
 	cpu_cycle();
 	assert(A == testValue);
-	assert(bit_test(A, flagZ) == 0);
-	assert(bit_test(A, flagN) == 1);
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagN) == 1);
 	assert(cachedPC + 1 == PC);
 	assert(cachedSP + 1 == SP);
 	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
+
+	printf("Test PLA passed!\n");
 }
 
-void test_PHA(){
+void test_PHA() {
 	int cachedPC = PC;
 	int cachedSP = SP;
 	int cachedCyclesThisSec = cyclesThisSec;
@@ -214,9 +229,11 @@ void test_PHA(){
 	assert(cachedPC + 1 == PC);
 	assert(cachedSP - 1 == SP);
 	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
+
+	printf("Test PHA passed!\n");
 }
 
-void test_AND(){
+void test_AND() {
 	int cachedPC = PC;
 	int cachedCyclesThisSec = cyclesThisSec;
 

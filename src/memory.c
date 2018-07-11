@@ -98,6 +98,7 @@ word peek_w() {
 void push_b(byte content) {
 	unsigned int bankPointer = SP + 0x100; // The stack is between 0x100 and 0x1FF
 	wmem_b(bankPointer, content);
+	SP -= 1;
 }
 
 void push_w(word content) {

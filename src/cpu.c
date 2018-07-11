@@ -175,6 +175,52 @@ void jsr_absolute() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////PHP (PusH Processor status) REGION/////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void php() {
+	push_b(P);
+	PC++;
+	cyclesThisSec += 3;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////PLP (PuLl Processor status) REGION/////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void plp() {
+	P = pop_b();
+	PC++;
+	cyclesThisSec += 4;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////PHA (PusH Acumulator) REGION///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void pha() {
+	push_b(A);
+	PC++;
+	cyclesThisSec += 3;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////PLA (PuLl Acumulator) REGION///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void pla() {
+	A = pop_b();
+	if (A == 0) {
+		bit_set(&P, flagZ);
+	}
+	if (bit_test(A, 7)) {
+		bit_set(&P, flagN);
+	}
+	PC++;
+	cyclesThisSec += 4;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////AND (bitwise AND accumulator) REGION///////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -254,7 +300,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_zpage,     //$05       ORA $44       bitwise OR with Accumulator     2       3
 		&asl_zpage,     //$06       ASL $44       Arithmetic Shift Left           2       5
 		0,
-		0,
+		&php,           //$08       PHP           PusH Processor status           1       3
 		&ora_immediate, //$09       ORA #$44      bitwise OR with Accumulator     2       2
 		&asl_accumulator,//$0A      ASL A         Arithmetic Shift Left           1       2
 		0,
@@ -278,11 +324,8 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_absolute_x,//$1D       ORA $4400, X  bitwise OR with Accumulator     3       4+
 		&asl_absolute_x,//$1E       ASL $4400, X  Arithmetic Shift Left           3       7
 		0,
-		&jsr_absolute,  //20        JSR $4400     Jump to SubRoutine              3       6
+		&jsr_absolute,  //$20       JSR $4400     Jump to SubRoutine              3       6
 		&and_indirect_x,//$21       AND ($44, X)  bitwise AND with accumulator    2       6
-		0,
-		0,
-		0,
 		&and_zpage,     //$25       AND $44       bitwise AND with accumulator    2       3
 		0,
 		0,
@@ -294,6 +337,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&and_absolute,  //$2D       AND $4400     bitwise AND with accumulator    3       4
 		0,
 		0,
+		&plp,           //$28       PLP           PuLl to status                  1       4
 		0,
 		0,
 		0,
@@ -327,6 +371,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&pha,           //$48       PHA           PusH Acumulator                  1       3
 		0,
 		0,
 		0,
@@ -351,6 +396,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&pla,           //$68       PLA           PuLl Acumulator                  1       4
 		0,
 		0,
 		0,
