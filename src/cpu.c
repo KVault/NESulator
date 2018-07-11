@@ -326,20 +326,22 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		&jsr_absolute,  //$20       JSR $4400     Jump to SubRoutine              3       6
 		&and_indirect_x,//$21       AND ($44, X)  bitwise AND with accumulator    2       6
+		0,
+		0,
+		0,
 		&and_zpage,     //$25       AND $44       bitwise AND with accumulator    2       3
 		0,
 		0,
-		0,
+		&plp,           //$28       PLP           PuLl to status                  1       4
 		&and_immediate, //$29       AND #$44      bitwise AND with accumulator    2       2
 		0,
-		&and_indirect_y,//$31       AND ($44), Y  bitwise AND with accumulator    2       5+
+		0,
 		0,
 		&and_absolute,  //$2D       AND $4400     bitwise AND with accumulator    3       4
 		0,
 		0,
-		&plp,           //$28       PLP           PuLl to status                  1       4
 		0,
-		0,
+		&and_indirect_y,//$31       AND ($44), Y  bitwise AND with accumulator    2       5+
 		0,
 		0,
 		0,
@@ -362,16 +364,14 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
 		&pha,           //$48       PHA           PusH Acumulator                  1       3
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
 		0,
 		0,
 		0,
