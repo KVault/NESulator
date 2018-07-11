@@ -174,6 +174,66 @@ void jsr_absolute() {
 	cyclesThisSec += 6;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////AND (bitwise AND accumulator) REGION///////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+void and(byte value, int cycles, int pcIncrease) {
+
+}
+
+void and_immediate() {
+	byte value = rmem_b(PC + 1);
+	and(value, 2, 2);
+}
+
+void and_zpage() {
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	and(value, 3, 2);
+}
+
+void and_zpage_x() {
+	word addr = zeropagex_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	and(value, 4, 2);
+}
+
+void and_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte value = rmem_b(addr);
+	and(value, 4, 3);
+}
+
+void and_absolute_x() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	byte value = rmem_b(addr);
+	and(value, 4, 3);
+	//TODO +1 cycle if page crossed
+}
+
+void and_absolute_y() {
+	word addr = absolutey_addr(rmem_w(PC + 1));
+	byte value = rmem_b(addr);
+	and(value, 4, 3);
+	//TODO +1 cycle if page crossed
+}
+
+void and_indirect_x() {
+	word addr = indirectx_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	and(value, 6, 2);
+}
+
+void and_indirect_y() {
+	word addr = indirecty_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	and(value, 5, 2);
+	//TODO +1 cycle if page crossed
+}
+
+
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
  *
@@ -219,6 +279,19 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&asl_absolute_x,//$1E       ASL $4400, X  Arithmetic Shift Left           3       7
 		0,
 		&jsr_absolute,  //20        JSR $4400     Jump to SubRoutine              3       6
+		&and_indirect_x,//$21       AND ($44, X)  bitwise AND with accumulator    2       6
+		0,
+		0,
+		0,
+		&and_zpage,     //$25       AND $44       bitwise AND with accumulator    2       3
+		0,
+		0,
+		0,
+		&and_immediate, //$29       AND #$44      bitwise AND with accumulator    2       2
+		0,
+		&and_indirect_y,//$31       AND ($44), Y  bitwise AND with accumulator    2       5+
+		0,
+		&and_absolute,  //$2D       AND $4400     bitwise AND with accumulator    3       4
 		0,
 		0,
 		0,
@@ -226,28 +299,15 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&and_zpage_x,   //$35       AND $44, X    bitwise AND with accumulator    2       4
 		0,
 		0,
 		0,
+		&and_absolute_y,//$39       AND $4400, Y  bitwise AND with accumulator    3       4+
 		0,
 		0,
 		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
+		&and_absolute_x,//$3D       AND $4400, X  bitwise AND with accumulator    3       4+
 		0,
 		0,
 		0,
@@ -365,3 +425,4 @@ void decOpcode() {
 void exeOpcode() {
 	((gen_opcode_func) opcodeFunctions[currentOpcode])();
 }
+

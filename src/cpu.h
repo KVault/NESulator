@@ -161,5 +161,53 @@ void asl_absolute_x();
  */
 void jsr_absolute();
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////AND (bitwise AND accumulator) REGION///////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Bitwise and operation on the accumulator
+ */
+void and(byte value, int cycles, int pcIncrease);
+
+/**
+ * Bitwise and operation on the accumulator
+ */
+void and_immediate();
+
+/**
+ * Bitwise and operation on the accumulator
+ */
+void and_zpage();
+
+/**
+ * Bitwise and operation on the accumulator
+ */
+void and_zpage_x();
+
+/**
+ * Bitwise and operation on the accumulator
+ */
+void and_absolute();
+
+/**
+ * Bitwise and operation on the accumulator
+ */
+void and_absolute_x();
+
+/**
+ * Bitwise and operation on the accumulator
+ */
+void and_absolute_y();
+
+/**
+ * Bitwise and operation on the accumulator
+ */
+void and_indirect_x();
+
+/**
+ * Bitwise and operation on the accumulator
+ */
+void and_indirect_y();
 
 #endif //NESULATOR_CPU_H
