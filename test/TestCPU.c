@@ -15,6 +15,7 @@ void testOpcodes() {
 	test_PLA();
 	test_PHA();
 	test_AND();
+	test_BIT();
 }
 
 /**
@@ -277,4 +278,22 @@ void test_AND() {
 	assert(bit_test(P, flagC));
 
 	printf("Test AND passed!\n");
+}
+
+void test_BIT() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	A = 0x05;
+	wmem_b(PC, 0x24);
+	wmem_b(PC + 1, 0xFD);
+	wmem_b(0xFD, 0x72);
+	cpu_cycle();
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagV));
+	assert(bit_test(P, flagN) == 0);
+
+	printf("Test BIT passed!\n");
 }

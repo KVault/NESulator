@@ -289,6 +289,42 @@ void and_indirect_y() {
 	//TODO +1 cycle if page crossed
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////BIT (BIt Test) REGION//////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * BIt Test checks if one or more bits of a memory position are set
+ */
+void bit(byte value, int cycles, int pcIncrease) {
+
+	byte tmp = A & value;
+	(tmp == 0) ? bit_clear(&P, flagZ) : bit_set(&P, flagZ);
+	(bit_test(value, 6)) ? bit_set(&P, flagV) : bit_clear(&P, flagV);
+	(bit_test(value, 7)) ? bit_set(&P, flagN) : bit_clear(&P, flagN);
+
+	cyclesThisSec += cycles;
+	PC += pcIncrease;
+}
+
+/**
+ * BIt Test checks if one or more bits of a memory position are set
+ */
+void bit_zpage() {
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	bit(value, 3, 2);
+}
+
+/**
+ * BIt Test checks if one or more bits of a memory position are set
+ */
+void bit_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte value = rmem_b(addr);
+	bit(value, 4, 3);
+}
+
 
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
@@ -338,7 +374,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&and_indirect_x,//$21       AND ($44, X)  bitwise AND with accumulator    2       6
 		0,
 		0,
-		0,
+		&bit_zpage,     //$24       BIT $44       BIt Test                        2       3
 		&and_zpage,     //$25       AND $44       bitwise AND with accumulator    2       3
 		0,
 		0,
@@ -346,7 +382,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&and_immediate, //$29       AND #$44      bitwise AND with accumulator    2       2
 		0,
 		0,
-		0,
+		&bit_absolute,  //$2C       BIT $4400     BIt Test                        3       4
 		&and_absolute,  //$2D       AND $4400     bitwise AND with accumulator    3       4
 		0,
 		0,

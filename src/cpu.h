@@ -244,4 +244,25 @@ void and_indirect_x();
  * Bitwise and operation on the accumulator
  */
 void and_indirect_y();
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////BIT (BIt Test) REGION//////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * BIt Test checks if one or more bits of a memory position are set
+ */
+void bit(byte value, int cycles, int pcIncrease);
+
+/**
+ * BIt Test checks if one or more bits of a memory position are set
+ */
+void bit_zpage();
+
+/**
+ * BIt Test checks if one or more bits of a memory position are set
+ */
+void bit_absolute();
+
 #endif //NESULATOR_CPU_H
