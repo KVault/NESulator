@@ -14,6 +14,7 @@ void testOpcodes() {
 	test_PLP();
 	test_PLA();
 	test_PHA();
+	test_AND();
 }
 
 /**
@@ -238,19 +239,22 @@ void test_AND() {
 	int cachedCyclesThisSec = cyclesThisSec;
 
 	//Immediate test
-	A = 0x05;
+	A = 0x0B;
 	wmem_b(PC, 0x29);
 	wmem_b(PC + 1, 0x0A);
 	cpu_cycle();
 	assert(cachedPC + 2 == PC);
 	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
-	assert(A == 0x0F);
+	assert(A == 0x0A);
 
 	//Zero page Test
 	A = 0b00000111;
 	wmem_b(PC, 0x25);
 	wmem_b(PC + 1, 0xFD);
 	wmem_b(0xFD, 0b01111000);
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+	P = 0;
 	cpu_cycle();
 	assert(cachedPC + 2 == PC);
 	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
@@ -262,9 +266,15 @@ void test_AND() {
 	wmem_b(PC, 0x2D);
 	wmem_w(PC + 1, 0x1234);
 	wmem_b(0x1234, 0b10000000);
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+	P = 0;
 	cpu_cycle();
 	assert(cachedPC + 3 == PC);
 	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
 	assert(A == 0b10000000);
 	assert(bit_test(P, flagN));
+	assert(bit_test(P, flagC));
+
+	printf("Test AND passed!\n");
 }

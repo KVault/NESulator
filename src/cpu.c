@@ -226,7 +226,17 @@ void pla() {
 
 
 void and(byte value, int cycles, int pcIncrease) {
+	A &= value;
+	cyclesThisSec += cycles;
+	PC += pcIncrease;
+	(bit_test(value, 7)) ? bit_set(&P, flagC) : bit_clear(&P, flagC);
 
+	if (A == 0) {
+		bit_set(&P, flagZ);
+	}
+	if (bit_test(A, 7)) {
+		bit_set(&P, flagN);
+	}
 }
 
 void and_immediate() {
