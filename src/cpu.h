@@ -373,4 +373,53 @@ void dey();
  */
 void iny();
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////ADC REGION//////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Add with carry
+ */
+void adc(byte value, int cycles, int pcIncrease);
+
+/**
+ * Add with carry
+ */
+void adc_immediate();
+
+/**
+ * Add with carry
+ */
+void adc_zpage();
+
+/**
+ * Add with carry
+ */
+void adc_zpage_x();
+
+/**
+ * Add with carry
+ */
+void adc_absolute();
+
+/**
+ * Add with carry
+ */
+void adc_absolute_x();
+
+/**
+ * Add with carry
+ */
+void adc_absolute_y();
+
+/**
+ * Add with carry
+ */
+void adc_indirect_x();
+
+/**
+ * Add with carry
+ */
+void adc_indirect_y();
+
 #endif //NESULATOR_CPU_H

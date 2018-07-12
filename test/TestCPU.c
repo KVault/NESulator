@@ -18,6 +18,7 @@ void testOpcodes() {
 	test_BIT();
 	test_FLAGS();
 	test_REGISTERS();
+	test_ADC();
 }
 
 /**
@@ -300,7 +301,7 @@ void test_BIT() {
 	printf("Test BIT passed!\n");
 }
 
-void test_FLAGS(){
+void test_FLAGS() {
 	//CLC
 	int cachedPC = PC;
 	int cachedCyclesThisSec = cyclesThisSec;
@@ -353,7 +354,7 @@ void test_FLAGS(){
 	printf("Test FLAGS passed!\n");
 }
 
-void test_REGISTERS(){
+void test_REGISTERS() {
 	//TAX
 	int cachedPC = PC;
 	int cachedCyclesThisSec = cyclesThisSec;
@@ -410,4 +411,57 @@ void test_REGISTERS(){
 	assert(X == 0x07);
 
 	printf("Test REGISTERS passed!\n");
+}
+
+void test_ADC() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// adc_inmediate
+	A = 0x05;
+	bit_set(&P, flagC);
+	wmem_b(PC, 0x69);
+	wmem_b(PC + 1, 0x06);
+	cpu_cycle();
+	assert(A == 0x0C);
+	assert(bit_test(P, flagC) == 0);
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagV) == 0);
+	assert(bit_test(P, flagN) == 0);
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	// adc_inmediate, now with carry!
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+	A = 0x05;
+	bit_clear(&P, flagC);
+	wmem_b(PC, 0x69);
+	wmem_b(PC + 1, 0xFF);
+	cpu_cycle();
+	assert(A == 0x04);
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagV) == 0);
+	assert(bit_test(P, flagN) == 0);
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	// adc_inmediate, now with overflow!
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+	A = 0xB0;
+	bit_clear(&P, flagC);
+	wmem_b(PC, 0x69);
+	wmem_b(PC + 1, 0xB0);
+	cpu_cycle();
+	assert(A == 0x60);
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagV));
+	assert(bit_test(P, flagN) == 0);
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	printf("Test ADC passed!\n");
 }

@@ -30,7 +30,7 @@ void power_up(int clockSpeed) {
 	//TODO LFSR stuff
 }
 
-void nop(){
+void nop() {
 	PC++;
 	cyclesThisSec += 2;
 }
@@ -336,7 +336,7 @@ void bit_absolute() {
 /**
  * All of this instructions have a length of one byte and require two machine cycles
  */
-void set_flag_value(byte flag, int isSet){
+void set_flag_value(byte flag, int isSet) {
 	(isSet) ? bit_set(&P, flag) : bit_clear(&P, flag);//Set or clear the flag depending on isSet
 	cyclesThisSec += 2; //Constant. Always
 	PC++; //Constant. Always
@@ -350,23 +350,23 @@ void cld() {
 	set_flag_value(flagD, 0);
 }
 
-void cli(){
+void cli() {
 	set_flag_value(flagI, 0);
 }
 
-void clv(){
+void clv() {
 	set_flag_value(flagV, 0);
 }
 
-void sec(){
+void sec() {
 	set_flag_value(flagC, 1);
 }
 
-void sei(){
+void sei() {
 	set_flag_value(flagI, 1);
 }
 
-void sed(){
+void sed() {
 	set_flag_value(flagD, 1);
 }
 
@@ -377,7 +377,7 @@ void sed(){
 /**
  * All of this instructions have a length of one byte and require two machine cycles
  */
-void transfer_reg(byte *from_reg, byte *to_reg){
+void transfer_reg(byte *from_reg, byte *to_reg) {
 	*to_reg = *from_reg;
 	PC++;
 	cyclesThisSec += 2;
@@ -386,7 +386,7 @@ void transfer_reg(byte *from_reg, byte *to_reg){
 /**
  * All of this instructions have a length of one byte and require two machine cycles
  */
-void dec_reg(byte *reg){
+void dec_reg(byte *reg) {
 	(*reg)--;
 	PC++;
 	cyclesThisSec += 2;
@@ -395,43 +395,98 @@ void dec_reg(byte *reg){
 /**
  * All of this instructions have a length of one byte and require two machine cycles
  */
-void inc_reg(byte *reg){
+void inc_reg(byte *reg) {
 	(*reg)++;
 	PC++;
 	cyclesThisSec += 2;
 }
 
-void tax(){
+void tax() {
 	transfer_reg(&A, &X);
 }
 
-void txa(){
+void txa() {
 	transfer_reg(&X, &A);
 }
 
-void dex(){
+void dex() {
 	dec_reg(&X);
 }
 
-void inx(){
+void inx() {
 	inc_reg(&X);
 }
 
-void tay(){
+void tay() {
 	transfer_reg(&A, &Y);
 }
 
-void tya(){
+void tya() {
 	transfer_reg(&Y, &A);
 }
 
-void dey(){
+void dey() {
 	dec_reg(&Y);
 }
 
-void iny(){
+void iny() {
 	inc_reg(&Y);
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////ADC REGION//////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+void adc(byte value, int cycles, int pcIncrease) {
+	byte carry = (byte) bit_test(P, flagC);
+	int result = A + carry + value;
+	carry = (byte) ((result & 0x100) >> 8);
+	bit_val(&P, flagC, carry);
+
+	// If operands same source sign but different result sign
+	int isOverflown = ((A ^ result) & (value ^ result) & 0x80);
+	A = (byte) result;
+
+	bit_val(&P, flagZ, A == 0);
+	bit_val(&P, flagV, isOverflown);
+	bit_val(&P, flagN, bit_test(A, 7));
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void adc_immediate() {
+	byte value = rmem_b(PC + 1);
+	adc(value, 2, 2);
+}
+
+void adc_zpage() {
+
+}
+
+void adc_zpage_x() {
+
+}
+
+void adc_absolute() {
+
+}
+
+void adc_absolute_x() {
+
+}
+
+void adc_absolute_y() {
+
+}
+
+void adc_indirect_x() {
+
+}
+
+void adc_indirect_y() {
+
+}
+
 
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
@@ -550,7 +605,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&pla,           //$68       PLA           PuLl Acumulator                  1       4
-		0,
+		&adc_immediate, //$69       ADC #$44      ADd with Carry                   2       2
 		0,
 		0,
 		0,
@@ -715,4 +770,3 @@ void decOpcode() {
 void exeOpcode() {
 	((gen_opcode_func) opcodeFunctions[currentOpcode])();
 }
-
