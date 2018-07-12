@@ -67,6 +67,11 @@ void cpu_cycle();
  */
 void brk();
 
+/**
+ * Just nop
+ */
+void nop();
+
 //////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////ORA REGION////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -309,5 +314,63 @@ void sei();
  */
 void sed();
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////Registers REGION///////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Transfers one register to another
+ */
+void transfer_reg(byte *from_reg, byte *to_reg);
+
+/**
+ * Decrements the given register
+ */
+void dec_reg(byte *reg);
+
+/**
+ * Increments the given register
+ */
+void inc_reg(byte *reg);
+
+/**
+ * Transfer A to X
+ */
+void tax();
+
+/**
+ * Transfer X to A
+ */
+void txa();
+
+/**
+ * Decrement X
+ */
+void dex();
+
+/**
+ * Increment X
+ */
+void inx();
+
+/**
+ * Transfer A to Y
+ */
+void tay();
+
+/**
+ * Transfer Y to A
+ */
+void tya();
+
+/**
+ * Decrement Y
+ */
+void dey();
+
+/**
+ * Increment Y
+ */
+void iny();
 
 #endif //NESULATOR_CPU_H

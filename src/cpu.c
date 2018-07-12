@@ -30,12 +30,16 @@ void power_up(int clockSpeed) {
 	//TODO LFSR stuff
 }
 
-void brk() {
-	int cycles = 7;
+void nop(){
 	PC++;
+	cyclesThisSec += 2;
+}
+
+void brk() {
 	bit_set(&P, flagZ);
 	bit_set(&P, flagB);
-	cyclesThisSec += cycles;
+	cyclesThisSec += 7;
+	PC++;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -366,6 +370,45 @@ void sed(){
 	set_flag_value(flagD, 1);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////Registers REGION///////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * All of this instructions have a length of one byte and require two machine cycles
+ */
+void transfer_reg(byte *from_reg, byte *to_reg){
+	PC++;
+	cyclesThisSec += 2;
+}
+
+/**
+ * All of this instructions have a length of one byte and require two machine cycles
+ */
+void dec_reg(byte *reg){
+	PC++;
+	cyclesThisSec += 2;
+}
+
+/**
+ * All of this instructions have a length of one byte and require two machine cycles
+ */
+void inc_reg(byte *reg){
+	PC++;
+	cyclesThisSec += 2;
+}
+
+void tax(){
+	transfer_reg(&A, &X);
+}
+
+void txa(){
+	transfer_reg(&X, &A);
+}
+
+void dex(){
+	dec_reg(&X);
+}
 
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
@@ -517,6 +560,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&txa,           //$8A       TXA           Transfer X to A                   1       2,
 		0,
 		0,
 		0,
@@ -548,8 +592,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
-		0,
+		&tax,           //$AA       TAX           Transfer A to X                   1       2,
 		0,
 		0,
 		0,
@@ -581,7 +624,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&dex,           //$CA       DEX           Decrements X register             1       2
 		0,
 		0,
 		0,
@@ -611,9 +654,9 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&inx,           //$E8      INX           Increments X register            1       7
 		0,
-		0,
-		0,
+		&nop,           //$EA       NOP           No OPeration                     1       2,
 		0,
 		0,
 		0,
