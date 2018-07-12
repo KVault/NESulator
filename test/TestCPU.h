@@ -30,4 +30,6 @@ void test_BIT();
 
 void test_FLAGS();
 
+void test_REGISTERS();
+
 #endif //NESULATOR_TESTCPU_H

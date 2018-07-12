@@ -17,6 +17,7 @@ void testOpcodes() {
 	test_AND();
 	test_BIT();
 	test_FLAGS();
+	test_REGISTERS();
 }
 
 /**
@@ -350,4 +351,63 @@ void test_FLAGS(){
 	assert(bit_test(P, flagD));
 
 	printf("Test FLAGS passed!\n");
+}
+
+void test_REGISTERS(){
+	//TAX
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	A = 0x05;
+	wmem_b(PC, 0xAA);
+	cpu_cycle();
+	assert(X == A);
+	assert(cachedPC + 1 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	//PC and cycles are constant. Only test once. More than enough
+
+	//TXA
+	X = 0x06;
+	wmem_b(PC, 0x8A);
+	cpu_cycle();
+	assert(X == A);
+
+	//DEX
+	X = 0x06;
+	wmem_b(PC, 0xCA);
+	cpu_cycle();
+	assert(X == 0x05);
+
+	//INX
+	X = 0x06;
+	wmem_b(PC, 0xE8);
+	cpu_cycle();
+	assert(X == 0x07);
+
+	//TAY
+	A = 0x06;
+	wmem_b(PC, 0xA8);
+	cpu_cycle();
+	assert(A == Y);
+
+	//TYA
+	Y = 0x07;
+	wmem_b(PC, 0x98);
+	cpu_cycle();
+	assert(Y == A);
+
+	//DEY
+	Y = 0x06;
+	wmem_b(PC, 0x88);
+	cpu_cycle();
+	assert(Y == 0x05);
+
+	//INY
+	Y = 0x06;
+	wmem_b(PC, 0xC8);
+	cpu_cycle();
+	assert(X == 0x07);
+
+	printf("Test REGISTERS passed!\n");
 }

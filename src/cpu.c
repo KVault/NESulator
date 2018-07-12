@@ -378,6 +378,7 @@ void sed(){
  * All of this instructions have a length of one byte and require two machine cycles
  */
 void transfer_reg(byte *from_reg, byte *to_reg){
+	*to_reg = *from_reg;
 	PC++;
 	cyclesThisSec += 2;
 }
@@ -386,6 +387,7 @@ void transfer_reg(byte *from_reg, byte *to_reg){
  * All of this instructions have a length of one byte and require two machine cycles
  */
 void dec_reg(byte *reg){
+	(*reg)--;
 	PC++;
 	cyclesThisSec += 2;
 }
@@ -394,6 +396,7 @@ void dec_reg(byte *reg){
  * All of this instructions have a length of one byte and require two machine cycles
  */
 void inc_reg(byte *reg){
+	(*reg)++;
 	PC++;
 	cyclesThisSec += 2;
 }
@@ -408,6 +411,26 @@ void txa(){
 
 void dex(){
 	dec_reg(&X);
+}
+
+void inx(){
+	inc_reg(&X);
+}
+
+void tay(){
+	transfer_reg(&A, &Y);
+}
+
+void tya(){
+	transfer_reg(&Y, &A);
+}
+
+void dey(){
+	dec_reg(&Y);
+}
+
+void iny(){
+	inc_reg(&Y);
 }
 
 /**
@@ -558,12 +581,9 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&dey,           //$88       DEY           Decrements Y                      1       2
 		0,
-		0,
-		&txa,           //$8A       TXA           Transfer X to A                   1       2,
-		0,
-		0,
-		0,
+		&txa,           //$8A       TXA           Transfer X to A                   1       2
 		0,
 		0,
 		0,
@@ -577,6 +597,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&tya,           //$98       TYA           Transfer Y to A                   1       2
 		0,
 		0,
 		0,
@@ -592,7 +613,9 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		&tax,           //$AA       TAX           Transfer A to X                   1       2,
+		&tay,           //$A8       TAY           Transfer A to Y                   1       2
+		0,
+		&tax,           //$AA       TAX           Transfer A to X                   1       2
 		0,
 		0,
 		0,
@@ -622,7 +645,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&iny,           //$C8       INY           Increments Y                      1       2
 		0,
 		&dex,           //$CA       DEX           Decrements X register             1       2
 		0,
@@ -654,7 +677,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		&inx,           //$E8      INX           Increments X register            1       7
+		&inx,           //$E8      INX           Increments X register             1       7
 		0,
 		&nop,           //$EA       NOP           No OPeration                     1       2,
 		0,
