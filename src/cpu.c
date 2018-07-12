@@ -325,6 +325,47 @@ void bit_absolute() {
 	bit(value, 4, 3);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////Clear flags (CLear flags) REGION///////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * All of this instructions have a length of one byte and require two machine cycles
+ */
+void set_flag_value(byte flag, int isSet){
+	(isSet) ? bit_set(&P, flag) : bit_clear(&P, flag);//Set or clear the flag depending on isSet
+	cyclesThisSec += 2; //Constant. Always
+	PC++; //Constant. Always
+}
+
+void clc() {
+	set_flag_value(flagC, 0);
+}
+
+void cld() {
+	set_flag_value(flagD, 0);
+}
+
+void cli(){
+	set_flag_value(flagI, 0);
+}
+
+void clv(){
+	set_flag_value(flagV, 0);
+}
+
+void sec(){
+	set_flag_value(flagC, 1);
+}
+
+void sei(){
+	set_flag_value(flagI, 1);
+}
+
+void sed(){
+	set_flag_value(flagD, 1);
+}
+
 
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
@@ -362,7 +403,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_zpage_x,   //$15       ORA ($44), X  bitwise OR with Accumulator     2       4
 		&asl_zpage_x,   //$16       ASL $44, X    Arithmetic Shift Left           2       6
 		0,
-		0,
+		&clc,           //$18       CLC           CLear Carry flag                1       2
 		&ora_absolute_y,//$19       ORA $4400, Y  bitwise OR with Accumulator     3       4+
 		0,
 		0,
@@ -394,7 +435,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&and_zpage_x,   //$35       AND $44, X    bitwise AND with accumulator    2       4
 		0,
 		0,
-		0,
+		&sec,           //$38       SEC           Sets Carry flag                 1       2
 		&and_absolute_y,//$39       AND $4400, Y  bitwise AND with accumulator    3       4+
 		0,
 		0,
@@ -426,7 +467,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&cli,           //$58       CLI           CLear Interrupt flag                1       2,
 		0,
 		0,
 		0,
@@ -458,6 +499,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&sei,           //$78       SEI           Sets Interrupt flag               1       2,
 		0,
 		0,
 		0,
@@ -496,6 +538,96 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		&clv,           //$B8       CLV           CLear Overflow flag                1       2,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		&cld,           //$D8       CLD           CLear Decimal flag                1       2
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		&sed,           //$F8       SED           Sets Decimal flag                1       2,
 		0,
 		0,
 		0,

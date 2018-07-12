@@ -16,6 +16,7 @@ void testOpcodes() {
 	test_PHA();
 	test_AND();
 	test_BIT();
+	test_FLAGS();
 }
 
 /**
@@ -296,4 +297,57 @@ void test_BIT() {
 	assert(bit_test(P, flagN) == 0);
 
 	printf("Test BIT passed!\n");
+}
+
+void test_FLAGS(){
+	//CLC
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	bit_set(&P, flagC);
+	wmem_b(PC, 0x18);
+	cpu_cycle();
+	assert(bit_test(P, flagC) == 0);
+	assert(cachedPC + 1 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	//PC and cycles are constant. Only test once. More than enough
+
+	//CLD
+	bit_set(&P, flagD);
+	wmem_b(PC, 0xD8);
+	cpu_cycle();
+	assert(bit_test(P, flagD) == 0);
+
+	//CLI
+	bit_set(&P, flagI);
+	wmem_b(PC, 0x58);
+	cpu_cycle();
+	assert(bit_test(P, flagI) == 0);
+
+	//CLV
+	bit_set(&P, flagV);
+	wmem_b(PC, 0xB8);
+	cpu_cycle();
+	assert(bit_test(P, flagV) == 0);
+
+	//SEC
+	bit_clear(&P, flagC);
+	wmem_b(PC, 0x38);
+	cpu_cycle();
+	assert(bit_test(P, flagC));
+
+	//SEI
+	bit_clear(&P, flagI);
+	wmem_b(PC, 0x78);
+	cpu_cycle();
+	assert(bit_test(P, flagI));
+
+	//SED
+	bit_clear(&P, flagD);
+	wmem_b(PC, 0xF8);
+	cpu_cycle();
+	assert(bit_test(P, flagD));
+
+	printf("Test FLAGS passed!\n");
 }

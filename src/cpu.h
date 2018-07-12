@@ -265,4 +265,49 @@ void bit_zpage();
  */
 void bit_absolute();
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////Flags REGION/////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Sets the given flag to the 'isSet' value
+ */
+void set_flag_value(byte flag, int isSet);
+
+/**
+ * Clear carry flag
+ */
+void clc();
+
+/**
+ * Clear decimal mode
+ */
+void cld();
+
+/**
+ * Clear interrupt flag
+ */
+void cli();
+
+/**
+ * Clear overflow flag
+ */
+void clv();
+
+/**
+ * Sets the carry flag
+ */
+void sec();
+
+/**
+ * Sets the interrupt flag
+ */
+void sei();
+
+/**
+ * Set the decimal flag
+ */
+void sed();
+
+
 #endif //NESULATOR_CPU_H
