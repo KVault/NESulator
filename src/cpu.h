@@ -422,4 +422,30 @@ void adc_indirect_x();
  */
 void adc_indirect_y();
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////BRANCH REGION///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Tries to branch the PC by adding the relative displacement (value) if the flag's value
+ * has the req_flag_value.
+ */
+void try_branch(byte flag, int req_flag_val);
+
+void bpl();
+
+void bmi();
+
+void bvc();
+
+void bvs();
+
+void bcc();
+
+void bcs();
+
+void bne();
+
+void beq();
+
 #endif //NESULATOR_CPU_H

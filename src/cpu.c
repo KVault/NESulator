@@ -504,6 +504,52 @@ void adc_indirect_y() {
 	adc(value, 5, 2);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////BRANCH REGION///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+void try_branch(byte flag, int req_flag_val){
+	byte value = rmem_b(PC + 1);
+	cyclesThisSec += 2;//This is always constant
+	PC += 2;
+	if(bit_test(P, flag) == req_flag_val){
+		PC += value;
+		cyclesThisSec++;
+		//TODO +2 cycle if page crossed
+	}
+}
+
+void bpl(){
+	try_branch(flagN, 0);
+}
+
+void bmi(){
+	try_branch(flagN, 1);
+}
+
+void bvc(){
+	try_branch(flagV, 0);
+}
+
+void bvs(){
+	try_branch(flagV, 1);
+}
+
+void bcc(){
+	try_branch(flagC, 0);
+}
+
+void bcs(){
+	try_branch(flagC, 1);
+}
+
+void bne(){
+	try_branch(flagZ, 0);
+}
+
+void beq(){
+	try_branch(flagZ, 1);
+}
 
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
@@ -516,7 +562,7 @@ void adc_indirect_y() {
  * https://stackoverflow.com/a/7670827/6265003
  */
 gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
-		//                Opcode    Syntax        Description                     Len     Tim
+		//              Opcode      Syntax        Description                     Len     Tim
 		&brk,           //$00       BRK           BReaK                           1       7
 		&ora_ind_x,     //$01       ORA ($44, X)  bitwise OR with Accumulator     2       6
 		0,
@@ -533,7 +579,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_absolute,  //$0D       ORA $4400     bitwise OR with Accumulator     3       4
 		&asl_absolute,  //$0E       ASL $4400     Arithmetic Shift Left           3       6
 		0,
-		0,
+		&bpl,           //$10       BPL           Branch if plus                  2       2(+2)
 		&ora_ind_y,     //$11       ORA ($44), Y  bitwise OR with Accumulator     2       6
 		0,
 		0,
@@ -565,7 +611,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&and_absolute,  //$2D       AND $4400     bitwise AND with accumulator    3       4
 		0,
 		0,
-		0,
+		&bmi,           //$30       BPL           Branch if minus                 2       2(+2)
 		&and_indirect_y,//$31       AND ($44), Y  bitwise AND with accumulator    2       5+
 		0,
 		0,
@@ -597,7 +643,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&bvc,           //$50       BVC           Branch if Overflow Clear        2       2(+2)
 		0,
 		0,
 		0,
@@ -629,7 +675,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&adc_absolute,  //$6D       ADC $4400    ADd with Carry                    3       4
 		0,
 		0,
-		0,
+		&bvs,           //$70      BVS           Branch if plus                  2       2(+2)
 		&adc_indirect_y,//$71      ADC ($44), X   ADd with Carry                   2       5+
 		0,
 		0,
@@ -661,7 +707,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&bcc,           //$90       BCC           Branch if carry clear             2       2(+2)
 		0,
 		0,
 		0,
@@ -693,7 +739,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&bcs,           //$B0       BCS           Branch id carry set               2       2(+2)
 		0,
 		0,
 		0,
@@ -725,7 +771,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&bne,           //$D0       BNE           Branch now equals                 2       2(+2)
 		0,
 		0,
 		0,
@@ -757,7 +803,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&beq,           //$F0       BEQ           Branch if equals                 2       2(+2)
 		0,
 		0,
 		0,
