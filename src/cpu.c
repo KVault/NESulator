@@ -20,7 +20,7 @@ void power_up(int clockSpeed) {
 	SP = 0xFD;
 	wmem_b(0x4015, 0);
 	wmem_b(0x4017, 0);
-	for (int i = 0x4000; i <= 0x400F; ++i) {
+	for (unsigned int i = 0x4000; i <= 0x400F; ++i) {
 		wmem_b(i, 0);
 	}
 
@@ -170,7 +170,6 @@ void asl_absolute_x() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void jsr_absolute() {
-	byte param[2];
 	word cachedPC = (word) (PC - 0x01);
 	word addr = absolute_addr(rmem_w(PC + 1));
 	push_w(cachedPC);
@@ -460,31 +459,49 @@ void adc_immediate() {
 }
 
 void adc_zpage() {
-
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	adc(value, 3, 2);
 }
 
 void adc_zpage_x() {
+	word addr = zeropagex_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	adc(value, 4, 2);
 
 }
 
 void adc_absolute() {
-
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte value = rmem_b(addr);
+	adc(value, 4, 3);
 }
 
 void adc_absolute_x() {
-
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	byte value = rmem_b(addr);
+	//TODO +1 cycle if page crossed
+	adc(value, 4, 3);
 }
 
 void adc_absolute_y() {
-
+	word addr = absolutey_addr(rmem_w(PC + 1));
+	byte value = rmem_b(addr);
+	//TODO +1 cycle if page crossed
+	adc(value, 4, 3);
 }
 
 void adc_indirect_x() {
-
+	word addr = indirectx_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	adc(value, 6, 2);
 }
 
 void adc_indirect_y() {
-
+	word addr = indirecty_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	//TODO +1 cycle if page crossed
+	adc(value, 5, 2);
 }
 
 
@@ -597,11 +614,11 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&adc_indirect_x, //$61      ADC ($44, X) ADd with Carry                    2       6
 		0,
 		0,
 		0,
-		0,
-		0,
+		&adc_zpage,     //$65       ADC $44      ADd with Carry                    2       3
 		0,
 		0,
 		&pla,           //$68       PLA           PuLl Acumulator                  1       4
@@ -609,23 +626,23 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&adc_absolute,  //$6D       ADC $4400    ADd with Carry                    3       4
 		0,
 		0,
 		0,
+		&adc_indirect_y,//$71      ADC ($44), X   ADd with Carry                   2       5+
 		0,
 		0,
 		0,
-		0,
-		0,
-		0,
+		&adc_zpage_x,   //$75       ADC $44, X    ADd with Carry                    2       4
 		0,
 		0,
 		&sei,           //$78       SEI           Sets Interrupt flag               1       2,
+		&adc_absolute_y,//$79       ADC $4400, Y  ADd with Carry                    3       4+
 		0,
 		0,
 		0,
-		0,
-		0,
+		&adc_absolute_x,//$7D       ADC $4400, X  ADd with Carry                    3       4+
 		0,
 		0,
 		0,

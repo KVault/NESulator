@@ -32,4 +32,6 @@ void test_FLAGS();
 
 void test_REGISTERS();
 
+void test_ADC();
+
 #endif //NESULATOR_TESTCPU_H
