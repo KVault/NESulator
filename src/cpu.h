@@ -448,4 +448,55 @@ void bne();
 
 void beq();
 
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////SBC REGION//////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Substract with carry
+ */
+void sbc(byte value, int cycles, int pcIncrease);
+
+/**
+ * Substract with carry
+ */
+void sbc_immediate();
+
+/**
+ * Substract with carry
+ */
+void sbc_zpage();
+
+/**
+ * Substract with carry
+ */
+void sbc_zpage_x();
+
+/**
+ * Substract with carry
+ */
+void sbc_absolute();
+
+/**
+ * Substract with carry
+ */
+void sbc_absolute_x();
+
+/**
+ * Substract with carry
+ */
+void sbc_absolute_y();
+
+/**
+ * Substract with carry
+ */
+void sbc_indirect_x();
+
+/**
+ * Substract with carry
+ */
+void sbc_indirect_y();
+
 #endif //NESULATOR_CPU_H

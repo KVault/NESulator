@@ -508,47 +508,121 @@ void adc_indirect_y() {
 ///////////////////////////////BRANCH REGION///////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-void try_branch(byte flag, int req_flag_val){
+void try_branch(byte flag, int req_flag_val) {
 	byte value = rmem_b(PC + 1);
 	cyclesThisSec += 2;//This is always constant
 	PC += 2;
-	if(bit_test(P, flag) == req_flag_val){
+	if (bit_test(P, flag) == req_flag_val) {
 		PC += value;
 		cyclesThisSec++;
 		//TODO +2 cycle if page crossed
 	}
 }
 
-void bpl(){
+void bpl() {
 	try_branch(flagN, 0);
 }
 
-void bmi(){
+void bmi() {
 	try_branch(flagN, 1);
 }
 
-void bvc(){
+void bvc() {
 	try_branch(flagV, 0);
 }
 
-void bvs(){
+void bvs() {
 	try_branch(flagV, 1);
 }
 
-void bcc(){
+void bcc() {
 	try_branch(flagC, 0);
 }
 
-void bcs(){
+void bcs() {
 	try_branch(flagC, 1);
 }
 
-void bne(){
+void bne() {
 	try_branch(flagZ, 0);
 }
 
-void beq(){
+void beq() {
 	try_branch(flagZ, 1);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////SBC REGION//////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+void sbc(byte value, int cycles, int pcIncrease) {
+	byte carry = (byte) bit_test(P, flagC);
+	byte carryNop = !carry;
+	int result = A - value - carryNop;
+	carry = (byte) ((result & 0x100) >> 8);
+	bit_val(&P, flagC, carry);
+
+	// If operands same source sign but different result sign
+	int isOverflown = ((A ^ result) & (value ^ result) & 0x80);
+	A = (byte) result;
+
+	bit_val(&P, flagZ, A == 0);
+	bit_val(&P, flagV, !isOverflown); // we need to clear the flagV
+	bit_val(&P, flagN, bit_test(A, 7));
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void sbc_immediate() {
+	byte value = rmem_b(PC + 1);
+	sbc(value, 2, 2);
+}
+
+void sbc_zpage() {
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	sbc(value, 3, 2);
+}
+
+void sbc_zpage_x() {
+	word addr = zeropagex_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	sbc(value, 4, 2);
+
+}
+
+void sbc_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte value = rmem_b(addr);
+	sbc(value, 4, 3);
+}
+
+void sbc_absolute_x() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	byte value = rmem_b(addr);
+	//TODO +1 cycle if page crossed
+	sbc(value, 4, 3);
+}
+
+void sbc_absolute_y() {
+	word addr = absolutey_addr(rmem_w(PC + 1));
+	byte value = rmem_b(addr);
+	//TODO +1 cycle if page crossed
+	sbc(value, 4, 3);
+}
+
+void sbc_indirect_x() {
+	word addr = indirectx_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	sbc(value, 6, 2);
+}
+
+void sbc_indirect_y() {
+	word addr = indirecty_addr(rmem_b(PC + 1));
+	byte value = rmem_b(addr);
+	//TODO +1 cycle if page crossed
+	sbc(value, 5, 2);
 }
 
 /**
@@ -788,35 +862,35 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&sbc_indirect_x,//$E1       SBC ($44,X)   SuBstract with Carry             2       6
 		0,
 		0,
 		0,
+		&sbc_zpage,     //$E5       SBC $44       SuBstract with Carry             2       3
 		0,
 		0,
+		&inx,           //$E8       INX           Increments X register            1       7
+		&sbc_immediate, //$E9       SBC #$44      SuBstract with Carry             2       2
+		&nop,           //$EA       NOP           No OPeration                     1       2
 		0,
 		0,
-		&inx,           //$E8      INX           Increments X register             1       7
-		0,
-		&nop,           //$EA       NOP           No OPeration                     1       2,
-		0,
-		0,
-		0,
+		&sbc_absolute, //$ED       SBC $4400       SuBstract with Carry            3       4
 		0,
 		0,
 		&beq,           //$F0       BEQ           Branch if equals                 2       2(+2)
+		&sbc_indirect_y,//$F1       SBC ($44),Y   SuBstract with Carry             2       5+
 		0,
 		0,
 		0,
+		&sbc_zpage_x,   //$F5       SBC $44,X     SuBstract with Carry             2       4
+		0,
+		0,
+		&sed,           //$F8       SED           Sets Decimal flag                1       2
+		&sbc_absolute_y,//$F9       SBC $4400,Y   SuBstract with Carry             3       4+
 		0,
 		0,
 		0,
-		0,
-		&sed,           //$F8       SED           Sets Decimal flag                1       2,
-		0,
-		0,
-		0,
-		0,
-		0,
+		&sbc_absolute_x,//$FD       SBC $4400,X   SuBstract with Carry             3       4+
 		0,
 		0
 };

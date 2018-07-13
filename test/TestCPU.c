@@ -19,6 +19,9 @@ void testOpcodes() {
 	test_FLAGS();
 	test_REGISTERS();
 	test_ADC();
+	test_BRANCH();
+	test_NOP();
+	test_SBC();
 }
 
 /**
@@ -464,4 +467,71 @@ void test_ADC() {
 	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
 
 	printf("Test ADC passed!\n");
+}
+
+void test_BRANCH() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// bpl
+	wmem_b(PC, 0x10);
+	wmem_b(PC + 1, 0x05);
+	bit_set(&P, flagN);
+	cpu_cycle();
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	//bmi
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+
+	wmem_b(PC, 0x30);
+	wmem_b(PC + 1, 0x06);
+	cpu_cycle();
+	assert(cachedPC + 0x08 == PC);
+	assert(cachedCyclesThisSec + 3 == cyclesThisSec);
+
+	printf("Test BRANCH passed!\n");
+}
+
+void test_NOP() {
+
+}
+
+void test_SBC() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// sbc_inmediate
+	A = 0x05;
+	bit_clear(&P, flagC);
+	wmem_b(PC, 0xE9);
+	wmem_b(PC + 1, 0x04);
+	cpu_cycle();
+	assert(A == 0x00);
+	assert(bit_test(P, flagC) == 0);
+	assert(bit_test(P, flagZ));
+	assert(bit_test(P, flagV));
+	assert(bit_test(P, flagN) == 0);
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	// sbc_inmediate, now with carry!
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+	A = 0x05;
+	bit_clear(&P, flagC);
+	wmem_b(PC, 0xE9);
+	wmem_b(PC + 1, 0x06);
+	cpu_cycle();
+	assert(A == 0xFe);
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagV) == 0);
+	assert(bit_test(P, flagN));
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	printf("Test SBC passed!\n");
+
 }

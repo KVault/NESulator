@@ -34,4 +34,10 @@ void test_REGISTERS();
 
 void test_ADC();
 
+void test_BRANCH();
+
+void test_NOP();
+
+void test_SBC();
+
 #endif //NESULATOR_TESTCPU_H
