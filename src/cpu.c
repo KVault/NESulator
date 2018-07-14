@@ -633,7 +633,15 @@ void sbc_indirect_y() {
  * Applies the delta to the content of the memory address. Sets the Z and N flags as appropiate
  */
 void delta_memory(word memAddr, int delta, int cycles, int pcIncrease){
+	byte value = rmem_b(memAddr);
+	value += delta;
+	wmem_w(memAddr, value);
 
+	bit_val(&P, flagZ, value == 0);
+	bit_val(&P, flagN, bit_test(value, 7));
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
 }
 
 void inc_mem(word memAddr, int cycles, int pcIncrease){
@@ -894,7 +902,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&dec_mem_zpage, //$C6       DEC $44       DEcrement Memory                  2       5
 		0,
 		&iny,           //$C8       INY           Increments Y                      1       2
 		0,
@@ -902,7 +910,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&dec_mem_absolute,//$CE     DEC $4400    DEcrement Memory                   3       6
 		0,
 		&bne,           //$D0       BNE           Branch now equals                 2       2(+2)
 		0,
@@ -910,7 +918,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&dec_mem_zpage_x,//$D6      DEC $44,X     DEcrement Memory                  2       6
 		0,
 		&cld,           //$D8       CLD           CLear Decimal flag                1       2
 		0,
@@ -918,7 +926,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&dec_mem_absolute_x,//$DE   DEC $4400,X   DEcrement Memory                 3       7
 		0,
 		0,
 		&sbc_indirect_x,//$E1       SBC ($44,X)   SuBstract with Carry             2       6
@@ -926,7 +934,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&sbc_zpage,     //$E5       SBC $44       SuBstract with Carry             2       3
-		0,
+		&inc_mem_zpage, //$E6       INC $44       INcrement Memory                 2       5
 		0,
 		&inx,           //$E8       INX           Increments X register            1       7
 		&sbc_immediate, //$E9       SBC #$44      SuBstract with Carry             2       2
@@ -934,7 +942,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&sbc_absolute, //$ED       SBC $4400       SuBstract with Carry            3       4
-		0,
+		&inc_mem_absolute,//$EE    INC $4400       INcrement Memory                3       6
 		0,
 		&beq,           //$F0       BEQ           Branch if equals                 2       2(+2)
 		&sbc_indirect_y,//$F1       SBC ($44),Y   SuBstract with Carry             2       5+
@@ -942,7 +950,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&sbc_zpage_x,   //$F5       SBC $44,X     SuBstract with Carry             2       4
-		0,
+		&inc_mem_zpage_x,//$F6      INC $44, X    INcrement Memory                 2       6
 		0,
 		&sed,           //$F8       SED           Sets Decimal flag                1       2
 		&sbc_absolute_y,//$F9       SBC $4400,Y   SuBstract with Carry             3       4+
@@ -950,7 +958,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&sbc_absolute_x,//$FD       SBC $4400,X   SuBstract with Carry             3       4+
-		0,
+		&inc_mem_absolute,//$FE     INC $4400,X   INcrement Memory                 3       7
 		0
 };
 

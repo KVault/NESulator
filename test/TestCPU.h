@@ -40,4 +40,6 @@ void test_NOP();
 
 void test_SBC();
 
+void test_INCDECMEM();
+
 #endif //NESULATOR_TESTCPU_H

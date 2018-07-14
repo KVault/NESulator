@@ -22,6 +22,7 @@ void testOpcodes() {
 	test_BRANCH();
 	test_NOP();
 	test_SBC();
+	test_INCDECMEM();
 }
 
 /**
@@ -495,7 +496,13 @@ void test_BRANCH() {
 }
 
 void test_NOP() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
 
+	wmem_b(PC, 0xEA);
+	cpu_cycle();
+	assert(cachedPC + 1 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
 }
 
 void test_SBC() {
@@ -533,5 +540,60 @@ void test_SBC() {
 	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
 
 	printf("Test SBC passed!\n");
-
 }
+
+void test_INCDECMEM(){
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	//Test inc zpage
+	wmem_b(PC, 0xE6);
+	wmem_b(PC + 1, 0x69);
+	wmem_b(0x69, 0x05);
+	cpu_cycle();
+	assert(rmem_b(0x69) == 0x06);
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagN) == 0);
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 5 == cyclesThisSec);
+
+	//test inc absolute
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+	wmem_b(PC, 0xEE);
+	wmem_w(PC + 1, 0x6969);
+	wmem_b(0x6969, 0x15);
+	cpu_cycle();
+	assert(rmem_b(0x6969) == 0x16);
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagN) == 0);
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+	//Test dec zpage
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+	wmem_b(PC, 0xC6);
+	wmem_w(PC + 1, 0x69);
+	wmem_b(0x69, 0x01);
+	cpu_cycle();
+	assert(rmem_b(0x69) == 0x00);
+	assert(bit_test(P, flagZ));
+	assert(bit_test(P, flagN) == 0);
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 5 == cyclesThisSec);
+
+	//Test dec absolute
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+	wmem_b(PC, 0xCE);
+	wmem_w(PC + 1, 0x6969);
+	wmem_b(0x6969, 0x00);
+	cpu_cycle();
+	assert(rmem_b(0x6969) == 0xFF);
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagN));
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+}
+
