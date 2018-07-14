@@ -8,6 +8,8 @@ void testWrite();
 
 void testRead();
 
+void testStack();
+
 void testIndirectXAddr();
 
 void testIndirectYAddr();

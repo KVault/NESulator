@@ -13,26 +13,68 @@ byte memoryBank[MEM_SIZE];
 void zeroMemory();
 
 /**
- * Write from content in a specific memory address
- * It also deals with memory mirroring
+ * Reads one byte from the specified memory position
  */
-void wmem(unsigned short amountBytes, unsigned int initialPosition, byte *content);
+byte rmem_b(unsigned int address);
 
 /**
- * Writes the same `repeatedValue` starting at `initialPosition` during `amountBytes` bytes
+ * Reads a words starting at the specified memory position
  */
-void wmem_const(unsigned short amountBytes, unsigned int initialPosition, byte const_val);
+word rmem_w(unsigned int startAddress);
 
 /**
- * Read content from a specific memory address and write to destiny
+ * Writes one byte at the specified memory position
  */
-void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destiny);
+void wmem_b(unsigned int address, byte content);
+
+/**
+ * Writes two bytes starting at the specified memory position
+ */
+void wmem_w(unsigned int address, word content);
+
+/**
+ * Pops a byte from the stack
+ */
+byte pop_b();
+
+/**
+ * Pops a word from the stack
+ */
+word pop_w();
+
+/**
+ * Peeks a byte from stack, it doesn't modify the SP
+ */
+byte peek_b();
+
+/**
+ * Peeks a word from stack, it doesn't modify the SP
+ */
+word peek_w();
+
+/**
+ * Pushes a byte to the stack
+ */
+void push_b(byte content);
+
+/**
+ * Pushes a word to the stack
+ */
+void push_w(word content);
+
 
 /**
  * returns the byte data as a memory address value. Basically it joins the bytes as it should to give back
- * a valid word
+ * a valid word.
+ * This operation is the inverse as to_mem_addr
  */
 word to_mem_addr(byte *content);
+
+/**
+ * Returns the memory address stored in the word as a byte array that can be written in the memory bank
+ * This operation is the inverse as to_mem_addr
+ */
+void to_mem_bytes(word content, byte *result);
 
 /**
  * Indexed indirect addressing takes a single byte as an operand and adds the value of the X register to it to give the

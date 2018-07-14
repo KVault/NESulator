@@ -23,4 +23,9 @@ void bit_set(byte *b, byte bitPos);
  */
 void bit_clear(byte *b, byte bitPos);
 
+/**
+ * Set or clear (based on value) the bitPos'th bit of b
+ */
+void bit_val(byte *b, byte bitPos, int value);
+
 #endif //NESULATOR_TYPES_H
