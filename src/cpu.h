@@ -499,4 +499,33 @@ void sbc_indirect_x();
  */
 void sbc_indirect_y();
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////MEMORY INC/DEC REGION//////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Applies the delta to the content of the memory address. Sets the Z and N flags as appropiate
+ */
+void delta_memory(word memAddr, int delta, int cycles, int pcIncrease);
+
+void inc_mem(word memAddr, int cycles, int pcIncrease);
+
+void dec_mem(word memAddr, int cycles, int pcIncrease);
+
+void inc_mem_zpage();
+
+void inc_mem_zpage_x();
+
+void inc_mem_absolute();
+
+void inc_mem_absolute_x();
+
+void dec_mem_zpage();
+
+void dec_mem_zpage_x();
+
+void dec_mem_absolute();
+
+void dec_mem_absolute_x();
+
 #endif //NESULATOR_CPU_H

@@ -625,6 +625,65 @@ void sbc_indirect_y() {
 	sbc(value, 5, 2);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////MEMORY INC/DEC REGION//////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Applies the delta to the content of the memory address. Sets the Z and N flags as appropiate
+ */
+void delta_memory(word memAddr, int delta, int cycles, int pcIncrease){
+
+}
+
+void inc_mem(word memAddr, int cycles, int pcIncrease){
+	delta_memory(memAddr, 1, cycles, pcIncrease);
+}
+
+void dec_mem(word memAddr, int cycles, int pcIncrease){
+	delta_memory(memAddr, -1, cycles, pcIncrease);
+}
+
+void inc_mem_zpage(){
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	inc_mem(addr, 5, 2);
+}
+
+void inc_mem_zpage_x(){
+	word addr = zeropagex_addr(rmem_b(PC + 1));
+	inc_mem(addr, 6, 2);
+}
+
+void inc_mem_absolute(){
+	word addr = absolute_addr(rmem_w(PC + 1));
+	inc_mem(addr, 6, 3);
+}
+
+void inc_mem_absolute_x(){
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	inc_mem(addr, 7, 3);
+}
+
+void dec_mem_zpage(){
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	dec_mem(addr, 5, 2);
+}
+
+void dec_mem_zpage_x(){
+	word addr = zeropagex_addr(rmem_b(PC + 1));
+	dec_mem(addr, 6, 2);
+}
+
+void dec_mem_absolute(){
+	word addr = absolute_addr(rmem_w(PC + 1));
+	dec_mem(addr, 6, 3);
+}
+
+void dec_mem_absolute_x(){
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	dec_mem(addr, 7, 3);
+}
+
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
  *
