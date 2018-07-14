@@ -528,4 +528,51 @@ void dec_mem_absolute();
 
 void dec_mem_absolute_x();
 
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////LOAD REGISTERS INC/DEC REGION///////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Loads the specified value onto the pointed register
+ */
+void load_register(byte *regPtr, byte value, int cycles, int pcIncrease);
+
+void lda_inmediate();
+
+void lda_zpage();
+
+void lda_zpage_x();
+
+void lda_absolute();
+
+void lda_absolute_x();
+
+void lda_absolute_y();
+
+void lda_indirect_x();
+
+void lda_indirect_y();
+
+void ldx_inmediate();
+
+void ldx_zpage();
+
+void ldx_zpage_y();
+
+void ldx_absolute();
+
+void ldx_absolute_y();
+
+void ldy_inmediate();
+
+void ldy_zpage();
+
+void ldy_zpage_x();
+
+void ldy_absolute();
+
+void ldy_absolute_x();
+
+
 #endif //NESULATOR_CPU_H

@@ -632,7 +632,7 @@ void sbc_indirect_y() {
 /**
  * Applies the delta to the content of the memory address. Sets the Z and N flags as appropiate
  */
-void delta_memory(word memAddr, int delta, int cycles, int pcIncrease){
+void delta_memory(word memAddr, int delta, int cycles, int pcIncrease) {
 	byte value = rmem_b(memAddr);
 	value += delta;
 	wmem_w(memAddr, value);
@@ -644,53 +644,161 @@ void delta_memory(word memAddr, int delta, int cycles, int pcIncrease){
 	cyclesThisSec += cycles;
 }
 
-void inc_mem(word memAddr, int cycles, int pcIncrease){
+void inc_mem(word memAddr, int cycles, int pcIncrease) {
 	delta_memory(memAddr, 1, cycles, pcIncrease);
 }
 
-void dec_mem(word memAddr, int cycles, int pcIncrease){
+void dec_mem(word memAddr, int cycles, int pcIncrease) {
 	delta_memory(memAddr, -1, cycles, pcIncrease);
 }
 
-void inc_mem_zpage(){
+void inc_mem_zpage() {
 	word addr = zeropage_addr(rmem_b(PC + 1));
 	inc_mem(addr, 5, 2);
 }
 
-void inc_mem_zpage_x(){
+void inc_mem_zpage_x() {
 	word addr = zeropagex_addr(rmem_b(PC + 1));
 	inc_mem(addr, 6, 2);
 }
 
-void inc_mem_absolute(){
+void inc_mem_absolute() {
 	word addr = absolute_addr(rmem_w(PC + 1));
 	inc_mem(addr, 6, 3);
 }
 
-void inc_mem_absolute_x(){
+void inc_mem_absolute_x() {
 	word addr = absolutex_addr(rmem_w(PC + 1));
 	inc_mem(addr, 7, 3);
 }
 
-void dec_mem_zpage(){
+void dec_mem_zpage() {
 	word addr = zeropage_addr(rmem_b(PC + 1));
 	dec_mem(addr, 5, 2);
 }
 
-void dec_mem_zpage_x(){
+void dec_mem_zpage_x() {
 	word addr = zeropagex_addr(rmem_b(PC + 1));
 	dec_mem(addr, 6, 2);
 }
 
-void dec_mem_absolute(){
+void dec_mem_absolute() {
 	word addr = absolute_addr(rmem_w(PC + 1));
 	dec_mem(addr, 6, 3);
 }
 
-void dec_mem_absolute_x(){
+void dec_mem_absolute_x() {
 	word addr = absolutex_addr(rmem_w(PC + 1));
 	dec_mem(addr, 7, 3);
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////LOAD REGISTERS INC/DEC REGION///////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+void load_register(byte *regPtr, byte value, int cycles, int pcIncrease) {
+	*regPtr = value;
+
+	bit_val(&P, flagZ, *regPtr == 0);
+	bit_val(&P, flagN, bit_test(*regPtr, 7));
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void lda_inmediate() {
+	load_register(&A, rmem_b(PC + 1), 2, 2);
+}
+
+void lda_zpage() {
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	load_register(&A, rmem_b(addr), 3, 2);
+}
+
+void lda_zpage_x() {
+	word addr = zeropagex_addr(rmem_b(PC + 1));
+	load_register(&A, rmem_b(addr), 4, 2);
+}
+
+void lda_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	load_register(&A, rmem_b(addr), 4, 3);
+}
+
+void lda_absolute_x() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	load_register(&A, rmem_b(addr), 4, 3);
+	// TODO +1 if page crossed
+}
+
+void lda_absolute_y() {
+	word addr = absolutey_addr(rmem_w(PC + 1));
+	load_register(&A, rmem_b(addr), 4, 3);
+	// TODO +1 if page crossed
+}
+
+void lda_indirect_x() {
+	word addr = indirectx_addr(rmem_b(PC + 1));
+	load_register(&A, rmem_b(addr), 6, 2);
+}
+
+void lda_indirect_y() {
+	word addr = indirecty_addr(rmem_b(PC + 1));
+	load_register(&A, rmem_b(addr), 5, 2);
+	// TODO +1 if page crossed
+}
+
+void ldx_inmediate() {
+	load_register(&X, rmem_b(PC + 1), 2, 2);
+}
+
+void ldx_zpage() {
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	load_register(&X, rmem_b(addr), 3, 2);
+}
+
+void ldx_zpage_y() {
+	word addr = zeropagey_addr(rmem_b(PC + 1));
+	load_register(&X, rmem_b(addr), 4, 2);
+}
+
+void ldx_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	load_register(&X, rmem_b(addr), 4, 3);
+}
+
+void ldx_absolute_y() {
+	word addr = absolutey_addr(rmem_w(PC + 1));
+	load_register(&X, rmem_b(addr), 4, 3);
+	// TODO +1 if page crossed
+}
+
+void ldy_inmediate() {
+	load_register(&Y, rmem_b(PC + 1), 2, 2);
+}
+
+void ldy_zpage() {
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	load_register(&Y, rmem_b(addr), 3, 2);
+}
+
+void ldy_zpage_x() {
+	word addr = zeropagex_addr(rmem_b(PC + 1));
+	load_register(&Y, rmem_b(addr), 4, 2);
+}
+
+void ldy_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	load_register(&Y, rmem_b(addr), 4, 3);
+}
+
+void ldy_absolute_x() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	load_register(&Y, rmem_b(addr), 4, 3);
+	// TODO +1 if page crossed
+}
+
 
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
@@ -869,11 +977,11 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&lda_zpage,     //$A5       LDA $44       LoaD Accumulator                  2       3
 		0,
 		0,
 		&tay,           //$A8       TAY           Transfer A to Y                   1       2
-		0,
+		&lda_inmediate, //$A9       LDA #$44      LoaD Accumulator                  2       2
 		&tax,           //$AA       TAX           Transfer A to X                   1       2
 		0,
 		0,
@@ -889,7 +997,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&clv,           //$B8       CLV           CLear Overflow flag                1       2,
-		0,
+		&lda_absolute_y,//$B9       LDA $4400,Y   LoaD Accumulator                   3       4+
 		0,
 		0,
 		0,
@@ -958,7 +1066,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&sbc_absolute_x,//$FD       SBC $4400,X   SuBstract with Carry             3       4+
-		&inc_mem_absolute,//$FE     INC $4400,X   INcrement Memory                 3       7
+		&inc_mem_absolute_x,//$FE     INC $4400,X   INcrement Memory                 3       7
 		0
 };
 

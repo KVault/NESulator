@@ -23,6 +23,7 @@ void testOpcodes() {
 	test_NOP();
 	test_SBC();
 	test_INCDECMEM();
+	test_LOADREGISTER();
 }
 
 /**
@@ -542,7 +543,7 @@ void test_SBC() {
 	printf("Test SBC passed!\n");
 }
 
-void test_INCDECMEM(){
+void test_INCDECMEM() {
 	int cachedPC = PC;
 	int cachedCyclesThisSec = cyclesThisSec;
 
@@ -595,5 +596,36 @@ void test_INCDECMEM(){
 	assert(bit_test(P, flagN));
 	assert(cachedPC + 3 == PC);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+	printf("Test INCDECMEM passed!\n");
+}
+
+void test_LOADREGISTER() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// lda_inmediate
+	wmem_b(PC, 0xA9);
+	wmem_b(PC + 1, 0x42);
+	cpu_cycle();
+	assert(A == 0x42);
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	// lda_absolute_y
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+	wmem_b(PC, 0xB9);
+	wmem_w(PC + 1, 0x6969);
+	Y = 0x01;
+	wmem_b(0x696A, 0xF5);
+	cpu_cycle();
+	assert(A == 0xF5);
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagN));
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
+
+	printf("Test LOADREGISTER passed!\n");
 }
 
