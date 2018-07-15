@@ -871,17 +871,17 @@ byte zpagey_param() {
 }
 
 byte absolute_param() {
-	word addr = absolute_addr(rmem_b(PC + 1));
+	word addr = absolute_addr(rmem_w(PC + 1));
 	return rmem_b(addr);
 }
 
 byte absolutex_param() {
-	word addr = absolutex_addr(rmem_b(PC + 1));
+	word addr = absolutex_addr(rmem_w(PC + 1));
 	return rmem_b(addr);
 }
 
 byte absolutey_param() {
-	word addr = absolutey_addr(rmem_b(PC + 1));
+	word addr = absolutey_addr(rmem_w(PC + 1));
 	return rmem_b(addr);
 }
 
