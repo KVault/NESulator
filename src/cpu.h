@@ -54,6 +54,47 @@ void decOpcode();
 void exeOpcode();
 
 /**
+ * Returns a byte by reading the PC + 1 and treating it as a zero page parameter. See addressing modes
+ */
+byte zpage_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a zero page X parameter. See addressing modes
+ */
+byte zpagex_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a zero page Y parameter. See addressing modes
+ */
+byte zpagey_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a absolute parameter. See addressing modes
+ */
+byte absolute_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a absolute X parameter. See addressing modes
+ */
+byte absolutex_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a absolute Y parameter. See addressing modes
+ */
+byte absolutey_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a indirect X parameter. See addressing modes
+ */
+byte indirectx_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a indirect Y parameter. See addressing modes
+ */
+byte indirecty_param();
+
+
+/**
  * Executes an instruction on the cpu. Internally it would decode the opcode and execute it (for now)
  * In  the future it would also have to call some routine to match the original cpu speed
  */
