@@ -64,24 +64,20 @@ void ora(byte b, int cycles, int pcIncrease) {
 }
 
 void ora_ind_x() {
-	word addr = indirectx_addr(rmem_b(PC + 1));
-	ora(rmem_b(addr), 6, 2);
+	ora(indirectx_param(), 6, 2);
 }
 
 void ora_ind_y() {
-	word addr = indirecty_addr(rmem_b(PC + 1));
+	ora(indirecty_param(), 5, 2);
 	// TODO +1 if page crossed
-	ora(rmem_b(addr), 5, 2);
 }
 
 void ora_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
-	ora(rmem_b(addr), 2, 2);
+	ora(zpage_param(), 2, 2);
 }
 
 void ora_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
-	ora(rmem_b(addr), 4, 2);
+	ora(zpagex_param(), 4, 2);
 }
 
 void ora_immediate() {
@@ -89,18 +85,15 @@ void ora_immediate() {
 }
 
 void ora_absolute() {
-	word addr = absolute_addr(rmem_w(PC + 1));
-	ora(rmem_b(addr), 4, 3);
+	ora(absolute_param(), 4, 3);
 }
 
 void ora_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
-	ora(rmem_b(addr), 4, 3);
+	ora(absolutex_param(), 4, 3);
 }
 
 void ora_absolute_y() {
-	word addr = absolutey_addr(rmem_w(PC + 1));
-	ora(rmem_b(addr), 4, 3);
+	ora(absolutey_param(), 4, 3);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +126,7 @@ void asl(byte *b, int cycles, int pcIncrease) {
 
 void asl_zpage() {
 	word addr = zeropage_addr(rmem_b(PC + 1));
-	byte data = rmem_b(addr);
+	byte data = zpage_param();
 	asl(&data, 5, 2);
 	wmem_b(addr, data);
 }
@@ -248,47 +241,33 @@ void and_immediate() {
 }
 
 void and_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	and(value, 3, 2);
+	and(zpage_param(), 3, 2);
 }
 
 void and_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	and(value, 4, 2);
+	and(zpagex_param(), 4, 2);
 }
 
 void and_absolute() {
-	word addr = absolute_addr(rmem_w(PC + 1));
-	byte value = rmem_b(addr);
-	and(value, 4, 3);
+	and(absolute_param(), 4, 3);
 }
 
 void and_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
-	byte value = rmem_b(addr);
-	and(value, 4, 3);
+	and(absolutex_param(), 4, 3);
 	//TODO +1 cycle if page crossed
 }
 
 void and_absolute_y() {
-	word addr = absolutey_addr(rmem_w(PC + 1));
-	byte value = rmem_b(addr);
-	and(value, 4, 3);
+	and(absolutey_param(), 4, 3);
 	//TODO +1 cycle if page crossed
 }
 
 void and_indirect_x() {
-	word addr = indirectx_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	and(value, 6, 2);
+	and(indirectx_param(), 6, 2);
 }
 
 void and_indirect_y() {
-	word addr = indirecty_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	and(value, 5, 2);
+	and(indirecty_param(), 5, 2);
 	//TODO +1 cycle if page crossed
 }
 
@@ -314,18 +293,14 @@ void bit(byte value, int cycles, int pcIncrease) {
  * BIt Test checks if one or more bits of a memory position are set
  */
 void bit_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	bit(value, 3, 2);
+	bit(zpage_param(), 3, 2);
 }
 
 /**
  * BIt Test checks if one or more bits of a memory position are set
  */
 void bit_absolute() {
-	word addr = absolute_addr(rmem_w(PC + 1));
-	byte value = rmem_b(addr);
-	bit(value, 4, 3);
+	bit(absolute_param(), 4, 3);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -459,49 +434,35 @@ void adc_immediate() {
 }
 
 void adc_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	adc(value, 3, 2);
+	adc(zpage_param(), 3, 2);
 }
 
 void adc_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	adc(value, 4, 2);
+	adc(zpagex_param(), 4, 2);
 
 }
 
 void adc_absolute() {
-	word addr = absolute_addr(rmem_w(PC + 1));
-	byte value = rmem_b(addr);
-	adc(value, 4, 3);
+	adc(absolute_param(), 4, 3);
 }
 
 void adc_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
-	byte value = rmem_b(addr);
+	adc(absolutex_param(), 4, 3);
 	//TODO +1 cycle if page crossed
-	adc(value, 4, 3);
 }
 
 void adc_absolute_y() {
-	word addr = absolutey_addr(rmem_w(PC + 1));
-	byte value = rmem_b(addr);
+	adc(absolutey_param(), 4, 3);
 	//TODO +1 cycle if page crossed
-	adc(value, 4, 3);
 }
 
 void adc_indirect_x() {
-	word addr = indirectx_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	adc(value, 6, 2);
+	adc(indirectx_param(), 6, 2);
 }
 
 void adc_indirect_y() {
-	word addr = indirecty_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
+	adc(indirecty_param(), 5, 2);
 	//TODO +1 cycle if page crossed
-	adc(value, 5, 2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -580,49 +541,35 @@ void sbc_immediate() {
 }
 
 void sbc_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	sbc(value, 3, 2);
+	sbc(zpage_param(), 3, 2);
 }
 
 void sbc_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	sbc(value, 4, 2);
+	sbc(zpagex_param(), 4, 2);
 
 }
 
 void sbc_absolute() {
-	word addr = absolute_addr(rmem_w(PC + 1));
-	byte value = rmem_b(addr);
-	sbc(value, 4, 3);
+	sbc(absolute_param(), 4, 3);
 }
 
 void sbc_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
-	byte value = rmem_b(addr);
 	//TODO +1 cycle if page crossed
-	sbc(value, 4, 3);
+	sbc(absolutex_param(), 4, 3);
 }
 
 void sbc_absolute_y() {
-	word addr = absolutey_addr(rmem_w(PC + 1));
-	byte value = rmem_b(addr);
 	//TODO +1 cycle if page crossed
-	sbc(value, 4, 3);
+	sbc(absolutey_param(), 4, 3);
 }
 
 void sbc_indirect_x() {
-	word addr = indirectx_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
-	sbc(value, 6, 2);
+	sbc(indirectx_param(), 6, 2);
 }
 
 void sbc_indirect_y() {
-	word addr = indirecty_addr(rmem_b(PC + 1));
-	byte value = rmem_b(addr);
 	//TODO +1 cycle if page crossed
-	sbc(value, 5, 2);
+	sbc(indirecty_param(), 5, 2);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -712,18 +659,15 @@ void lda_inmediate() {
 }
 
 void lda_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
-	load_register(&A, rmem_b(addr), 3, 2);
+	load_register(&A, zpage_param(), 3, 2);
 }
 
 void lda_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
-	load_register(&A, rmem_b(addr), 4, 2);
+	load_register(&A, zpagex_param(), 4, 2);
 }
 
 void lda_absolute() {
-	word addr = absolute_addr(rmem_w(PC + 1));
-	load_register(&A, rmem_b(addr), 4, 3);
+	load_register(&A, absolute_param(), 4, 3);
 }
 
 void lda_absolute_x() {
@@ -733,19 +677,16 @@ void lda_absolute_x() {
 }
 
 void lda_absolute_y() {
-	word addr = absolutey_addr(rmem_w(PC + 1));
-	load_register(&A, rmem_b(addr), 4, 3);
+	load_register(&A, absolutey_param(), 4, 3);
 	// TODO +1 if page crossed
 }
 
 void lda_indirect_x() {
-	word addr = indirectx_addr(rmem_b(PC + 1));
-	load_register(&A, rmem_b(addr), 6, 2);
+	load_register(&A, absolutex_param(), 6, 2);
 }
 
 void lda_indirect_y() {
-	word addr = indirecty_addr(rmem_b(PC + 1));
-	load_register(&A, rmem_b(addr), 5, 2);
+	load_register(&A, indirecty_param(), 5, 2);
 	// TODO +1 if page crossed
 }
 
@@ -754,23 +695,19 @@ void ldx_immediate() {
 }
 
 void ldx_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
-	load_register(&X, rmem_b(addr), 3, 2);
+	load_register(&X, zpage_param(), 3, 2);
 }
 
 void ldx_zpage_y() {
-	word addr = zeropagey_addr(rmem_b(PC + 1));
-	load_register(&X, rmem_b(addr), 4, 2);
+	load_register(&X, zpagey_param(), 4, 2);
 }
 
 void ldx_absolute() {
-	word addr = absolute_addr(rmem_w(PC + 1));
-	load_register(&X, rmem_b(addr), 4, 3);
+	load_register(&X, absolute_param(), 4, 3);
 }
 
 void ldx_absolute_y() {
-	word addr = absolutey_addr(rmem_w(PC + 1));
-	load_register(&X, rmem_b(addr), 4, 3);
+	load_register(&X, absolutey_param(), 4, 3);
 	// TODO +1 if page crossed
 }
 
@@ -779,23 +716,19 @@ void ldy_immediate() {
 }
 
 void ldy_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
-	load_register(&Y, rmem_b(addr), 3, 2);
+	load_register(&Y, zpage_param(), 3, 2);
 }
 
 void ldy_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
-	load_register(&Y, rmem_b(addr), 4, 2);
+	load_register(&Y, zpagex_param(), 4, 2);
 }
 
 void ldy_absolute() {
-	word addr = absolute_addr(rmem_w(PC + 1));
-	load_register(&Y, rmem_b(addr), 4, 3);
+	load_register(&Y, absolute_param(), 4, 3);
 }
 
 void ldy_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
-	load_register(&Y, rmem_b(addr), 4, 3);
+	load_register(&Y, absolutex_param(), 4, 3);
 	// TODO +1 if page crossed
 }
 
@@ -1144,4 +1077,44 @@ void decOpcode() {
 
 void exeOpcode() {
 	((gen_opcode_func) opcodeFunctions[currentOpcode])();
+}
+
+byte zpage_param() {
+	word addr = zeropage_addr(rmem_b(PC + 1));
+	return rmem_b(addr);
+}
+
+byte zpagex_param() {
+	word addr = zeropagex_addr(rmem_b(PC + 1));
+	return rmem_b(addr);
+}
+
+byte zpagey_param() {
+	word addr = zeropagey_addr(rmem_b(PC + 1));
+	return rmem_b(addr);
+}
+
+byte absolute_param() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	return rmem_b(addr);
+}
+
+byte absolutex_param() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	return rmem_b(addr);
+}
+
+byte absolutey_param() {
+	word addr = absolutey_addr(rmem_w(PC + 1));
+	return rmem_b(addr);
+}
+
+byte indirectx_param() {
+	word addr = indirectx_addr(rmem_b(PC + 1));
+	return rmem_b(addr);
+}
+
+byte indirecty_param() {
+	word addr = indirecty_addr(rmem_b(PC + 1));
+	return rmem_b(addr);
 }
