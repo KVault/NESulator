@@ -558,7 +558,7 @@ void beq() {
 
 void sbc(byte value, int cycles, int pcIncrease) {
 	byte carry = (byte) bit_test(P, flagC);
-	byte carryNop = !carry;
+	byte carryNop = (byte) !carry;
 	int result = A - value - carryNop;
 	carry = (byte) ((result & 0x100) >> 8);
 	bit_val(&P, flagC, carry);
@@ -800,6 +800,69 @@ void ldy_absolute_x() {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////LOAD REGISTERS REGION///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Loads the specified value onto the pointed register
+ */
+void store_register(byte *regPtr, byte value, int cycles, int pcIncrease){
+
+}
+
+void sta_zpage(){
+	
+}
+
+void sta_zpage_x(){
+
+}
+
+void sta_absolute(){
+
+}
+
+void sta_absolute_x(){
+
+}
+
+void sta_absolute_y(){
+
+}
+
+void sta_indirect_x(){
+
+}
+
+void sta_indirect_y(){
+
+}
+
+void stx_zpage(){
+
+}
+
+void stx_zpage_y(){
+
+}
+
+void stx_absolute(){
+
+}
+
+void sty_zpage(){
+
+}
+
+void sty_zpage_x(){
+
+}
+
+void sty_absolute(){
+
+}
+
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
  *
@@ -941,37 +1004,38 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		&sta_indirect_x,//$81      STA ($44,X)    STore Accumulator                 2       6
 		0,
 		0,
-		0,
-		0,
-		0,
-		0,
+		&sty_zpage,     //$84      STX $44       STore Y Register                   2       3
+		&sta_zpage,     //$85      STA $44       STore Accumulator                  2       2
+		&stx_zpage,     //$86      STX $44       STore X Register                   2       2
 		0,
 		&dey,           //$88       DEY           Decrements Y                      1       2
 		0,
 		&txa,           //$8A       TXA           Transfer X to A                   1       2
 		0,
-		0,
-		0,
-		0,
+		&sty_absolute,  //$8C       STX $4400     STore Y Register                  3       4
+		&sta_absolute,  //$8D       STA $4400     STore Accumulator                 3       4
+		&stx_absolute,  //$8E       STX $4400     STore X Register                  3       4
 		0,
 		&bcc,           //$90       BCC           Branch if carry clear             2       2(+2)
+		&sta_indirect_y,//$91      STA ($44),Y    STore Accumulator                 2       6
+		0,
+		0,
+		&sty_zpage_x,   //$94      STX $44,Y      STore Y Register                  2       4
+		&sta_zpage_x,   //$95      STA $44,X      STore Accumulator                 2       4
+		&stx_zpage_y,   //96       STX $44, Y     STore X Register                  2       4
+		0,
+		&tya,           //$98      TYA           Transfer Y to A                   1       2
+		&sta_absolute_y,//$9D      STA $4400,Y    STore Accumulator                 3       5
 		0,
 		0,
 		0,
+		&sta_absolute_x,//$9D      STA $4400,X    STore Accumulator                 3       5
 		0,
 		0,
-		0,
-		0,
-		&tya,           //$98       TYA           Transfer Y to A                   1       2
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0, &ldy_immediate, //A0       LDA #$44       LoaD Accumulator                  2       2
+		&ldy_immediate, //A0       LDA #$44       LoaD Accumulator                  2       2
 		&lda_indirect_x,//A1       LDA ($44,X)    LoaD Accumulator                  2       6
 		&ldx_immediate, //A2       LDA #$44       LoaD Accumulator                  2       2
 		0,
