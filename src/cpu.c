@@ -749,7 +749,7 @@ void lda_indirect_y() {
 	// TODO +1 if page crossed
 }
 
-void ldx_inmediate() {
+void ldx_immediate() {
 	load_register(&X, rmem_b(PC + 1), 2, 2);
 }
 
@@ -774,7 +774,7 @@ void ldx_absolute_y() {
 	// TODO +1 if page crossed
 }
 
-void ldy_inmediate() {
+void ldy_immediate() {
 	load_register(&Y, rmem_b(PC + 1), 2, 2);
 }
 
@@ -971,38 +971,37 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
+		0, &ldy_immediate, //A0       LDA #$44       LoaD Accumulator                  2       2
+		&lda_indirect_x,//A1       LDA ($44,X)    LoaD Accumulator                  2       6
+		&ldx_immediate, //A2       LDA #$44       LoaD Accumulator                  2       2
 		0,
-		0,
-		0,
-		0,
-		0,
-		0,
+		&ldy_zpage,     //$A4       LDA $44       LoaD Accumulator                  2       3
 		&lda_zpage,     //$A5       LDA $44       LoaD Accumulator                  2       3
-		0,
+		&ldx_zpage,     //$A6       LDA $44       LoaD Accumulator                  2       3
 		0,
 		&tay,           //$A8       TAY           Transfer A to Y                   1       2
 		&lda_inmediate, //$A9       LDA #$44      LoaD Accumulator                  2       2
 		&tax,           //$AA       TAX           Transfer A to X                   1       2
 		0,
-		0,
-		0,
-		0,
+		&ldy_absolute,  //$A4      LDY $4400     LoaD Y Register                    3       4
+		&lda_absolute,  //AD       LDA $4400     LoaD Accumulator                   3       4
+		&ldx_absolute,  //AE       LDA $4400     LoaD Accumulator                   3       4
 		0,
 		&bcs,           //$B0       BCS           Branch id carry set               2       2(+2)
+		&lda_indirect_y,//B1        LDA ($44),Y   LoaD Accumulator                  2       5+
 		0,
 		0,
-		0,
-		0,
-		0,
-		0,
+		&ldy_zpage_x,   //$B4       LDY $44, X    LoaD Y Register                    2       6
+		&lda_zpage_x,   //$B5       LDA $44, X    LoaD Accumulator                   2       4
+		&ldx_zpage_y,   //$B6       LDX $44, Y    LoaD Accumulator                   2       4
 		0,
 		&clv,           //$B8       CLV           CLear Overflow flag                1       2,
 		&lda_absolute_y,//$B9       LDA $4400,Y   LoaD Accumulator                   3       4+
 		0,
 		0,
-		0,
-		0,
-		0,
+		&ldy_absolute_x,//$A4      LDY $4400,Y    LoaD Y Register                    3       4+
+		&lda_absolute_x,//BD       LDA $4400,X    LoaD Accumulator                   3       4+
+		&ldx_absolute_y,//BE       LDA $4400,Y    LoaD Accumulator                   3       4+
 		0,
 		0,
 		0,

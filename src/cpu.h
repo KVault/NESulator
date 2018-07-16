@@ -554,7 +554,7 @@ void lda_indirect_x();
 
 void lda_indirect_y();
 
-void ldx_inmediate();
+void ldx_immediate();
 
 void ldx_zpage();
 
@@ -564,7 +564,7 @@ void ldx_absolute();
 
 void ldx_absolute_y();
 
-void ldy_inmediate();
+void ldy_immediate();
 
 void ldy_zpage();
 
