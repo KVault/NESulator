@@ -622,7 +622,7 @@ void ldy_absolute_x();
 /**
  * Loads the specified value onto the pointed register
  */
-void store_register(byte *regPtr, byte value, int cycles, int pcIncrease);
+void store_register(byte reg, word memAddr, int cycles, int pcIncrease);
 
 void sta_zpage();
 

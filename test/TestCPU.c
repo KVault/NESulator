@@ -24,6 +24,7 @@ void testOpcodes() {
 	test_SBC();
 	test_INCDECMEM();
 	test_LOADREGISTER();
+	test_STOREREGISTER();
 }
 
 /**
@@ -101,7 +102,7 @@ void test_ASL() {
 	P = 0;
 	wmem_b(PC, 0x06); // asl_zage opcode injected
 	wmem_b(PC + 1, 0x56); // where the data is save
-	word addr = zeropage_addr((word) 0x56);
+	word addr = zpage_addr((word) 0x56);
 	wmem_b(addr, 0b10000101);
 	cpu_cycle();
 	byte result = rmem_b(addr);
@@ -628,4 +629,23 @@ void test_LOADREGISTER() {
 
 	printf("Test LOADREGISTER passed!\n");
 }
+
+void test_STOREREGISTER() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// sta_indirect_y
+	wmem_b(PC, 0x91);
+	wmem_b(PC + 1, 0x69);
+	Y = 0x42;
+	word addr = indirecty_addr(0x69);
+	A = 0x23;
+	cpu_cycle();
+	assert(rmem_b(addr) == A);
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+	printf("Test STOREREGISTER passed!\n");
+}
+
 

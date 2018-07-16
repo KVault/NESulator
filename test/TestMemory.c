@@ -114,20 +114,20 @@ void testZeroPageAddr() {
 	zeroMemory();
 	word addr = 0;
 
-	// zeropagex_addr test
+	// zpagex_addr test
 	X = 0x60;
-	addr = zeropagex_addr(0xC0);
+	addr = zpagex_addr(0xC0);
 	assert(0x0020 == addr);
 	printf("Test ZeroPageXAddr passed!\n");
 
-	// zeropagey_addr test
+	// zpagey_addr test
 	Y = 0x10;
-	addr = zeropagey_addr(0xFB);
+	addr = zpagey_addr(0xFB);
 	assert(0x000B == addr);
 	printf("Test ZeroPageYAddr passed!\n");
 
-	// zeropage_addr test
-	addr = zeropage_addr(0x6969);
+	// zpage_addr test
+	addr = zpage_addr(0x6969);
 	assert(0x0069 == addr);
 	printf("Test ZeroPageAddr passed!\n");
 }

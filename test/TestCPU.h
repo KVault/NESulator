@@ -44,4 +44,6 @@ void test_INCDECMEM();
 
 void test_LOADREGISTER();
 
+void test_STOREREGISTER();
+
 #endif //NESULATOR_TESTCPU_H

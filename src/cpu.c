@@ -125,7 +125,7 @@ void asl(byte *b, int cycles, int pcIncrease) {
 }
 
 void asl_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
+	word addr = zpage_addr(rmem_b(PC + 1));
 	byte data = zpage_param();
 	asl(&data, 5, 2);
 	wmem_b(addr, data);
@@ -136,7 +136,7 @@ void asl_accumulator() {
 }
 
 void asl_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
+	word addr = zpagex_addr(rmem_b(PC + 1));
 	byte data = rmem_b(addr);
 	asl(&data, 6, 2);
 	wmem_b(addr, data);
@@ -600,12 +600,12 @@ void dec_mem(word memAddr, int cycles, int pcIncrease) {
 }
 
 void inc_mem_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
+	word addr = zpage_addr(rmem_b(PC + 1));
 	inc_mem(addr, 5, 2);
 }
 
 void inc_mem_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
+	word addr = zpagex_addr(rmem_b(PC + 1));
 	inc_mem(addr, 6, 2);
 }
 
@@ -620,12 +620,12 @@ void inc_mem_absolute_x() {
 }
 
 void dec_mem_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
+	word addr = zpage_addr(rmem_b(PC + 1));
 	dec_mem(addr, 5, 2);
 }
 
 void dec_mem_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
+	word addr = zpagex_addr(rmem_b(PC + 1));
 	dec_mem(addr, 6, 2);
 }
 
@@ -738,62 +738,64 @@ void ldy_absolute_x() {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Loads the specified value onto the pointed register
+ * Store the specified value onto the pointed register
  */
-void store_register(byte *regPtr, byte value, int cycles, int pcIncrease){
-
+void store_register(byte reg, word memAddr, int cycles, int pcIncrease) {
+	wmem_b(memAddr, reg);
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
 }
 
-void sta_zpage(){
-	
+void sta_zpage() {
+	store_register(A, zpage_addr(rmem_b(PC + 1)), 3, 2);
 }
 
-void sta_zpage_x(){
-
+void sta_zpage_x() {
+	store_register(A, zpagex_addr(rmem_b(PC + 1)), 4, 2);
 }
 
-void sta_absolute(){
-
+void sta_absolute() {
+	store_register(A, absolute_addr(rmem_b(PC + 1)), 4, 3);
 }
 
-void sta_absolute_x(){
-
+void sta_absolute_x() {
+	store_register(A, absolutex_addr(rmem_b(PC + 1)), 5, 3);
 }
 
-void sta_absolute_y(){
-
+void sta_absolute_y() {
+	store_register(A, absolutey_addr(rmem_b(PC + 1)), 5, 3);
 }
 
-void sta_indirect_x(){
-
+void sta_indirect_x() {
+	store_register(A, indirectx_addr(rmem_b(PC + 1)), 6, 2);
 }
 
-void sta_indirect_y(){
-
+void sta_indirect_y() {
+	store_register(A, indirecty_addr(rmem_b(PC + 1)), 6, 2);
 }
 
-void stx_zpage(){
-
+void stx_zpage() {
+	store_register(X, zpagex_addr(rmem_b(PC + 1)), 3, 2);
 }
 
-void stx_zpage_y(){
-
+void stx_zpage_y() {
+	store_register(X, zpagey_addr(rmem_b(PC + 1)), 4, 2);
 }
 
-void stx_absolute(){
-
+void stx_absolute() {
+	store_register(X, absolute_addr(rmem_b(PC + 1)), 4, 3);
 }
 
-void sty_zpage(){
-
+void sty_zpage() {
+	store_register(Y, zpage_addr(rmem_b(PC + 1)), 3, 2);
 }
 
-void sty_zpage_x(){
-
+void sty_zpage_x() {
+	store_register(Y, zpagex_addr(rmem_b(PC + 1)), 4, 2);
 }
 
-void sty_absolute(){
-
+void sty_absolute() {
+	store_register(Y, absolute_addr(rmem_b(PC + 1)), 4, 3);
 }
 
 /**
@@ -1080,17 +1082,17 @@ void exeOpcode() {
 }
 
 byte zpage_param() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
+	word addr = zpage_addr(rmem_b(PC + 1));
 	return rmem_b(addr);
 }
 
 byte zpagex_param() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
+	word addr = zpagex_addr(rmem_b(PC + 1));
 	return rmem_b(addr);
 }
 
 byte zpagey_param() {
-	word addr = zeropagey_addr(rmem_b(PC + 1));
+	word addr = zpagey_addr(rmem_b(PC + 1));
 	return rmem_b(addr);
 }
 
