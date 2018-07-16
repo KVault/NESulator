@@ -148,7 +148,7 @@ void test_JSR() {
 	wmem_w(PC + 1, param);
 	cpu_cycle();
 
-	assert(peek_w() == cachedPC - 1);
+	assert(peek_w() == cachedPC + 2);
 	assert(PC == 0x6969);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
 	assert(cachedSP - 2 == SP);
@@ -650,6 +650,22 @@ void test_STOREREGISTER() {
 }
 
 void test_RTI() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// Let's run a JSR
+	wmem_b(PC, 0x20);
+	wmem_w(PC + 1, 0x6969);
+	cpu_cycle();
+	assert(PC == 0x6969);
+
+	// And now, the RTI
+	cachedCyclesThisSec = cyclesThisSec;
+	wmem_b(PC, 0x40);
+	cpu_cycle();
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
 	printf("Test RTI passed!\n");
 }
 
