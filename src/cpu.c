@@ -798,6 +798,14 @@ void sty_absolute() {
 	store_register(Y, absolute_addr(rmem_b(PC + 1)), 4, 3);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////LOAD REGISTERS REGION///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+void rti(){
+
+}
+
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
  *
@@ -874,7 +882,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&and_absolute_x,//$3D       AND $4400, X  bitwise AND with accumulator    3       4+
 		0,
 		0,
-		0,
+		&rti,           //$40       RTI           Returns from Interrupt          1        6
 		0,
 		0,
 		0,

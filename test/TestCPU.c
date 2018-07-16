@@ -25,6 +25,7 @@ void testOpcodes() {
 	test_INCDECMEM();
 	test_LOADREGISTER();
 	test_STOREREGISTER();
+	test_RTI();
 }
 
 /**
@@ -646,6 +647,10 @@ void test_STOREREGISTER() {
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
 
 	printf("Test STOREREGISTER passed!\n");
+}
+
+void test_RTI() {
+	printf("Test RTI passed!\n");
 }
 
 

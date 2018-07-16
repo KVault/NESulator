@@ -46,4 +46,6 @@ void test_LOADREGISTER();
 
 void test_STOREREGISTER();
 
+void test_RTI();
+
 #endif //NESULATOR_TESTCPU_H
