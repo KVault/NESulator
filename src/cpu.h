@@ -54,6 +54,47 @@ void decOpcode();
 void exeOpcode();
 
 /**
+ * Returns a byte by reading the PC + 1 and treating it as a zero page parameter. See addressing modes
+ */
+byte zpage_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a zero page X parameter. See addressing modes
+ */
+byte zpagex_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a zero page Y parameter. See addressing modes
+ */
+byte zpagey_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a absolute parameter. See addressing modes
+ */
+byte absolute_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a absolute X parameter. See addressing modes
+ */
+byte absolutex_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a absolute Y parameter. See addressing modes
+ */
+byte absolutey_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a indirect X parameter. See addressing modes
+ */
+byte indirectx_param();
+
+/**
+ * Returns a byte by reading the PC + 1 and treating it as a indirect Y parameter. See addressing modes
+ */
+byte indirecty_param();
+
+
+/**
  * Executes an instruction on the cpu. Internally it would decode the opcode and execute it (for now)
  * In  the future it would also have to call some routine to match the original cpu speed
  */
@@ -498,5 +539,81 @@ void sbc_indirect_x();
  * Substract with carry
  */
 void sbc_indirect_y();
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////MEMORY INC/DEC REGION//////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Applies the delta to the content of the memory address. Sets the Z and N flags as appropiate
+ */
+void delta_memory(word memAddr, int delta, int cycles, int pcIncrease);
+
+void inc_mem(word memAddr, int cycles, int pcIncrease);
+
+void dec_mem(word memAddr, int cycles, int pcIncrease);
+
+void inc_mem_zpage();
+
+void inc_mem_zpage_x();
+
+void inc_mem_absolute();
+
+void inc_mem_absolute_x();
+
+void dec_mem_zpage();
+
+void dec_mem_zpage_x();
+
+void dec_mem_absolute();
+
+void dec_mem_absolute_x();
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////LOAD REGISTERS INC/DEC REGION///////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Loads the specified value onto the pointed register
+ */
+void load_register(byte *regPtr, byte value, int cycles, int pcIncrease);
+
+void lda_inmediate();
+
+void lda_zpage();
+
+void lda_zpage_x();
+
+void lda_absolute();
+
+void lda_absolute_x();
+
+void lda_absolute_y();
+
+void lda_indirect_x();
+
+void lda_indirect_y();
+
+void ldx_inmediate();
+
+void ldx_zpage();
+
+void ldx_zpage_y();
+
+void ldx_absolute();
+
+void ldx_absolute_y();
+
+void ldy_inmediate();
+
+void ldy_zpage();
+
+void ldy_zpage_x();
+
+void ldy_absolute();
+
+void ldy_absolute_x();
+
 
 #endif //NESULATOR_CPU_H
