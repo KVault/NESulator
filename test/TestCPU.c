@@ -671,7 +671,7 @@ void test_RTS() {
 	printf("Test RTS passed!\n");
 }
 
-void test_RTI(){
+void test_RTI() {
 	int cachedCyclesThisSec = cyclesThisSec;
 
 	push_w(0x6969);
@@ -686,6 +686,37 @@ void test_RTI(){
 	printf("Test RTI passed!\n");
 }
 
-void test_COMPAREREGISTER(){
+void test_COMPAREREGISTER() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// cmp_inmediate zero flag set
+	wmem_b(PC, 0xC9);
+	wmem_b(PC + 1, 0x23);
+	A = 0x23;
+	cpu_cycle();
+
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagN) == 0);
+	assert(bit_test(P, flagZ));
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	// cmp_absolute carry flag set & negative set
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+
+	wmem_b(PC, 0xCD);
+	wmem_w(PC + 1, 0x2323);
+	wmem_b(0x2323, 0x20);
+	A = 0x23;
+	cpu_cycle();
+
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagN));
+	assert(bit_test(P, flagZ) == 0);
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
+
 	printf("Test COMPAREREGISTER passed!\n");
 }

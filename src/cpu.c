@@ -820,7 +820,12 @@ void rti() {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease) {
+	bit_val(&P, flagC, *regPtr >= value);
+	bit_val(&P, flagN, *regPtr < value);
+	bit_val(&P, flagZ, *regPtr == value);
 
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
 }
 
 void cmp_inmediate() {
