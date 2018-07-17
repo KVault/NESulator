@@ -887,6 +887,57 @@ void cpy_absolute() {
 	compare_register(&Y, absolute_param(), 3, 4);
 }
 
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////LSR (Logical Shift Right) REGION///////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void lsr(byte *value, int cycles, int pcIncrease) {
+
+	bit_val(&P, flagC, bit_test(*value, 0));
+
+	byte shifted = *value >> 1;
+
+	bit_val(&P, flagZ, shifted == 0);
+	*value = shifted;
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void lsr_zpage() {
+	word addr = zpage_addr(rmem_b(PC + 1));
+	byte data = zpage_param();
+	lsr(&data, 5, 2);
+	wmem_b(addr, data);
+}
+
+void lsr_accumulator() {
+	lsr(&A, 2, 1);
+}
+
+void lsr_zpage_x() {
+	word addr = zpagex_addr(rmem_b(PC + 1));
+	byte data = rmem_b(addr);
+	lsr(&data, 6, 2);
+	wmem_b(addr, data);
+}
+
+void lsr_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	lsr(&data, 6, 3);
+	wmem_b(addr, data);
+}
+
+
+void lsr_absolute_x() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	lsr(&data, 7, 3);
+	wmem_w(addr, data);
+}
+
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
  *

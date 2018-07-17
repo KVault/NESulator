@@ -702,4 +702,39 @@ void cpy_zpage();
 void cpy_absolute();
 
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////LSR (Logical Shift Right) REGION///////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Logical Shift Right on the accumulator
+ */
+void lsr(byte *b, int cycles, int pcIncrease);
+
+/**
+ * Logical Shift Right on the accumulator
+ */
+void lsr_accumulator();
+
+/**
+ * Logical Shift Right on the accumulator
+ */
+void lsr_zpage();
+
+/**
+ * Logical Shift Right on the accumulator
+ */
+void lsr_zpage_x();
+
+/**
+ * Logical Shift Right on the accumulator
+ */
+void lsr_absolute();
+
+/**
+ * Logical Shift Right on the accumulator
+ */
+void lsr_absolute_x();
+
+
 #endif //NESULATOR_CPU_H
