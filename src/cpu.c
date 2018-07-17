@@ -808,7 +808,7 @@ void rts() {
 	cyclesThisSec += 6;
 }
 
-void rti(){
+void rti() {
 	P = pop_b();
 	PC = pop_w(); //Unlike RTS. RTI pulls the correct PC address. No need to increment
 	cyclesThisSec += 6;
@@ -819,66 +819,66 @@ void rti(){
 ///////////////////////////////COMPARE REGISTERS REGION///////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease){
+void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease) {
 
 }
 
-void cmp_inmediate(){
+void cmp_inmediate() {
 	compare_register(&A, rmem_b(PC + 1), 2, 2);
 }
 
-void cmp_zpage(){
+void cmp_zpage() {
 	compare_register(&A, zpage_param(), 3, 2);
 }
 
-void cmp_zpage_x(){
+void cmp_zpage_x() {
 	compare_register(&A, zpagex_param(), 4, 2);
 }
 
-void cmp_absolute(){
+void cmp_absolute() {
 	compare_register(&A, absolute_param(), 4, 3);
 }
 
-void cmp_absolute_x(){
+void cmp_absolute_x() {
 	compare_register(&A, absolutex_param(), 4, 3);
 	//TODO +1 if page crossed
 }
 
-void cmp_absolute_y(){
+void cmp_absolute_y() {
 	compare_register(&A, absolutey_param(), 4, 3);
 	//TODO +1 if page crossed
 }
 
-void cmp_indirect_x(){
+void cmp_indirect_x() {
 	compare_register(&A, indirectx_param(), 6, 2);
 }
 
-void cmp_indirect_y(){
+void cmp_indirect_y() {
 	compare_register(&A, indirecty_param(), 5, 2);
 	//TODO +1 if page crossed
 }
 
-void cpx_immediate(){
+void cpx_immediate() {
 	compare_register(&X, rmem_b(PC + 1), 2, 2);
 }
 
-void cpx_zpage(){
+void cpx_zpage() {
 	compare_register(&X, zpage_param(), 3, 2);
 }
 
-void cpx_absolute(){
+void cpx_absolute() {
 	compare_register(&X, absolute_param(), 4, 3);
 }
 
-void cpy_immediate(){
+void cpy_immediate() {
 	compare_register(&Y, rmem_b(PC + 1), 2, 2);
 }
 
-void cpy_zpage(){
+void cpy_zpage() {
 	compare_register(&Y, zpage_param(), 2, 3);
 }
 
-void cpy_absolute(){
+void cpy_absolute() {
 	compare_register(&Y, absolute_param(), 3, 4);
 }
 
