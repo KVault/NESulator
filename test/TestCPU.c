@@ -25,6 +25,7 @@ void testOpcodes() {
 	test_INCDECMEM();
 	test_LOADREGISTER();
 	test_STOREREGISTER();
+	test_RTS();
 	test_RTI();
 }
 
@@ -649,9 +650,9 @@ void test_STOREREGISTER() {
 	printf("Test STOREREGISTER passed!\n");
 }
 
-void test_RTI() {
+void test_RTS() {
 	int cachedPC = PC;
-	int cachedCyclesThisSec = cyclesThisSec;
+	int cachedCyclesThisSec;
 
 	// Let's run a JSR
 	wmem_b(PC, 0x20);
@@ -661,9 +662,24 @@ void test_RTI() {
 
 	// And now, the RTI
 	cachedCyclesThisSec = cyclesThisSec;
-	wmem_b(PC, 0x40);
+	wmem_b(PC, 0x60);
 	cpu_cycle();
 	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+	printf("Test RTS passed!\n");
+}
+
+void test_RTI(){
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	push_w(0x6969);
+	push_b(0x23);
+	wmem_b(PC, 0x40);
+	cpu_cycle();
+
+	assert(PC == 0x6969);
+	assert(P == 0x23);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
 
 	printf("Test RTI passed!\n");

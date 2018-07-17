@@ -802,10 +802,15 @@ void sty_absolute() {
 ///////////////////////////////ReTurn from Interrupt REGION////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-void rti() {
+void rts() {
 	PC = pop_w();
+	PC++; // JSR pushes the address -1, so when we recover (here) we have to add 1 to make up for that "1" lost
+	cyclesThisSec += 6;
+}
 
-	PC++;
+void rti(){
+	P = pop_b();
+	PC = pop_w(); //Unlike RTS. RTI pulls the correct PC address. No need to increment
 	cyclesThisSec += 6;
 }
 
@@ -917,7 +922,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&rts,            //$60      RTS          Returns from Subroutine           1       6
 		&adc_indirect_x, //$61      ADC ($44, X) ADd with Carry                    2       6
 		0,
 		0,
