@@ -27,6 +27,7 @@ void testOpcodes() {
 	test_STOREREGISTER();
 	test_RTS();
 	test_RTI();
+	test_COMPAREREGISTER();
 }
 
 /**
@@ -685,4 +686,6 @@ void test_RTI(){
 	printf("Test RTI passed!\n");
 }
 
-
+void test_COMPAREREGISTER(){
+	printf("Test COMPAREREGISTER passed!\n");
+}

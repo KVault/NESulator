@@ -50,4 +50,6 @@ void test_RTS();
 
 void test_RTI();
 
+void test_COMPAREREGISTER();
+
 #endif //NESULATOR_TESTCPU_H

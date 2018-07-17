@@ -664,6 +664,42 @@ void rts();
  */
 void rti();
 
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////COMPARE REGISTERS REGION///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Compares the specified value with the pointed register
+ */
+void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease);
+
+void cmp_inmediate();
+
+void cmp_zpage();
+
+void cmp_zpage_x();
+
+void cmp_absolute();
+
+void cmp_absolute_x();
+
+void cmp_absolute_y();
+
+void cmp_indirect_x();
+
+void cmp_indirect_y();
+
+void cpx_immediate();
+
+void cpx_zpage();
+
+void cpx_absolute();
+
+void cpy_immediate();
+
+void cpy_zpage();
+
+void cpy_absolute();
 
 
 #endif //NESULATOR_CPU_H
