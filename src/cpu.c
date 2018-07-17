@@ -1086,43 +1086,43 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&lda_absolute_x,//BD       LDA $4400,X    LoaD Accumulator                   3       4+
 		&ldx_absolute_y,//BE       LDA $4400,Y    LoaD Accumulator                   3       4+
 		0,
+		&cpy_immediate,     //$C0   CPX #$44      Compare                           2       2
+		&cmp_indirect_x,    //$C1   CMP ($44,X)   Compare                           2       6
 		0,
 		0,
-		0,
-		0,
-		0,
-		0,
+		&cpy_zpage,     //$C4       CPX $44       Compare                           2       3
+		&cmp_zpage,     //$C5       CMP $44       Compare                           2       3
 		&dec_mem_zpage, //$C6       DEC $44       DEcrement Memory                  2       5
 		0,
 		&iny,           //$C8       INY           Increments Y                      1       2
-		0,
+		&cmp_inmediate, //$C9       CMP #$44      Compare                           2       2
 		&dex,           //$CA       DEX           Decrements X register             1       2
 		0,
-		0,
-		0,
-		&dec_mem_absolute,//$CE     DEC $4400    DEcrement Memory                   3       6
+		&cpy_absolute,    //$CC     CPX $4400     Compare                           3       4
+		&cmp_absolute,    //$CD     CMP $4400     Compare                           3       4
+		&dec_mem_absolute,//$CE     DEC $4400     DEcrement Memory                  3       6
 		0,
 		&bne,           //$D0       BNE           Branch now equals                 2       2(+2)
+		&cmp_indirect_y,    //$D1   CMP ($44),X   Compare                           2       5+
 		0,
 		0,
 		0,
+		&cmp_zpage_x,       //$D5      CMP $44,X     Compare                           2       4
+		&dec_mem_zpage_x,   //$D6      DEC $44,X     DEcrement Memory                  2       6
 		0,
-		0,
-		&dec_mem_zpage_x,//$D6      DEC $44,X     DEcrement Memory                  2       6
-		0,
-		&cld,           //$D8       CLD           CLear Decimal flag                1       2
-		0,
-		0,
+		&cld,               //$D8      CLD           CLear Decimal flag                1       2
+		&cmp_absolute_y,    //$DD      CMP $4400,Y   Compare                          3       4+
 		0,
 		0,
 		0,
+		&cmp_absolute_x,    //$DD   CMP $4400,X   Compare                          3       4+
 		&dec_mem_absolute_x,//$DE   DEC $4400,X   DEcrement Memory                 3       7
 		0,
-		0,
+		&cpx_immediate,    //$E0    CPX #$44      Compare                          2       2
 		&sbc_indirect_x,//$E1       SBC ($44,X)   SuBstract with Carry             2       6
 		0,
 		0,
-		0,
+		&cpx_zpage,    //$E4        CPX $44       Compare                          2       3
 		&sbc_zpage,     //$E5       SBC $44       SuBstract with Carry             2       3
 		&inc_mem_zpage, //$E6       INC $44       INcrement Memory                 2       5
 		0,
@@ -1130,7 +1130,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&sbc_immediate, //$E9       SBC #$44      SuBstract with Carry             2       2
 		&nop,           //$EA       NOP           No OPeration                     1       2
 		0,
-		0,
+		&cpx_absolute,  //$EC      CPX $4400       Compare                         3       4
 		&sbc_absolute, //$ED       SBC $4400       SuBstract with Carry            3       4
 		&inc_mem_absolute,//$EE    INC $4400       INcrement Memory                3       6
 		0,
