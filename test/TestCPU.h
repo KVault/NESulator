@@ -52,4 +52,6 @@ void test_RTI();
 
 void test_COMPAREREGISTER();
 
+void test_LSR();
+
 #endif //NESULATOR_TESTCPU_H

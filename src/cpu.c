@@ -938,6 +938,108 @@ void lsr_absolute_x() {
 	wmem_w(addr, data);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////Rotate REGION//////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void rol(byte *value, int cycles, int pcIncrease) {
+	byte cachedFlagC = (byte) bit_test(P, flagC);
+	byte cached7 = (byte) bit_test(*value, 7);
+
+	bit_val(&P, flagC, cached7);
+	byte shifted = *value << 1;
+
+	bit_val(&shifted, 0, cachedFlagC);
+	bit_val(&P, flagZ, shifted == 0);
+	bit_val(&P, flagN, bit_test(shifted, 7));
+	*value = shifted;
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void rol_zpage() {
+	word addr = zpage_addr(rmem_b(PC + 1));
+	byte data = zpage_param();
+	rol(&data, 5, 2);
+	wmem_b(addr, data);
+}
+
+void rol_accumulator() {
+	rol(&A, 2, 1);
+}
+
+void rol_zpage_x() {
+	word addr = zpagex_addr(rmem_b(PC + 1));
+	byte data = rmem_b(addr);
+	rol(&data, 6, 2);
+	wmem_b(addr, data);
+}
+
+void rol_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	rol(&data, 6, 3);
+	wmem_b(addr, data);
+}
+
+void rol_absolute_x() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	rol(&data, 7, 3);
+	wmem_w(addr, data);
+}
+
+
+void ror(byte *value, int cycles, int pcIncrease) {
+	byte cachedFlagC = (byte) bit_test(P, flagC);
+	byte cached0 = (byte) bit_test(*value, 0);
+
+	byte shifted = *value >> 1;
+	bit_val(&shifted, 7, cachedFlagC);
+	bit_val(&P, flagC, cached0);
+
+	bit_val(&P, flagZ, shifted == 0);
+	bit_val(&P, flagN, bit_test(shifted, 7));
+	*value = shifted;
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void ror_zpage() {
+	word addr = zpage_addr(rmem_b(PC + 1));
+	byte data = zpage_param();
+	ror(&data, 5, 2);
+	wmem_b(addr, data);
+}
+
+void ror_accumulator() {
+	ror(&A, 2, 1);
+}
+
+void ror_zpage_x() {
+	word addr = zpagex_addr(rmem_b(PC + 1));
+	byte data = rmem_b(addr);
+	ror(&data, 6, 2);
+	wmem_b(addr, data);
+}
+
+void ror_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	ror(&data, 6, 3);
+	wmem_b(addr, data);
+}
+
+
+void ror_absolute_x() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	ror(&data, 7, 3);
+	wmem_w(addr, data);
+}
+
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
  *
@@ -988,15 +1090,15 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		&bit_zpage,     //$24       BIT $44       BIt Test                        2       3
 		&and_zpage,     //$25       AND $44       bitwise AND with accumulator    2       3
-		0,
+		&rol_zpage,     //$26       ROL $44       Rotate Left                     2       5
 		0,
 		&plp,           //$28       PLP           PuLl to status                  1       4
 		&and_immediate, //$29       AND #$44      bitwise AND with accumulator    2       2
-		0,
+		&rol_accumulator,//$2A      ROL $44       Rotate Left                     1       2
 		0,
 		&bit_absolute,  //$2C       BIT $4400     BIt Test                        3       4
 		&and_absolute,  //$2D       AND $4400     bitwise AND with accumulator    3       4
-		0,
+		&rol_absolute,  //$2E       ROL $44       Rotate Left                     3       6
 		0,
 		&bmi,           //$30       BPL           Branch if minus                 2       2(+2)
 		&and_indirect_y,//$31       AND ($44), Y  bitwise AND with accumulator    2       5+
@@ -1004,7 +1106,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&and_zpage_x,   //$35       AND $44, X    bitwise AND with accumulator    2       4
-		0,
+		&rol_zpage_x,   //$36       ROL $44       Rotate Left                     2       6
 		0,
 		&sec,           //$38       SEC           Sets Carry flag                 1       2
 		&and_absolute_y,//$39       AND $4400, Y  bitwise AND with accumulator    3       4+
@@ -1012,9 +1114,9 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&and_absolute_x,//$3D       AND $4400, X  bitwise AND with accumulator    3       4+
+		&rol_absolute_x,//$3E       ROL $44       Rotate Left                     3       7
 		0,
-		0,
-		&rti,           //$40       RTI           Returns from Interrupt          1        6
+		&rti,           //$40       RTI           Returns from Interrupt          1       6
 		0,
 		0,
 		0,
@@ -1052,23 +1154,23 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&adc_zpage,     //$65       ADC $44      ADd with Carry                    2       3
-		0,
+		&ror_zpage,     //$66       ROR $44      Rotate Right                      2       5
 		0,
 		&pla,           //$68       PLA           PuLl Acumulator                  1       4
 		&adc_immediate, //$69       ADC #$44      ADd with Carry                   2       2
-		0,
+		&ror_accumulator,//$6A      ROR $44      Rotate Right                      1       2
 		0,
 		0,
 		&adc_absolute,  //$6D       ADC $4400    ADd with Carry                    3       4
+		&ror_absolute,  //$6E       ROR $44      Rotate Right                      3       6
 		0,
-		0,
-		&bvs,           //$70      BVS           Branch if plus                  2       2(+2)
+		&bvs,           //$70      BVS           Branch if plus                    2       2(+2)
 		&adc_indirect_y,//$71      ADC ($44), X   ADd with Carry                   2       5+
 		0,
 		0,
 		0,
 		&adc_zpage_x,   //$75       ADC $44, X    ADd with Carry                    2       4
-		0,
+		&ror_zpage_x,   //$76       ROR $44      Rotate Right                       2       6
 		0,
 		&sei,           //$78       SEI           Sets Interrupt flag               1       2,
 		&adc_absolute_y,//$79       ADC $4400, Y  ADd with Carry                    3       4+
@@ -1076,7 +1178,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&adc_absolute_x,//$7D       ADC $4400, X  ADd with Carry                    3       4+
-		0,
+		&ror_absolute_x,//$7E       ROR $44      Rotate Right                       3       7
 		0,
 		0,
 		&sta_indirect_x,//$81      STA ($44,X)    STore Accumulator                 2       6
@@ -1102,7 +1204,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&sta_zpage_x,   //$95      STA $44,X      STore Accumulator                 2       4
 		&stx_zpage_y,   //96       STX $44, Y     STore X Register                  2       4
 		0,
-		&tya,           //$98      TYA           Transfer Y to A                   1       2
+		&tya,           //$98      TYA           Transfer Y to A                    1       2
 		&sta_absolute_y,//$9D      STA $4400,Y    STore Accumulator                 3       5
 		0,
 		0,
