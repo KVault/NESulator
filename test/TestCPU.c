@@ -29,6 +29,7 @@ void testOpcodes() {
 	test_RTI();
 	test_COMPAREREGISTER();
 	test_LSR();
+	test_ROTATE();
 }
 
 /**
@@ -740,6 +741,42 @@ void test_LSR() {
 	assert(cachedPC + 2 == PC);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
 
-
 	printf("Test LSR passed!\n");
+}
+
+void test_ROTATE() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// rol_accumulator
+	wmem_b(PC, 0x2A);
+	A = 0x42;
+	bit_set(&P, flagC);
+	cpu_cycle();
+
+	assert(bit_test(P, flagC) == 0);
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagN));
+	assert(A == 0x85);
+	assert(cachedPC + 1 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+
+	// ror_absolute
+	wmem_b(PC, 0x6E);
+	wmem_w(PC + 1, 0x6942);
+	word addr = absolute_addr(0x6942);
+	wmem_b(addr, 0x23);
+	cpu_cycle();
+
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagN) == 0);
+	assert(rmem_b(addr) == 0x11);
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+	printf("Test ROTATE passed!\n");
 }

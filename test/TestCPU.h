@@ -54,4 +54,6 @@ void test_COMPAREREGISTER();
 
 void test_LSR();
 
+void test_ROTATE();
+
 #endif //NESULATOR_TESTCPU_H
