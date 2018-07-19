@@ -1020,15 +1020,15 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&lsr_zpage,     //$46       LSR           Logical Shift Right              2       5
 		0,
 		&pha,           //$48       PHA           PusH Acumulator                  1       3
 		0,
+		&lsr_accumulator,//$4A       LSR           Logical Shift Right             1       2
 		0,
 		0,
 		0,
-		0,
-		0,
+		&lsr_absolute,  //$4E       LSR           Logical Shift Right               3       6
 		0,
 		&bvc,           //$50       BVC           Branch if Overflow Clear        2       2(+2)
 		0,
@@ -1036,7 +1036,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&lsr_zpage_x,   //$56       LSR           Logical Shift Right               2       6
 		0,
 		&cli,           //$58       CLI           CLear Interrupt flag                1       2,
 		0,
@@ -1044,7 +1044,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		0,
-		0,
+		&lsr_absolute_x, //$5E       LSR           Logical Shift Right               3       7
 		0,
 		&rts,            //$60      RTS          Returns from Subroutine           1       6
 		&adc_indirect_x, //$61      ADC ($44, X) ADd with Carry                    2       6

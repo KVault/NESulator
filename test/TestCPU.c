@@ -28,6 +28,7 @@ void testOpcodes() {
 	test_RTS();
 	test_RTI();
 	test_COMPAREREGISTER();
+	test_LSR();
 }
 
 /**
@@ -719,4 +720,26 @@ void test_COMPAREREGISTER() {
 	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
 
 	printf("Test COMPAREREGISTER passed!\n");
+}
+
+void test_LSR() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	//lsr_zpage_x
+	wmem_b(PC, 0x56);
+	wmem_b(PC + 1, 0x42);
+	X = 0x05;
+	word addr = zpagex_addr(0x42);
+	wmem_b(addr, 0x11);
+	cpu_cycle();
+
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagZ) == 0);
+	assert(rmem_b(addr) == 0x08); // Because 0x08 is the result of the lsr opcode
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+
+	printf("Test LSR passed!\n");
 }
