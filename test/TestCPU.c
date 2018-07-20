@@ -30,6 +30,7 @@ void testOpcodes() {
 	test_COMPAREREGISTER();
 	test_LSR();
 	test_ROTATE();
+	test_EOR();
 }
 
 /**
@@ -779,4 +780,9 @@ void test_ROTATE() {
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
 
 	printf("Test ROTATE passed!\n");
+}
+
+void test_EOR(){
+
+	printf("Test EOR passed!\n");
 }

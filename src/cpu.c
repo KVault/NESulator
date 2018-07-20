@@ -1040,6 +1040,70 @@ void ror_absolute_x() {
 	wmem_w(addr, data);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////EOR REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void eor(byte value, int cycles, int pcIncrease){
+
+}
+
+void eor_immediate(){
+	byte value = rmem_b(PC + 1);
+	eor(value, 2, 2);
+}
+
+void eor_zpage(){
+	eor(zpage_param(), 3, 2);
+}
+
+void eor_zpage_x(){
+	eor(zpagex_param(), 4, 2);
+}
+
+void eor_absolute(){
+	eor(absolute_param(), 4, 3);
+}
+
+void eor_absolute_x(){
+	eor(absolutex_param(), 4, 3);
+	//TODO +1 if page crossed
+}
+
+void eor_absolute_y(){
+	eor(absolutey_param(), 4, 3);
+	//TODO +1 if page crossed
+}
+
+void eor_indirect_x(){
+	eor(indirectx_param(), 6, 2);
+}
+
+void eor_indirect_y(){
+	eor(indirecty_param(), 5, 2);
+	//TODO +1 if page crossed
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////JMP REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void jmp(word addr, int cycles, int pcIncrease){}
+
+void jmp_absolute(){
+	jmp(absolutey_param(), 3, 3);
+}
+
+void jmp_indirect(){}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////Invalid Opcodes REGION/////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void invalid(){
+	
+}
+
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
  *
@@ -1117,36 +1181,36 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&rol_absolute_x,//$3E       ROL $44       Rotate Left                     3       7
 		0,
 		&rti,           //$40       RTI           Returns from Interrupt          1       6
+		&eor_indirect_x,//$41       EOR           Exclusive OR                    2       6
 		0,
 		0,
 		0,
-		0,
-		0,
+		&eor_zpage,     //$45       EOR           Exclusive OR                     2       3
 		&lsr_zpage,     //$46       LSR           Logical Shift Right              2       5
 		0,
 		&pha,           //$48       PHA           PusH Acumulator                  1       3
+		&eor_immediate,  //$49       EOR          Exclusive OR                     2       2
+		&lsr_accumulator,//$4A       LSR          Logical Shift Right              1       2
 		0,
-		&lsr_accumulator,//$4A       LSR           Logical Shift Right             1       2
-		0,
-		0,
-		0,
+		&jmp_absolute,  //$4C       JMP           JuMP                              3       3
+		&eor_absolute,  //$4D       EOR           Exclusive OR                      3       4
 		&lsr_absolute,  //$4E       LSR           Logical Shift Right               3       6
 		0,
 		&bvc,           //$50       BVC           Branch if Overflow Clear        2       2(+2)
+		&eor_indirect_y,//$51       EOR           Exclusive OR                    2       5
 		0,
 		0,
 		0,
-		0,
-		0,
+		&eor_zpage_x,   //$55       EOR           Exclusive OR                      2       4
 		&lsr_zpage_x,   //$56       LSR           Logical Shift Right               2       6
 		0,
-		&cli,           //$58       CLI           CLear Interrupt flag                1       2,
+		&cli,           //$58       CLI           CLear Interrupt flag              1       2,
+		&eor_absolute_y,//$59       EOR           Exclusive OR                      3       4
 		0,
 		0,
 		0,
-		0,
-		0,
-		&lsr_absolute_x, //$5E       LSR           Logical Shift Right               3       7
+		&eor_absolute_x, //$5D       EOR           Exclusive OR                    3       4
+		&lsr_absolute_x, //$5E       LSR           Logical Shift Right             3       7
 		0,
 		&rts,            //$60      RTS          Returns from Subroutine           1       6
 		&adc_indirect_x, //$61      ADC ($44, X) ADd with Carry                    2       6
@@ -1160,7 +1224,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&adc_immediate, //$69       ADC #$44      ADd with Carry                   2       2
 		&ror_accumulator,//$6A      ROR $44      Rotate Right                      1       2
 		0,
-		0,
+		&jmp_indirect,  //$6C       JMP          JuMP                             3       5
 		&adc_absolute,  //$6D       ADC $4400    ADd with Carry                    3       4
 		&ror_absolute,  //$6E       ROR $44      Rotate Right                      3       6
 		0,
@@ -1306,7 +1370,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&sbc_absolute_x,//$FD       SBC $4400,X   SuBstract with Carry             3       4+
-		&inc_mem_absolute_x,//$FE     INC $4400,X   INcrement Memory                 3       7
+		&inc_mem_absolute_x,//$FE     INC $4400,X   INcrement Memory               3       7
 		0
 };
 

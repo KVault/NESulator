@@ -56,4 +56,6 @@ void test_LSR();
 
 void test_ROTATE();
 
+void test_EOR();
+
 #endif //NESULATOR_TESTCPU_H
