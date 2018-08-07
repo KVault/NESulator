@@ -44,4 +44,18 @@ void test_INCDECMEM();
 
 void test_LOADREGISTER();
 
+void test_STOREREGISTER();
+
+void test_RTS();
+
+void test_RTI();
+
+void test_COMPAREREGISTER();
+
+void test_LSR();
+
+void test_ROTATE();
+
+void test_EOR();
+
 #endif //NESULATOR_TESTCPU_H

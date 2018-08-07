@@ -24,6 +24,13 @@ void testOpcodes() {
 	test_SBC();
 	test_INCDECMEM();
 	test_LOADREGISTER();
+	test_STOREREGISTER();
+	test_RTS();
+	test_RTI();
+	test_COMPAREREGISTER();
+	test_LSR();
+	test_ROTATE();
+	test_EOR();
 }
 
 /**
@@ -101,7 +108,7 @@ void test_ASL() {
 	P = 0;
 	wmem_b(PC, 0x06); // asl_zage opcode injected
 	wmem_b(PC + 1, 0x56); // where the data is save
-	word addr = zeropage_addr((word) 0x56);
+	word addr = zpage_addr((word) 0x56);
 	wmem_b(addr, 0b10000101);
 	cpu_cycle();
 	byte result = rmem_b(addr);
@@ -146,7 +153,7 @@ void test_JSR() {
 	wmem_w(PC + 1, param);
 	cpu_cycle();
 
-	assert(peek_w() == cachedPC - 1);
+	assert(peek_w() == cachedPC + 2);
 	assert(PC == 0x6969);
 	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
 	assert(cachedSP - 2 == SP);
@@ -629,3 +636,153 @@ void test_LOADREGISTER() {
 	printf("Test LOADREGISTER passed!\n");
 }
 
+void test_STOREREGISTER() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// sta_indirect_y
+	wmem_b(PC, 0x91);
+	wmem_b(PC + 1, 0x69);
+	Y = 0x42;
+	word addr = indirecty_addr(0x69);
+	A = 0x23;
+	cpu_cycle();
+	assert(rmem_b(addr) == A);
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+	printf("Test STOREREGISTER passed!\n");
+}
+
+void test_RTS() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec;
+
+	// Let's run a JSR
+	wmem_b(PC, 0x20);
+	wmem_w(PC + 1, 0x6969);
+	cpu_cycle();
+	assert(PC == 0x6969);
+
+	// And now, the RTI
+	cachedCyclesThisSec = cyclesThisSec;
+	wmem_b(PC, 0x60);
+	cpu_cycle();
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+	printf("Test RTS passed!\n");
+}
+
+void test_RTI() {
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	push_w(0x6969);
+	push_b(0x23);
+	wmem_b(PC, 0x40);
+	cpu_cycle();
+
+	assert(PC == 0x6969);
+	assert(P == 0x23);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+	printf("Test RTI passed!\n");
+}
+
+void test_COMPAREREGISTER() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// cmp_inmediate zero flag set
+	wmem_b(PC, 0xC9);
+	wmem_b(PC + 1, 0x23);
+	A = 0x23;
+	cpu_cycle();
+
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagN) == 0);
+	assert(bit_test(P, flagZ));
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	// cmp_absolute carry flag set & negative set
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+
+	wmem_b(PC, 0xCD);
+	wmem_w(PC + 1, 0x2323);
+	wmem_b(0x2323, 0x20);
+	A = 0x23;
+	cpu_cycle();
+
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagN));
+	assert(bit_test(P, flagZ) == 0);
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
+
+	printf("Test COMPAREREGISTER passed!\n");
+}
+
+void test_LSR() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	//lsr_zpage_x
+	wmem_b(PC, 0x56);
+	wmem_b(PC + 1, 0x42);
+	X = 0x05;
+	word addr = zpagex_addr(0x42);
+	wmem_b(addr, 0x11);
+	cpu_cycle();
+
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagZ) == 0);
+	assert(rmem_b(addr) == 0x08); // Because 0x08 is the result of the lsr opcode
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+	printf("Test LSR passed!\n");
+}
+
+void test_ROTATE() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// rol_accumulator
+	wmem_b(PC, 0x2A);
+	A = 0x42;
+	bit_set(&P, flagC);
+	cpu_cycle();
+
+	assert(bit_test(P, flagC) == 0);
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagN));
+	assert(A == 0x85);
+	assert(cachedPC + 1 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+
+	// ror_absolute
+	wmem_b(PC, 0x6E);
+	wmem_w(PC + 1, 0x6942);
+	word addr = absolute_addr(0x6942);
+	wmem_b(addr, 0x23);
+	cpu_cycle();
+
+	assert(bit_test(P, flagC));
+	assert(bit_test(P, flagZ) == 0);
+	assert(bit_test(P, flagN) == 0);
+	assert(rmem_b(addr) == 0x11);
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 6 == cyclesThisSec);
+
+	printf("Test ROTATE passed!\n");
+}
+
+void test_EOR(){
+
+	printf("Test EOR passed!\n");
+}

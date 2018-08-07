@@ -120,7 +120,7 @@ void asl(byte *b, int cycles, int pcIncrease) {
 }
 
 void asl_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
+	word addr = zpage_addr(rmem_b(PC + 1));
 	byte data = zpage_param();
 	asl(&data, 5, 2);
 	wmem_b(addr, data);
@@ -131,7 +131,7 @@ void asl_accumulator() {
 }
 
 void asl_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
+	word addr = zpagex_addr(rmem_b(PC + 1));
 	byte data = rmem_b(addr);
 	asl(&data, 6, 2);
 	wmem_b(addr, data);
@@ -158,9 +158,9 @@ void asl_absolute_x() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void jsr_absolute() {
-	word cachedPC = (word) (PC - 0x01);
+	word cachedPC = (word) (PC + 0x02);
 	word addr = absolute_addr(rmem_w(PC + 1));
-	push_w(cachedPC);
+	push_w(cachedPC); // Stores the address of the next opcode minus one
 	PC = addr;
 	cyclesThisSec += 6;
 }
@@ -505,7 +505,7 @@ void beq() {
 
 void sbc(byte value, int cycles, int pcIncrease) {
 	byte carry = (byte) bit_test(P, flagC);
-	byte carryNop = !carry;
+	byte carryNop = (byte) !carry;
 	int result = A - value - carryNop;
 	carry = (byte) ((result & 0x100) >> 8);
 	bit_val(&P, flagC, carry);
@@ -586,12 +586,12 @@ void dec_mem(word memAddr, int cycles, int pcIncrease) {
 }
 
 void inc_mem_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
+	word addr = zpage_addr(rmem_b(PC + 1));
 	inc_mem(addr, 5, 2);
 }
 
 void inc_mem_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
+	word addr = zpagex_addr(rmem_b(PC + 1));
 	inc_mem(addr, 6, 2);
 }
 
@@ -606,12 +606,12 @@ void inc_mem_absolute_x() {
 }
 
 void dec_mem_zpage() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
+	word addr = zpage_addr(rmem_b(PC + 1));
 	dec_mem(addr, 5, 2);
 }
 
 void dec_mem_zpage_x() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
+	word addr = zpagex_addr(rmem_b(PC + 1));
 	dec_mem(addr, 6, 2);
 }
 
@@ -676,7 +676,7 @@ void lda_indirect_y() {
 	// TODO +1 if page crossed
 }
 
-void ldx_inmediate() {
+void ldx_immediate() {
 	load_register(&X, rmem_b(PC + 1), 2, 2);
 }
 
@@ -697,7 +697,7 @@ void ldx_absolute_y() {
 	// TODO +1 if page crossed
 }
 
-void ldy_inmediate() {
+void ldy_immediate() {
 	load_register(&Y, rmem_b(PC + 1), 2, 2);
 }
 
@@ -718,6 +718,377 @@ void ldy_absolute_x() {
 	// TODO +1 if page crossed
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////STORE REGISTERS REGION///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Store the specified value onto the pointed register
+ */
+void store_register(byte reg, word memAddr, int cycles, int pcIncrease) {
+	wmem_b(memAddr, reg);
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void sta_zpage() {
+	store_register(A, zpage_addr(rmem_b(PC + 1)), 3, 2);
+}
+
+void sta_zpage_x() {
+	store_register(A, zpagex_addr(rmem_b(PC + 1)), 4, 2);
+}
+
+void sta_absolute() {
+	store_register(A, absolute_addr(rmem_b(PC + 1)), 4, 3);
+}
+
+void sta_absolute_x() {
+	store_register(A, absolutex_addr(rmem_b(PC + 1)), 5, 3);
+}
+
+void sta_absolute_y() {
+	store_register(A, absolutey_addr(rmem_b(PC + 1)), 5, 3);
+}
+
+void sta_indirect_x() {
+	store_register(A, indirectx_addr(rmem_b(PC + 1)), 6, 2);
+}
+
+void sta_indirect_y() {
+	store_register(A, indirecty_addr(rmem_b(PC + 1)), 6, 2);
+}
+
+void stx_zpage() {
+	store_register(X, zpagex_addr(rmem_b(PC + 1)), 3, 2);
+}
+
+void stx_zpage_y() {
+	store_register(X, zpagey_addr(rmem_b(PC + 1)), 4, 2);
+}
+
+void stx_absolute() {
+	store_register(X, absolute_addr(rmem_b(PC + 1)), 4, 3);
+}
+
+void sty_zpage() {
+	store_register(Y, zpage_addr(rmem_b(PC + 1)), 3, 2);
+}
+
+void sty_zpage_x() {
+	store_register(Y, zpagex_addr(rmem_b(PC + 1)), 4, 2);
+}
+
+void sty_absolute() {
+	store_register(Y, absolute_addr(rmem_b(PC + 1)), 4, 3);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////ReTurn from Interrupt REGION////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+void rts() {
+	PC = pop_w();
+	PC++; // JSR pushes the address -1, so when we recover (here) we have to add 1 to make up for that "1" lost
+	cyclesThisSec += 6;
+}
+
+void rti() {
+	P = pop_b();
+	PC = pop_w(); //Unlike RTS. RTI pulls the correct PC address. No need to increment
+	cyclesThisSec += 6;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////COMPARE REGISTERS REGION///////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////
+
+void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease) {
+	bit_val(&P, flagC, *regPtr >= value);
+	bit_val(&P, flagN, *regPtr > value);
+	bit_val(&P, flagZ, *regPtr == value);
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void cmp_inmediate() {
+	compare_register(&A, rmem_b(PC + 1), 2, 2);
+}
+
+void cmp_zpage() {
+	compare_register(&A, zpage_param(), 3, 2);
+}
+
+void cmp_zpage_x() {
+	compare_register(&A, zpagex_param(), 4, 2);
+}
+
+void cmp_absolute() {
+	compare_register(&A, absolute_param(), 4, 3);
+}
+
+void cmp_absolute_x() {
+	compare_register(&A, absolutex_param(), 4, 3);
+	//TODO +1 if page crossed
+}
+
+void cmp_absolute_y() {
+	compare_register(&A, absolutey_param(), 4, 3);
+	//TODO +1 if page crossed
+}
+
+void cmp_indirect_x() {
+	compare_register(&A, indirectx_param(), 6, 2);
+}
+
+void cmp_indirect_y() {
+	compare_register(&A, indirecty_param(), 5, 2);
+	//TODO +1 if page crossed
+}
+
+void cpx_immediate() {
+	compare_register(&X, rmem_b(PC + 1), 2, 2);
+}
+
+void cpx_zpage() {
+	compare_register(&X, zpage_param(), 3, 2);
+}
+
+void cpx_absolute() {
+	compare_register(&X, absolute_param(), 4, 3);
+}
+
+void cpy_immediate() {
+	compare_register(&Y, rmem_b(PC + 1), 2, 2);
+}
+
+void cpy_zpage() {
+	compare_register(&Y, zpage_param(), 2, 3);
+}
+
+void cpy_absolute() {
+	compare_register(&Y, absolute_param(), 3, 4);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////LSR (Logical Shift Right) REGION///////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void lsr(byte *value, int cycles, int pcIncrease) {
+
+	bit_val(&P, flagC, bit_test(*value, 0));
+
+	byte shifted = *value >> 1;
+
+	bit_val(&P, flagZ, shifted == 0);
+	*value = shifted;
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void lsr_zpage() {
+	word addr = zpage_addr(rmem_b(PC + 1));
+	byte data = zpage_param();
+	lsr(&data, 5, 2);
+	wmem_b(addr, data);
+}
+
+void lsr_accumulator() {
+	lsr(&A, 2, 1);
+}
+
+void lsr_zpage_x() {
+	word addr = zpagex_addr(rmem_b(PC + 1));
+	byte data = rmem_b(addr);
+	lsr(&data, 6, 2);
+	wmem_b(addr, data);
+}
+
+void lsr_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	lsr(&data, 6, 3);
+	wmem_b(addr, data);
+}
+
+
+void lsr_absolute_x() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	lsr(&data, 7, 3);
+	wmem_w(addr, data);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////Rotate REGION//////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void rol(byte *value, int cycles, int pcIncrease) {
+	byte cachedFlagC = (byte) bit_test(P, flagC);
+	byte cached7 = (byte) bit_test(*value, 7);
+
+	bit_val(&P, flagC, cached7);
+	byte shifted = *value << 1;
+
+	bit_val(&shifted, 0, cachedFlagC);
+	bit_val(&P, flagZ, shifted == 0);
+	bit_val(&P, flagN, bit_test(shifted, 7));
+	*value = shifted;
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void rol_zpage() {
+	word addr = zpage_addr(rmem_b(PC + 1));
+	byte data = zpage_param();
+	rol(&data, 5, 2);
+	wmem_b(addr, data);
+}
+
+void rol_accumulator() {
+	rol(&A, 2, 1);
+}
+
+void rol_zpage_x() {
+	word addr = zpagex_addr(rmem_b(PC + 1));
+	byte data = rmem_b(addr);
+	rol(&data, 6, 2);
+	wmem_b(addr, data);
+}
+
+void rol_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	rol(&data, 6, 3);
+	wmem_b(addr, data);
+}
+
+void rol_absolute_x() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	rol(&data, 7, 3);
+	wmem_w(addr, data);
+}
+
+
+void ror(byte *value, int cycles, int pcIncrease) {
+	byte cachedFlagC = (byte) bit_test(P, flagC);
+	byte cached0 = (byte) bit_test(*value, 0);
+
+	byte shifted = *value >> 1;
+	bit_val(&shifted, 7, cachedFlagC);
+	bit_val(&P, flagC, cached0);
+
+	bit_val(&P, flagZ, shifted == 0);
+	bit_val(&P, flagN, bit_test(shifted, 7));
+	*value = shifted;
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void ror_zpage() {
+	word addr = zpage_addr(rmem_b(PC + 1));
+	byte data = zpage_param();
+	ror(&data, 5, 2);
+	wmem_b(addr, data);
+}
+
+void ror_accumulator() {
+	ror(&A, 2, 1);
+}
+
+void ror_zpage_x() {
+	word addr = zpagex_addr(rmem_b(PC + 1));
+	byte data = rmem_b(addr);
+	ror(&data, 6, 2);
+	wmem_b(addr, data);
+}
+
+void ror_absolute() {
+	word addr = absolute_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	ror(&data, 6, 3);
+	wmem_b(addr, data);
+}
+
+
+void ror_absolute_x() {
+	word addr = absolutex_addr(rmem_w(PC + 1));
+	byte data = rmem_b(addr);
+	ror(&data, 7, 3);
+	wmem_w(addr, data);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////EOR REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void eor(byte value, int cycles, int pcIncrease){
+
+}
+
+void eor_immediate(){
+	byte value = rmem_b(PC + 1);
+	eor(value, 2, 2);
+}
+
+void eor_zpage(){
+	eor(zpage_param(), 3, 2);
+}
+
+void eor_zpage_x(){
+	eor(zpagex_param(), 4, 2);
+}
+
+void eor_absolute(){
+	eor(absolute_param(), 4, 3);
+}
+
+void eor_absolute_x(){
+	eor(absolutex_param(), 4, 3);
+	//TODO +1 if page crossed
+}
+
+void eor_absolute_y(){
+	eor(absolutey_param(), 4, 3);
+	//TODO +1 if page crossed
+}
+
+void eor_indirect_x(){
+	eor(indirectx_param(), 6, 2);
+}
+
+void eor_indirect_y(){
+	eor(indirecty_param(), 5, 2);
+	//TODO +1 if page crossed
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////JMP REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void jmp(word addr, int cycles, int pcIncrease){}
+
+void jmp_absolute(){
+	jmp(absolutey_param(), 3, 3);
+}
+
+void jmp_indirect(){}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////Invalid Opcodes REGION/////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void invalid(){
+	printf("Invalid shit");
+}
 
 /**
  * Massive function pointer array that holds a call to each opcode. Valid or invalid.
@@ -769,15 +1140,15 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		&bit_zpage,     //$24       BIT $44       BIt Test                        2       3
 		&and_zpage,     //$25       AND $44       bitwise AND with accumulator    2       3
-		0,
+		&rol_zpage,     //$26       ROL $44       Rotate Left                     2       5
 		0,
 		&plp,           //$28       PLP           PuLl to status                  1       4
 		&and_immediate, //$29       AND #$44      bitwise AND with accumulator    2       2
-		0,
+		&rol_accumulator,//$2A      ROL $44       Rotate Left                     1       2
 		0,
 		&bit_absolute,  //$2C       BIT $4400     BIt Test                        3       4
 		&and_absolute,  //$2D       AND $4400     bitwise AND with accumulator    3       4
-		0,
+		&rol_absolute,  //$2E       ROL $44       Rotate Left                     3       6
 		0,
 		&bmi,           //$30       BPL           Branch if minus                 2       2(+2)
 		&and_indirect_y,//$31       AND ($44), Y  bitwise AND with accumulator    2       5+
@@ -785,7 +1156,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&and_zpage_x,   //$35       AND $44, X    bitwise AND with accumulator    2       4
-		0,
+		&rol_zpage_x,   //$36       ROL $44       Rotate Left                     2       6
 		0,
 		&sec,           //$38       SEC           Sets Carry flag                 1       2
 		&and_absolute_y,//$39       AND $4400, Y  bitwise AND with accumulator    3       4+
@@ -793,63 +1164,63 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&and_absolute_x,//$3D       AND $4400, X  bitwise AND with accumulator    3       4+
+		&rol_absolute_x,//$3E       ROL $44       Rotate Left                     3       7
+		0,
+		&rti,           //$40       RTI           Returns from Interrupt          1       6
+		&eor_indirect_x,//$41       EOR           Exclusive OR                    2       6
 		0,
 		0,
 		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
+		&eor_zpage,     //$45       EOR           Exclusive OR                     2       3
+		&lsr_zpage,     //$46       LSR           Logical Shift Right              2       5
 		0,
 		&pha,           //$48       PHA           PusH Acumulator                  1       3
+		&eor_immediate,  //$49       EOR          Exclusive OR                     2       2
+		&lsr_accumulator,//$4A       LSR          Logical Shift Right              1       2
 		0,
-		0,
-		0,
-		0,
-		0,
-		0,
+		&jmp_absolute,  //$4C       JMP           JuMP                              3       3
+		&eor_absolute,  //$4D       EOR           Exclusive OR                      3       4
+		&lsr_absolute,  //$4E       LSR           Logical Shift Right               3       6
 		0,
 		&bvc,           //$50       BVC           Branch if Overflow Clear        2       2(+2)
+		&eor_indirect_y,//$51       EOR           Exclusive OR                    2       5
 		0,
 		0,
 		0,
+		&eor_zpage_x,   //$55       EOR           Exclusive OR                      2       4
+		&lsr_zpage_x,   //$56       LSR           Logical Shift Right               2       6
+		0,
+		&cli,           //$58       CLI           CLear Interrupt flag              1       2,
+		&eor_absolute_y,//$59       EOR           Exclusive OR                      3       4
 		0,
 		0,
 		0,
+		&eor_absolute_x, //$5D       EOR           Exclusive OR                    3       4
+		&lsr_absolute_x, //$5E       LSR           Logical Shift Right             3       7
 		0,
-		&cli,           //$58       CLI           CLear Interrupt flag                1       2,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
+		&rts,            //$60      RTS          Returns from Subroutine           1       6
 		&adc_indirect_x, //$61      ADC ($44, X) ADd with Carry                    2       6
 		0,
 		0,
 		0,
 		&adc_zpage,     //$65       ADC $44      ADd with Carry                    2       3
-		0,
+		&ror_zpage,     //$66       ROR $44      Rotate Right                      2       5
 		0,
 		&pla,           //$68       PLA           PuLl Acumulator                  1       4
 		&adc_immediate, //$69       ADC #$44      ADd with Carry                   2       2
+		&ror_accumulator,//$6A      ROR $44      Rotate Right                      1       2
 		0,
-		0,
-		0,
+		&jmp_indirect,  //$6C       JMP          JuMP                             3       5
 		&adc_absolute,  //$6D       ADC $4400    ADd with Carry                    3       4
+		&ror_absolute,  //$6E       ROR $44      Rotate Right                      3       6
 		0,
-		0,
-		&bvs,           //$70      BVS           Branch if plus                  2       2(+2)
+		&bvs,           //$70      BVS           Branch if plus                    2       2(+2)
 		&adc_indirect_y,//$71      ADC ($44), X   ADd with Carry                   2       5+
 		0,
 		0,
 		0,
 		&adc_zpage_x,   //$75       ADC $44, X    ADd with Carry                    2       4
-		0,
+		&ror_zpage_x,   //$76       ROR $44      Rotate Right                       2       6
 		0,
 		&sei,           //$78       SEI           Sets Interrupt flag               1       2,
 		&adc_absolute_y,//$79       ADC $4400, Y  ADd with Carry                    3       4+
@@ -857,109 +1228,109 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&adc_absolute_x,//$7D       ADC $4400, X  ADd with Carry                    3       4+
+		&ror_absolute_x,//$7E       ROR $44      Rotate Right                       3       7
 		0,
 		0,
+		&sta_indirect_x,//$81      STA ($44,X)    STore Accumulator                 2       6
 		0,
 		0,
-		0,
-		0,
-		0,
-		0,
-		0,
+		&sty_zpage,     //$84      STX $44       STore Y Register                   2       3
+		&sta_zpage,     //$85      STA $44       STore Accumulator                  2       2
+		&stx_zpage,     //$86      STX $44       STore X Register                   2       2
 		0,
 		&dey,           //$88       DEY           Decrements Y                      1       2
 		0,
 		&txa,           //$8A       TXA           Transfer X to A                   1       2
 		0,
-		0,
-		0,
-		0,
+		&sty_absolute,  //$8C       STX $4400     STore Y Register                  3       4
+		&sta_absolute,  //$8D       STA $4400     STore Accumulator                 3       4
+		&stx_absolute,  //$8E       STX $4400     STore X Register                  3       4
 		0,
 		&bcc,           //$90       BCC           Branch if carry clear             2       2(+2)
+		&sta_indirect_y,//$91      STA ($44),Y    STore Accumulator                 2       6
+		0,
+		0,
+		&sty_zpage_x,   //$94      STX $44,Y      STore Y Register                  2       4
+		&sta_zpage_x,   //$95      STA $44,X      STore Accumulator                 2       4
+		&stx_zpage_y,   //96       STX $44, Y     STore X Register                  2       4
+		0,
+		&tya,           //$98      TYA           Transfer Y to A                    1       2
+		&sta_absolute_y,//$9D      STA $4400,Y    STore Accumulator                 3       5
 		0,
 		0,
 		0,
+		&sta_absolute_x,//$9D      STA $4400,X    STore Accumulator                 3       5
 		0,
 		0,
+		&ldy_immediate, //A0       LDA #$44       LoaD Accumulator                  2       2
+		&lda_indirect_x,//A1       LDA ($44,X)    LoaD Accumulator                  2       6
+		&ldx_immediate, //A2       LDA #$44       LoaD Accumulator                  2       2
 		0,
-		0,
-		&tya,           //$98       TYA           Transfer Y to A                   1       2
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
+		&ldy_zpage,     //$A4       LDA $44       LoaD Accumulator                  2       3
 		&lda_zpage,     //$A5       LDA $44       LoaD Accumulator                  2       3
-		0,
+		&ldx_zpage,     //$A6       LDA $44       LoaD Accumulator                  2       3
 		0,
 		&tay,           //$A8       TAY           Transfer A to Y                   1       2
 		&lda_inmediate, //$A9       LDA #$44      LoaD Accumulator                  2       2
 		&tax,           //$AA       TAX           Transfer A to X                   1       2
 		0,
-		0,
-		0,
-		0,
+		&ldy_absolute,  //$A4      LDY $4400     LoaD Y Register                    3       4
+		&lda_absolute,  //AD       LDA $4400     LoaD Accumulator                   3       4
+		&ldx_absolute,  //AE       LDA $4400     LoaD Accumulator                   3       4
 		0,
 		&bcs,           //$B0       BCS           Branch id carry set               2       2(+2)
+		&lda_indirect_y,//B1        LDA ($44),Y   LoaD Accumulator                  2       5+
 		0,
 		0,
-		0,
-		0,
-		0,
-		0,
+		&ldy_zpage_x,   //$B4       LDY $44, X    LoaD Y Register                    2       6
+		&lda_zpage_x,   //$B5       LDA $44, X    LoaD Accumulator                   2       4
+		&ldx_zpage_y,   //$B6       LDX $44, Y    LoaD Accumulator                   2       4
 		0,
 		&clv,           //$B8       CLV           CLear Overflow flag                1       2,
 		&lda_absolute_y,//$B9       LDA $4400,Y   LoaD Accumulator                   3       4+
 		0,
 		0,
+		&ldy_absolute_x,//$A4      LDY $4400,Y    LoaD Y Register                    3       4+
+		&lda_absolute_x,//BD       LDA $4400,X    LoaD Accumulator                   3       4+
+		&ldx_absolute_y,//BE       LDA $4400,Y    LoaD Accumulator                   3       4+
+		0,
+		&cpy_immediate,     //$C0   CPX #$44      Compare                           2       2
+		&cmp_indirect_x,    //$C1   CMP ($44,X)   Compare                           2       6
 		0,
 		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
+		&cpy_zpage,     //$C4       CPX $44       Compare                           2       3
+		&cmp_zpage,     //$C5       CMP $44       Compare                           2       3
 		&dec_mem_zpage, //$C6       DEC $44       DEcrement Memory                  2       5
 		0,
 		&iny,           //$C8       INY           Increments Y                      1       2
-		0,
+		&cmp_inmediate, //$C9       CMP #$44      Compare                           2       2
 		&dex,           //$CA       DEX           Decrements X register             1       2
 		0,
-		0,
-		0,
-		&dec_mem_absolute,//$CE     DEC $4400    DEcrement Memory                   3       6
+		&cpy_absolute,    //$CC     CPX $4400     Compare                           3       4
+		&cmp_absolute,    //$CD     CMP $4400     Compare                           3       4
+		&dec_mem_absolute,//$CE     DEC $4400     DEcrement Memory                  3       6
 		0,
 		&bne,           //$D0       BNE           Branch now equals                 2       2(+2)
+		&cmp_indirect_y,    //$D1   CMP ($44),X   Compare                           2       5+
 		0,
 		0,
 		0,
+		&cmp_zpage_x,       //$D5      CMP $44,X     Compare                           2       4
+		&dec_mem_zpage_x,   //$D6      DEC $44,X     DEcrement Memory                  2       6
 		0,
-		0,
-		&dec_mem_zpage_x,//$D6      DEC $44,X     DEcrement Memory                  2       6
-		0,
-		&cld,           //$D8       CLD           CLear Decimal flag                1       2
-		0,
-		0,
+		&cld,               //$D8      CLD           CLear Decimal flag                1       2
+		&cmp_absolute_y,    //$DD      CMP $4400,Y   Compare                          3       4+
 		0,
 		0,
 		0,
+		&cmp_absolute_x,    //$DD   CMP $4400,X   Compare                          3       4+
 		&dec_mem_absolute_x,//$DE   DEC $4400,X   DEcrement Memory                 3       7
 		0,
-		0,
+		&cpx_immediate,    //$E0    CPX #$44      Compare                          2       2
 		&sbc_indirect_x,//$E1       SBC ($44,X)   SuBstract with Carry             2       6
 		0,
 		0,
-		0,
+		&cpx_zpage,    //$E4        CPX $44       Compare                          2       3
 		&sbc_zpage,     //$E5       SBC $44       SuBstract with Carry             2       3
 		&inc_mem_zpage, //$E6       INC $44       INcrement Memory                 2       5
 		0,
@@ -967,7 +1338,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&sbc_immediate, //$E9       SBC #$44      SuBstract with Carry             2       2
 		&nop,           //$EA       NOP           No OPeration                     1       2
 		0,
-		0,
+		&cpx_absolute,  //$EC      CPX $4400       Compare                         3       4
 		&sbc_absolute, //$ED       SBC $4400       SuBstract with Carry            3       4
 		&inc_mem_absolute,//$EE    INC $4400       INcrement Memory                3       6
 		0,
@@ -985,7 +1356,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		0,
 		0,
 		&sbc_absolute_x,//$FD       SBC $4400,X   SuBstract with Carry             3       4+
-		&inc_mem_absolute_x,//$FE     INC $4400,X   INcrement Memory                 3       7
+		&inc_mem_absolute_x,//$FE     INC $4400,X   INcrement Memory               3       7
 		0
 };
 
@@ -1003,17 +1374,17 @@ void exeOpcode() {
 }
 
 byte zpage_param() {
-	word addr = zeropage_addr(rmem_b(PC + 1));
+	word addr = zpage_addr(rmem_b(PC + 1));
 	return rmem_b(addr);
 }
 
 byte zpagex_param() {
-	word addr = zeropagex_addr(rmem_b(PC + 1));
+	word addr = zpagex_addr(rmem_b(PC + 1));
 	return rmem_b(addr);
 }
 
 byte zpagey_param() {
-	word addr = zeropagey_addr(rmem_b(PC + 1));
+	word addr = zpagey_addr(rmem_b(PC + 1));
 	return rmem_b(addr);
 }
 

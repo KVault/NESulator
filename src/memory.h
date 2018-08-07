@@ -93,17 +93,17 @@ word indirecty_addr(byte b);
 /**
  * This works just like absolute indexed, but the target address is limited to the first 0xFF bytes.
  */
-word zeropagex_addr(byte b);
+word zpagex_addr(byte b);
 
 /**
  * Like zeropagex_addr but with the Y instead of X
  */
-word zeropagey_addr(byte b);
+word zpagey_addr(byte b);
 
 /**
  *  Like zeropagex_addr and zeropagey_addr but without using registers
  */
-word zeropage_addr(word w);
+word zpage_addr(word w);
 
 /**
  * Instructions using absolute addressing contain a full 16 bit address to identify the target location.
