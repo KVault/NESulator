@@ -93,6 +93,11 @@ byte indirectx_param();
  */
 byte indirecty_param();
 
+/**
+ * The instruction contains a 16 bit address which identifies the location of the least significant byte of another
+ * 16 bit memory address which is the real target of the instruction.
+ */
+word indirect_param();
 
 /**
  * Executes an instruction on the cpu. Internally it would decode the opcode and execute it (for now)
@@ -833,7 +838,7 @@ void eor_indirect_y();
 ///////////////////////////JMP REGION/////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void jmp(word addr, int cycles, int pcIncrease);
+void jmp(word addr, int cycles);
 
 void jmp_absolute();
 
@@ -845,8 +850,6 @@ void jmp_indirect();
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void invalid();
-
-
 
 
 #endif //NESULATOR_CPU_H

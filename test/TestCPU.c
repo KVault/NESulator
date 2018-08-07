@@ -31,6 +31,7 @@ void testOpcodes() {
 	test_LSR();
 	test_ROTATE();
 	test_EOR();
+	test_JMP();
 }
 
 /**
@@ -782,7 +783,53 @@ void test_ROTATE() {
 	printf("Test ROTATE passed!\n");
 }
 
-void test_EOR(){
+void test_EOR() {
+	int cachedPC = PC;
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	// eor_immediate
+	wmem_b(PC, 0x49);
+	wmem_b(PC + 1, 0x32);
+	A = 0xFF;
+	cpu_cycle();
+
+	assert(A == 0xCD);
+	assert(bit_test(P, flagN) == 1);
+	assert(cachedPC + 2 == PC);
+	assert(cachedCyclesThisSec + 2 == cyclesThisSec);
+
+	cachedPC = PC;
+	cachedCyclesThisSec = cyclesThisSec;
+
+	// eor_absolute
+	wmem_b(PC, 0x4D);
+	wmem_w(PC + 1, 0x6942);
+	word addr = absolute_addr(0x6942);
+	wmem_b(addr, 0xFF);
+	A = 0xFF;
+	cpu_cycle();
+
+	assert(bit_test(P, flagZ) == 1);
+	assert(A == 0x00);
+	assert(cachedPC + 3 == PC);
+	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
 
 	printf("Test EOR passed!\n");
+}
+
+void test_JMP() {
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	wmem_b(PC, 0x6C);
+	wmem_w(PC + 1, 0x6942);
+	word addr = absolute_addr(0x6942);
+	wmem_b(addr, 0x23);
+	addr = absolute_addr(0x6943);
+	wmem_b(addr, 0x32);
+	cpu_cycle();
+
+	assert(PC == 0x3223);
+	assert(cachedCyclesThisSec + 5 == cyclesThisSec);
+
+	printf("Test JMP passed!\n");
 }

@@ -58,4 +58,6 @@ void test_ROTATE();
 
 void test_EOR();
 
+void test_JMP();
+
 #endif //NESULATOR_TESTCPU_H
