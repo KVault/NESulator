@@ -55,8 +55,8 @@ void ora(byte b, int cycles, int pcIncrease) {
 	//Do the actual or operation, saving the result in the accumulator
 	A = A | b;
 	//Set the flags
-	if (A == 0x00) bit_set(&P, flagZ);
-	if (bit_test(A, 7)) bit_set(&P, flagN);
+	bit_val(&P, flagZ, A == 0x00);
+	bit_val(&P, flagN, bit_test(A, 7));
 
 	//Update cycles and pc
 	cyclesThisSec += cycles;
@@ -107,17 +107,12 @@ void ora_absolute_y() {
  * if the number is negative AFTER the shifting the we set the negative flag.
  */
 void asl(byte *b, int cycles, int pcIncrease) {
-	if (bit_test(*b, flagN)) {
-		bit_set(&P, flagC);
-	}
+	bit_val(&P, flagC, bit_test(*b, flagN));
 
 	byte shifted = *b << 1;
-	if (bit_test(shifted, 7)) {
-		bit_set(&P, flagN);
-	}
-	if (A == 0) {
-		bit_set(&P, flagZ);
-	}
+	bit_val(&P, flagN, bit_test(shifted, 7));
+	bit_val(&P, flagZ, A == 0);
+
 
 	*b = shifted;
 	PC += pcIncrease;
@@ -206,12 +201,8 @@ void pha() {
 
 void pla() {
 	A = pop_b();
-	if (A == 0) {
-		bit_set(&P, flagZ);
-	}
-	if (bit_test(A, 7)) {
-		bit_set(&P, flagN);
-	}
+	bit_val(&P, flagZ, A == 0);
+	bit_val(&P, flagN, bit_test(A, 7));
 	PC++;
 	cyclesThisSec += 4;
 }
@@ -225,14 +216,9 @@ void and(byte value, int cycles, int pcIncrease) {
 	A &= value;
 	cyclesThisSec += cycles;
 	PC += pcIncrease;
-	(bit_test(value, 7)) ? bit_set(&P, flagC) : bit_clear(&P, flagC);
-
-	if (A == 0) {
-		bit_set(&P, flagZ);
-	}
-	if (bit_test(A, 7)) {
-		bit_set(&P, flagN);
-	}
+	bit_val(&P, flagC, bit_test(value, 7));
+	bit_val(&P, flagZ, A == 0);
+	bit_val(&P, flagN, bit_test(A, 7));
 }
 
 void and_immediate() {
@@ -281,9 +267,9 @@ void and_indirect_y() {
 void bit(byte value, int cycles, int pcIncrease) {
 
 	byte tmp = A & value;
-	(tmp == 0) ? bit_clear(&P, flagZ) : bit_set(&P, flagZ);
-	(bit_test(value, 6)) ? bit_set(&P, flagV) : bit_clear(&P, flagV);
-	(bit_test(value, 7)) ? bit_set(&P, flagN) : bit_clear(&P, flagN);
+	bit_val(&P, flagZ, tmp != 0);
+	bit_val(&P, flagV, bit_test(value, 6));
+	bit_val(&P, flagN, bit_test(value, 7));
 
 	cyclesThisSec += cycles;
 	PC += pcIncrease;
@@ -311,7 +297,7 @@ void bit_absolute() {
  * All of this instructions have a length of one byte and require two machine cycles
  */
 void set_flag_value(byte flag, int isSet) {
-	(isSet) ? bit_set(&P, flag) : bit_clear(&P, flag);//Set or clear the flag depending on isSet
+	bit_val(&P, flag, isSet);
 	cyclesThisSec += 2; //Constant. Always
 	PC++; //Constant. Always
 }
