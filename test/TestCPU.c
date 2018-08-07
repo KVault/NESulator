@@ -31,6 +31,7 @@ void testOpcodes() {
 	test_LSR();
 	test_ROTATE();
 	test_EOR();
+	test_JMP();
 }
 
 /**
@@ -814,4 +815,21 @@ void test_EOR() {
 	assert(cachedCyclesThisSec + 4 == cyclesThisSec);
 
 	printf("Test EOR passed!\n");
+}
+
+void test_JMP() {
+	int cachedCyclesThisSec = cyclesThisSec;
+
+	wmem_b(PC, 0x6C);
+	wmem_w(PC + 1, 0x6942);
+	word addr = absolute_addr(0x6942);
+	wmem_b(addr, 0x23);
+	addr = absolute_addr(0x6943);
+	wmem_b(addr, 0x32);
+	cpu_cycle();
+
+	assert(PC == 0x3223);
+	assert(cachedCyclesThisSec + 5 == cyclesThisSec);
+
+	printf("Test JMP passed!\n");
 }

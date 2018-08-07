@@ -1080,13 +1080,18 @@ void eor_indirect_y() {
 ///////////////////////////JMP REGION/////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void jmp(word addr, int cycles, int pcIncrease) {}
-
-void jmp_absolute() {
-	jmp(absolutey_param(), 3, 3);
+void jmp(word addr, int cycles) {
+	PC = addr;
+	cyclesThisSec += cycles;
 }
 
-void jmp_indirect() {}
+void jmp_absolute() {
+	jmp(absolutey_param(), 3);
+}
+
+void jmp_indirect() {
+	jmp(indirect_param(), 5);
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////Invalid Opcodes REGION/////////////////////////////////////////
@@ -1417,4 +1422,12 @@ byte indirectx_param() {
 byte indirecty_param() {
 	word addr = indirecty_addr(rmem_b(PC + 1));
 	return rmem_b(addr);
+}
+
+word indirect_param() {
+	word addr = rmem_w(PC + 1);
+	byte least_significant = rmem_b(addr);
+	byte most_significant = rmem_b(addr + 1);
+
+	return (most_significant << 8) + least_significant;
 }
