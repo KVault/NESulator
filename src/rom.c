@@ -5,7 +5,7 @@ struct ROM {
     //Header
     byte nesTitle[3]; //Bytes 0-3 of the ROM
     byte fileFormat;// for iNES format it should always be 0xA1 (26)
-    byte numROMPages;  //Byte4. Number of 16384 byte program ROM pages. Byte4
+    byte numPRGPages;  //Byte4. Number of 16384 byte program ROM pages. Byte4
     byte numCHRPages; //Byte5. Number of 8192 byte character ROM pages (0 indicates CHR RAM).
 
     /*NNNN FTBM
@@ -55,7 +55,7 @@ struct ROM *loadROM(char *filePath) {
 
     bytesRead += fread(&rom.nesTitle, 3, 1, file);
     bytesRead += fread(&rom.fileFormat, 1, 1, file);
-    bytesRead += fread(&rom.numROMPages, 1, 1, file);
+    bytesRead += fread(&rom.numPRGPages, 1, 1, file);
     bytesRead += fread(&rom.numCHRPages, 1, 1, file);
     bytesRead += fread(&rom.flags6, 1, 1, file);
     bytesRead += fread(&rom.flags7, 1, 1, file);
