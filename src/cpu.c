@@ -1030,42 +1030,48 @@ void ror_absolute_x() {
 ///////////////////////////EOR REGION/////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void eor(byte value, int cycles, int pcIncrease){
+void eor(byte value, int cycles, int pcIncrease) {
+	A ^= value;
 
+	bit_val(&P, flagN, bit_test(A, 7));
+	bit_val(&P, flagZ, A == 0);
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
 }
 
-void eor_immediate(){
+void eor_immediate() {
 	byte value = rmem_b(PC + 1);
 	eor(value, 2, 2);
 }
 
-void eor_zpage(){
+void eor_zpage() {
 	eor(zpage_param(), 3, 2);
 }
 
-void eor_zpage_x(){
+void eor_zpage_x() {
 	eor(zpagex_param(), 4, 2);
 }
 
-void eor_absolute(){
+void eor_absolute() {
 	eor(absolute_param(), 4, 3);
 }
 
-void eor_absolute_x(){
+void eor_absolute_x() {
 	eor(absolutex_param(), 4, 3);
 	//TODO +1 if page crossed
 }
 
-void eor_absolute_y(){
+void eor_absolute_y() {
 	eor(absolutey_param(), 4, 3);
 	//TODO +1 if page crossed
 }
 
-void eor_indirect_x(){
+void eor_indirect_x() {
 	eor(indirectx_param(), 6, 2);
 }
 
-void eor_indirect_y(){
+void eor_indirect_y() {
 	eor(indirecty_param(), 5, 2);
 	//TODO +1 if page crossed
 }
@@ -1074,19 +1080,19 @@ void eor_indirect_y(){
 ///////////////////////////JMP REGION/////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void jmp(word addr, int cycles, int pcIncrease){}
+void jmp(word addr, int cycles, int pcIncrease) {}
 
-void jmp_absolute(){
+void jmp_absolute() {
 	jmp(absolutey_param(), 3, 3);
 }
 
-void jmp_indirect(){}
+void jmp_indirect() {}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////Invalid Opcodes REGION/////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void invalid(){
+void invalid() {
 	printf("Invalid shit");
 }
 
