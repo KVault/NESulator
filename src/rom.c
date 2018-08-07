@@ -32,10 +32,10 @@ struct ROM {
     byte *trainer;
 
     //ROM
-    byte *romData;
+    byte *prgROM;
 
     //CHR
-    byte *chrData;
+    byte *chrROM;
 };
 
 //Create the struct outside so that when we fill it in and exit the function, we don't lose the reference
@@ -84,6 +84,6 @@ struct ROM *loadROM(char *filePath) {
 
 void cleanupROM() {
     free(rom.trainer);
-    free(rom.romData);
-    free(rom.chrData);
+    free(rom.prgROM);
+    free(rom.chrROM);
 }
