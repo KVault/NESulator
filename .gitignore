@@ -57,4 +57,4 @@ dkms.conf
 *.vcxproj.*
 
 # NES stuff
-*.nes
+rom
