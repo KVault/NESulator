@@ -14,7 +14,7 @@ int main() {
 	//If we need to initialize anything, it should go here
 
 	//Read the ROM, that we're going to execute and all that stuff
-	struct ROM *rom = loadROM("../../rom/cpu_dummy_reads/cpu_dummy_reads.nes");
+	struct ROM *rom = insertCartridge("../../rom/cpu_dummy_reads/cpu_dummy_reads.nes");
 
 	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
 	//control this with a debugger, or an UI. But for now, it simply runs forever
@@ -27,7 +27,7 @@ int main() {
 	}
 
 	//Cleans up our stuff
-	cleanupROM();
+	ejectCartridge();
 
 	return 0;
 }

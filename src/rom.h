@@ -7,11 +7,11 @@
 /**
  * Loads a ROM from the specified filePath. What it does with it is still to be determined
  */
-struct ROM *loadROM(char *filePath);
+struct ROM *insertCartridge(char *filePath);
 
 /**
  * Cleans up the memory from the ROM. Basically it releases the mallocs
  */
-void cleanupROM();
+void ejectCartridge();
 
 #endif //NESULATOR_ROM_H

@@ -3,13 +3,14 @@
 
 #define PRG_PAGE_SIZE 16384
 #define CHR_PAGE_SIZE 8192
+#define TRAINER_SIZE 512
 
 struct ROM {
 	//Header
 	byte nesTitle[3]; //Bytes 0-3 of the ROM
 	byte fileFormat;// for iNES format it should always be 0xA1 (26)
-	byte numPRGPages;  //Byte4. Number of 16384 byte program ROM pages. Byte4
-	byte numCHRPages; //Byte5. Number of 8192 byte character ROM pages (0 indicates CHR RAM).
+	unsigned int numPRGPages;  //Byte4. Number of 16384 byte program ROM pages. Byte4
+	unsigned int numCHRPages; //Byte5. Number of 8192 byte character ROM pages (0 indicates CHR RAM).
 
 	/*NNNN FTBM
 	N: Lower 4 bits of the mapper number
@@ -30,8 +31,6 @@ struct ROM {
 	//MAPPER
 	int mapper;
 
-	//TRAINER 0 or 512 bytes
-	int trainerSize;//We need to keep track of the size for when we free up the memory
 	byte *trainer;
 
 	//ROM
@@ -46,23 +45,17 @@ struct ROM {
 struct ROM rom = {};
 
 
-struct ROM *loadROM(char *filePath) {
+struct ROM *insertCartridge(char *filePath) {
 	FILE *file;
 	file = fopen(filePath, "rb");
-	fseek(file, 0L, SEEK_END);//Go to the end of the file
-	long fSize = ftell(file);//get the size
-	rewind(file);//Get back to the beginning.
 
-	//Used to track count of the bytes read throughout
-	int bytesRead = 0;
-
-	bytesRead += fread(&rom.nesTitle, 3, 1, file);
-	bytesRead += fread(&rom.fileFormat, 1, 1, file);
-	bytesRead += fread(&rom.numPRGPages, 1, 1, file);
-	bytesRead += fread(&rom.numCHRPages, 1, 1, file);
-	bytesRead += fread(&rom.flags6, 1, 1, file);
-	bytesRead += fread(&rom.flags7, 1, 1, file);
-	bytesRead += fread(&rom.endOfHeader, 8, 1, file);
+	fread(&rom.nesTitle, 3, 1, file);
+	fread(&rom.fileFormat, 1, 1, file);
+	fread(&rom.numPRGPages, 1, 1, file);
+	fread(&rom.numCHRPages, 1, 1, file);
+	fread(&rom.flags6, 1, 1, file);
+	fread(&rom.flags7, 1, 1, file);
+	fread(&rom.endOfHeader, 8, 1, file);
 
 	//Figure out the mapper number
 	int lowerBits = (rom.flags6 & 0b11110000) >> 4; // extract upper 4 bits of the flag6 and use them as lower bits
@@ -71,32 +64,23 @@ struct ROM *loadROM(char *filePath) {
 	rom.mapper = lowerBits + upperBits;
 
 	//Check the third bit to check if the ROM has a trainer
-	int hasTrainer = rom.flags6 & 0b00000100;
-	if (hasTrainer) { //if the trainer is there, then it's 512 bytes long. Always.
-		rom.trainerSize = 512;
-		rom.trainer = (byte *) malloc(rom.trainerSize);
-		for (int i = 0; i < rom.trainerSize; i++) {
-			fread(&rom.trainer[i], 1, 1, file);
-		}
+	if (bit_test(rom.flags6, 3)) { //if the trainer is there, then it's 512 bytes long. Always.
+		rom.trainer = malloc(TRAINER_SIZE);
+		fread(&rom.trainer, TRAINER_SIZE, 1, file);
 	}
 
-	rom.prgROM = malloc((unsigned int) (rom.numPRGPages * PRG_PAGE_SIZE));
-	rom.chrROM = malloc((unsigned int) (rom.numCHRPages * CHR_PAGE_SIZE));
+	rom.prgROM = malloc(rom.numPRGPages * PRG_PAGE_SIZE);
+	rom.chrROM = malloc(rom.numCHRPages * CHR_PAGE_SIZE);
 
-	for (int i = 0; i < rom.numPRGPages * PRG_PAGE_SIZE; i++) {
-		fread(&rom.prgROM[i], 1, 1, file);
-	}
-
-	for (int i = 0; i < rom.numCHRPages * CHR_PAGE_SIZE; i++) {
-		fread(&rom.chrROM[i], 1, 1, file);
-	}
+	fread(&rom.prgROM, rom.numPRGPages * PRG_PAGE_SIZE, 1, file);
+	fread(&rom.chrROM, rom.numCHRPages * CHR_PAGE_SIZE, 1, file);
 
 	fflush(file);
 	fclose(file);
 	return &rom;
 }
 
-void cleanupROM() {
+void ejectCartridge() {
 	free(rom.trainer);
 	free(rom.prgROM);
 	free(rom.chrROM);
