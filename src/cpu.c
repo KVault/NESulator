@@ -64,6 +64,8 @@ void ora(byte b, int cycles, int pcIncrease) {
 	//Update cycles and pc
 	cyclesThisSec += cycles;
 	PC += pcIncrease;
+
+	log_info("ORA %X, #%X - PC=%X \n", currentOpcode,b , PC);
 }
 
 void ora_ind_x() {
@@ -120,6 +122,8 @@ void asl(byte *b, int cycles, int pcIncrease) {
 	*b = shifted;
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
+
+	log_info("ASL %X, #%X - PC=%X \n", currentOpcode,b , PC);
 }
 
 void asl_zpage() {
@@ -166,6 +170,8 @@ void jsr_absolute() {
 	push_w(cachedPC); // Stores the address of the next opcode minus one
 	PC = addr;
 	cyclesThisSec += 6;
+
+	log_info("JSR ABSOLUTE %X, #%X - PC=%X \n", currentOpcode, addr , PC);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -176,6 +182,8 @@ void php() {
 	push_b(P);
 	PC++;
 	cyclesThisSec += 3;
+
+	log_info("PHP %X, #%X - PC=%X \n", currentOpcode, P, PC);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -186,6 +194,8 @@ void plp() {
 	P = pop_b();
 	PC++;
 	cyclesThisSec += 4;
+
+	log_info("PLP %X, #%X - PC=%X \n", currentOpcode, P, PC);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -196,6 +206,8 @@ void pha() {
 	push_b(A);
 	PC++;
 	cyclesThisSec += 3;
+
+	log_info("PHA %X, #%X - PC=%X \n", currentOpcode, A, PC);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -208,6 +220,8 @@ void pla() {
 	bit_val(&P, flagN, bit_test(A, 7));
 	PC++;
 	cyclesThisSec += 4;
+
+	log_info("PLA %X, #%X - PC=%X \n", currentOpcode, A, PC);;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -222,6 +236,8 @@ void and(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagC, bit_test(value, 7));
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagN, bit_test(A, 7));
+
+	log_info("AND %X, #%X - PC=%X \n", currentOpcode, value, PC);
 }
 
 void and_immediate() {
@@ -276,6 +292,8 @@ void bit(byte value, int cycles, int pcIncrease) {
 
 	cyclesThisSec += cycles;
 	PC += pcIncrease;
+
+	log_info("BIT %X, #%X - PC=%X \n", currentOpcode, value, PC);
 }
 
 /**
@@ -303,6 +321,8 @@ void set_flag_value(byte flag, int isSet) {
 	bit_val(&P, flag, isSet);
 	cyclesThisSec += 2; //Constant. Always
 	PC++; //Constant. Always
+
+	log_info("FLAGS %X, #%X - PC=%X \n", currentOpcode, P, PC);
 }
 
 void clc() {
@@ -344,6 +364,8 @@ void transfer_reg(byte *from_reg, byte *to_reg) {
 	*to_reg = *from_reg;
 	PC++;
 	cyclesThisSec += 2;
+
+	log_info("REGISTERS %X, FROM:%X, TO:%X - PC=%X \n", currentOpcode, *from_reg, *to_reg, PC);
 }
 
 /**
@@ -415,6 +437,8 @@ void adc(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(A, 7));
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
+
+	log_info("ADC %X, #%X - PC=%X \n", currentOpcode, value, PC);
 }
 
 void adc_immediate() {
@@ -522,6 +546,8 @@ void sbc(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(A, 7));
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
+
+	log_info("SBC %X, #%X - PC=%X \n", currentOpcode, value, PC);
 }
 
 void sbc_immediate() {
@@ -645,29 +671,41 @@ void load_register(byte *regPtr, byte value, int cycles, int pcIncrease) {
 
 void lda_inmediate() {
 	load_register(&A, rmem_b(PC + 1), 2, 2);
+
+	log_info("LDA %X, #%X - PC=%X \n", currentOpcode, rmem_b(PC + 1), PC);
 }
 
 void lda_zpage() {
 	load_register(&A, zpage_param(), 3, 2);
+
+	log_info("LDA %X, #%X - PC=%X \n", currentOpcode, zpage_param(), PC);
 }
 
 void lda_zpage_x() {
 	load_register(&A, zpagex_param(), 4, 2);
+
+	log_info("LDA %X, #%X - PC=%X \n", currentOpcode, zpagex_param(), PC);
 }
 
 void lda_absolute() {
 	load_register(&A, absolute_param(), 4, 3);
+
+	log_info("LDA %X, #%X - PC=%X \n", currentOpcode, absolute_param(), PC);
 }
 
 void lda_absolute_x() {
 	word addr = absolutex_addr(rmem_w(PC + 1));
 	load_register(&A, rmem_b(addr), 4, 3);
 	// TODO +1 if page crossed
+
+	log_info("LDA %X, #%X - PC=%X \n", currentOpcode, absolutex_param(), PC);
 }
 
 void lda_absolute_y() {
 	load_register(&A, absolutey_param(), 4, 3);
 	// TODO +1 if page crossed
+
+	log_info("LDA %X, #%X - PC=%X \n", currentOpcode, absolutey_param(), PC);
 }
 
 void lda_indirect_x() {
@@ -1101,8 +1139,8 @@ void jmp_indirect() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void invalid() {
-	printf("Invalid opcode %X, PC=%X \n", currentOpcode, PC);
-	PC++;
+	//log_error("Invalid opcode %X, PC=%X \n", currentOpcode, PC);
+	PC+=2;
 }
 
 /**

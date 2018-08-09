@@ -3,6 +3,7 @@
 
 #include "nes.h"
 #include "Utils.h"
+#include "log.h"
 
 #define OPCODE_COUNT 256
 
