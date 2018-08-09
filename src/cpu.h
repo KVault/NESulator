@@ -42,6 +42,11 @@ byte currentOpcode; // The opcode of this cycle
 void power_up(int clockSpeed);
 
 /**
+ * Resets the PC to the value held in the reset vector $FFFC and $FFFD
+ */
+void resetPC();
+
+/**
  * Fetch the next X bytes (TBD) from where the PC is pointing to. It will map it and decide which opcode is
  * to be executed.
  */

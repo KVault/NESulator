@@ -1,8 +1,8 @@
 #include "CNROM.h"
 
-const uint first_rom_page = 0x8000;
-const uint second_rom_page = 0xC000;
-const uint prg_ram = 0x6000;
+static uint first_rom_page = 0x8000;
+static uint second_rom_page = 0xC000;
+static uint prg_ram = 0x6000;
 
 void mapper3(struct ROM *rom) {
 	for (int i = 0; i < PRG_PAGE_SIZE; ++i) {
