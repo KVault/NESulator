@@ -20,7 +20,7 @@ void power_up(int clockSpeed) {
 	SP = 0xFD;
 	wmem_b(0x4015, 0);
 	wmem_b(0x4017, 0);
-	for (unsigned int i = 0x4000; i <= 0x400F; ++i) {
+	for (uint i = 0x4000; i <= 0x400F; ++i) {
 		wmem_b(i, 0);
 	}
 

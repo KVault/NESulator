@@ -12,8 +12,8 @@ struct ROM {
 	//Header
 	byte nesTitle[3]; //Bytes 0-3 of the ROM
 	byte fileFormat;// for iNES format it should always be 0xA1 (26)
-	unsigned int numPRGPages;  //Byte4. Number of 16384 byte program ROM pages. Byte4
-	unsigned int numCHRPages; //Byte5. Number of 8192 byte character ROM pages (0 indicates CHR RAM).
+	uint numPRGPages;  //Byte4. Number of 16384 byte program ROM pages. Byte4
+	uint numCHRPages; //Byte5. Number of 8192 byte character ROM pages (0 indicates CHR RAM).
 
 	/*NNNN FTBM
 	N: Lower 4 bits of the mapper number

@@ -15,22 +15,22 @@ void zeroMemory();
 /**
  * Reads one byte from the specified memory position
  */
-byte rmem_b(unsigned int address);
+byte rmem_b(uint address);
 
 /**
  * Reads a words starting at the specified memory position
  */
-word rmem_w(unsigned int startAddress);
+word rmem_w(uint startAddress);
 
 /**
  * Writes one byte at the specified memory position
  */
-void wmem_b(unsigned int address, byte content);
+void wmem_b(uint address, byte content);
 
 /**
  * Writes two bytes starting at the specified memory position
  */
-void wmem_w(unsigned int address, word content);
+void wmem_w(uint address, word content);
 
 /**
  * Pops a byte from the stack

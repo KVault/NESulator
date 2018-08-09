@@ -3,6 +3,7 @@
 
 typedef unsigned char byte;
 typedef unsigned short word;
+typedef unsigned int uint;
 // TODO typedef unsigned ??? 3 bytes or more?
 
 #define BYTE 1

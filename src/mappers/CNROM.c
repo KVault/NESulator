@@ -1,16 +1,17 @@
 #include "CNROM.h"
 
-const unsigned int first_rom_page = 0x8000;
-const unsigned int second_rom_page = 0xC000;
-const unsigned int prg_ram = 0x6000;
+const uint first_rom_page = 0x8000;
+const uint second_rom_page = 0xC000;
+const uint prg_ram = 0x6000;
 
 void mapper3(struct ROM *rom) {
 	for (int i = 0; i < PRG_PAGE_SIZE; ++i) {
 		wmem_b(first_rom_page + i, rom->prgROM[i]);
 	}
 
-	unsigned int mirror_starting_point = rom->numPRGPages == 1 ? 0 : PRG_PAGE_SIZE;
+	uint mirror_starting_point = rom->numPRGPages == 1 ? 0 : PRG_PAGE_SIZE;
 
+	//If there's more than one 16Kb pages, then copy everything, otherwise mirror what was copied on the first loop
 	for (int i = 0; i < PRG_PAGE_SIZE; ++i) {
 		wmem_b(second_rom_page + i, rom->prgROM[i + mirror_starting_point]);
 	}
