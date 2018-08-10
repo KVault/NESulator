@@ -587,8 +587,9 @@ void dec_mem_absolute_x();
 
 /**
  * Loads the specified value onto the pointed register
+ * the mnemonic is only used for logging purposes
  */
-void load_register(byte *regPtr, byte value, int cycles, int pcIncrease);
+void load_register(byte *regPtr, byte value, int cycles, int pcIncrease, const char *regMnemonic);
 
 void lda_inmediate();
 
@@ -632,8 +633,9 @@ void ldy_absolute_x();
 
 /**
  * Loads the specified value onto the pointed register
+ * The mnmemonic is used for logging
  */
-void store_register(byte reg, word memAddr, int cycles, int pcIncrease);
+void store_register(byte reg, word memAddr, int cycles, int pcIncrease, const char *regMnemonic);
 
 void sta_zpage();
 
@@ -682,7 +684,7 @@ void rti();
 /**
  * Compares the specified value with the pointed register
  */
-void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease);
+void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease, const char *regMnemonic);
 
 void cmp_inmediate();
 

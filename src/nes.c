@@ -13,6 +13,7 @@ int main() {
 	set_log_level(Debug);
 	set_clear_log_file();
 	set_log_path("../../log.txt");
+
 	power_up(0);
 	isRunning = 1;
 	//If we need to initialize anything, it should go here

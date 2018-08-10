@@ -58,3 +58,5 @@ dkms.conf
 
 # NES stuff
 rom
+
+log.txt
