@@ -29,7 +29,7 @@ void power_up(int clockSpeed) {
 	//TODO LFSR stuff
 }
 
-void resetPC(){
+void resetPC() {
 	PC = rmem_w(0xFFFC);
 }
 
@@ -39,11 +39,12 @@ void nop() {
 	log_info("NOP \t $%X \t\t PC=%X \n", currentOpcode, PC);
 }
 
-void brk() {
+void breakpoint() {
 	bit_set(&P, flagZ);
 	bit_set(&P, flagB);
 	cyclesThisSec += 7;
 	PC++;
+	log_instruction(0, "BRK");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +67,7 @@ void ora(byte b, int cycles, int pcIncrease) {
 	cyclesThisSec += cycles;
 	PC += pcIncrease;
 
-	log_info("ORA \t $%X \t #%X \t\t PC=%X \n", currentOpcode,b , PC);
+	log_info("ORA \t $%X \t #%X \t\t PC=%X \n", currentOpcode, b, PC);
 }
 
 void ora_ind_x() {
@@ -124,7 +125,7 @@ void asl(byte *b, int cycles, int pcIncrease) {
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
 
-	log_info("ASL \t $%X \t #%X \t\t PC=%X \n", currentOpcode,b , PC);
+	log_info("ASL \t $%X \t #%X \t\t PC=%X \n", currentOpcode, b, PC);
 }
 
 void asl_zpage() {
@@ -172,7 +173,7 @@ void jsr_absolute() {
 	PC = addr;
 	cyclesThisSec += 6;
 
-	log_info("JSR ABSOLUTE \t $%X \t #%X \t\t PC=%X \n", currentOpcode,addr , PC);
+	log_info("JSR ABSOLUTE \t $%X \t #%X \t\t PC=%X \n", currentOpcode, addr, PC);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -676,7 +677,7 @@ void load_register(byte *regPtr, byte value, int cycles, int pcIncrease, const c
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
-	log_info("LD%s \t $%X \t #%X \t\t PC=%X \n",regMnemonic , currentOpcode, absolutey_param(), PC);
+	log_instruction(pcIncrease - 1, "LDA #$%X", value);
 }
 
 void lda_inmediate() {
@@ -769,7 +770,7 @@ void store_register(byte reg, word memAddr, int cycles, int pcIncrease, const ch
 	wmem_b(memAddr, reg);
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
-	log_info("LD%s \t $%X \t #%X \t\t PC=%X \n",regMnemonic, currentOpcode, absolutey_param(), PC);
+	log_info("LD%s \t $%X \t #%X \t\t PC=%X \n", regMnemonic, currentOpcode, absolutey_param(), PC);
 }
 
 void sta_zpage() {
@@ -841,7 +842,7 @@ void rti() {
 	PC = pop_w(); //Unlike RTS. RTI pulls the correct PC address. No need to increment
 	cyclesThisSec += 6;
 
-	log_info("RTI \t $%X  \t P=%X \t\t PC=%X \n", currentOpcode,P , PC);
+	log_info("RTI \t $%X  \t P=%X \t\t PC=%X \n", currentOpcode, P, PC);
 }
 
 
@@ -1155,7 +1156,7 @@ void jmp_indirect() {
 
 void invalid() {
 	//log_error("Invalid opcode %X, PC=%X \n", currentOpcode, PC);
-	PC+=2;
+	PC += 2;
 }
 
 /**
@@ -1170,7 +1171,7 @@ void invalid() {
  */
 gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		//              Opcode      Syntax        Description                     Len     Tim
-		&brk,           //$00       BRK           BReaK                           1       7
+		&breakpoint,           //$00       BRK           BReaK                           1       7
 		&ora_ind_x,     //$01       ORA ($44, X)  bitwise OR with Accumulator     2       6
 		&invalid,
 		&invalid,
@@ -1487,4 +1488,21 @@ word indirect_param() {
 	byte most_significant = rmem_b(addr + 1);
 
 	return (most_significant << 8) + least_significant;
+}
+
+void log_instruction(int num_params, const char *mnemonic, ...) {
+	log_info("%X %X ", PC, currentOpcode);
+	for (uint i = 1; i <= num_params; i++) {
+		log_info("%X ", rmem_b(PC + i));
+	}
+	log_info("\t");
+	if (num_params == 0) {
+		log_info("\t");
+	}
+	va_list args;
+	va_start(args, mnemonic);
+	vlog(mnemonic, Info, args);
+	va_end(args);
+	log_info("\t\t\t");
+	log_info("A:%X X:%X Y:%X P:%X SP:%X CYC:%d\n", A, X, Y, P, SP, cyclesThisSec);
 }

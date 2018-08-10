@@ -19,7 +19,7 @@ int main() {
 	//If we need to initialize anything, it should go here
 
 	//Read the ROM, that we're going to execute and all that stuff
-	struct ROM *rom = insertCartridge("../../rom/cpu_dummy_reads/cpu_dummy_reads.nes");
+	struct ROM *rom = insertCartridge("../../rom/cpu_dummy_reads.nes");
 	loadROM(rom);
 	resetPC();
 

@@ -111,13 +111,18 @@ word indirect_param();
  */
 void cpu_cycle();
 
+/**
+ * Log an instruction with all the CPU information at that point: PC and registers.
+ */
+void log_instruction(int num_params, const char *mnemonic, ...);
+
 
 /**
  * BRK causes a non-maskable interrupt and increments the program counter by one.
  * Therefore an RTI will go to the address of the BRK +2 so that BRK may be used to replace a two-byte instruction
  * for debugging and the subsequent RTI will be correct.
  */
-void brk();
+void breakpoint();
 
 /**
  * Just nop

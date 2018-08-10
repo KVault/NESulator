@@ -43,7 +43,7 @@ void test_BRK() {
 	int cachedCyclesThisSec = cyclesThisSec;
 	bit_clear(&P, flagB);
 	assert(bit_test(P, flagB) == 0);
-	wmem_b(PC, 0x00); // brk opcode injected
+	wmem_b(PC, 0x00); // breakpoint opcode injected
 	cpu_cycle();
 	assert(cachedPC + 1 == PC);
 	assert(bit_test(P, flagB) == 1);
