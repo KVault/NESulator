@@ -487,7 +487,7 @@ void adc_indirect_y();
  * Tries to branch the PC by adding the relative displacement (value) if the flag's value
  * has the req_flag_value.
  */
-void try_branch(byte flag, int req_flag_val);
+void try_branch(byte flag, int req_flag_val, const char *mnemonic);
 
 void bpl();
 

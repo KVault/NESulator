@@ -32,6 +32,9 @@ void testOpcodes() {
 	test_ROTATE();
 	test_EOR();
 	test_JMP();
+
+	//Now for the real deal. Test the NESTEST ROM!
+	test_NESTEST();
 }
 
 /**
@@ -832,4 +835,43 @@ void test_JMP() {
 	assert(cachedCyclesThisSec + 5 == cyclesThisSec);
 
 	printf("Test JMP passed!\n");
+}
+
+/**
+ * At this moment, this won't assert anything, just run it and spit out the logs. We'll have a fresh new instance of
+ * the console, we'll enable the logs and run it from scratch
+ */
+void test_NESTEST() {
+	set_log_level(Debug);
+	set_clear_log_file();
+	set_log_path("../../log.txt");
+
+	power_up(0);
+	//If we need to initialize anything, it should go here
+
+	//Read the ROM, that we're going to execute and all that stuff
+	struct ROM *rom = insertCartridge("../../rom/nestest.nes");
+	loadROM(rom);
+
+	int isRunning = 1;
+
+	//For this ROM to work in non-GUI mode we need to setup the PC to $C000 manually
+	PC = 0xC000;
+
+	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
+	//control this with a debugger, or an UI. But for now, it simply runs forever
+	while (isRunning) {
+		cpu_cycle();
+
+		//Stop the emulation once the PC reaches $FFFF
+		if(PC >= 0xFFFF)
+		{
+			isRunning = 0;
+		}
+	}
+
+	printf("NESTEST test passed? Or not :P Have a look at the logs!");
+
+	ejectCartridge();
+
 }
