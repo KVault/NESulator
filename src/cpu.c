@@ -16,7 +16,7 @@
 void power_up(int clockSpeed) {
 	zeroMemory();
 	A = X = Y = 0;
-	P = 0x34; //00110100
+	P = 0x24;
 	SP = 0xFD;
 	wmem_b(0x4015, 0);
 	wmem_b(0x4017, 0);
@@ -59,13 +59,12 @@ void breakpoint() {
  * the flagN to one.
  */
 void ora(byte b, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tORA #$%02X\t", b);
 	//Do the actual or operation, saving the result in the accumulator
 	A = A | b;
 	//Set the flags
 	bit_val(&P, flagZ, A == 0x00);
 	bit_val(&P, flagN, bit_test(A, 7));
-
-	log_instruction(pcIncrease - 1, "\tORA #$%02X\t", b);
 
 	//Update cycles and pc
 	cyclesThisSec += cycles;
@@ -117,14 +116,13 @@ void ora_absolute_y() {
  * if the number is negative AFTER the shifting the we set the negative flag.
  */
 void asl(byte *b, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "ASL #$%02X", b);
 	bit_val(&P, flagC, bit_test(*b, flagN));
 
 	byte shifted = *b << 1;
 	bit_val(&P, flagN, bit_test(shifted, 7));
 	bit_val(&P, flagZ, A == 0);
 	*b = shifted;
-
-	log_instruction(pcIncrease - 1, "ASL #$%02X", b);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -171,9 +169,9 @@ void asl_absolute_x() {
 void jsr_absolute() {
 	word cachedPC = (word) (PC + 0x02);
 	word addr = absolute_addr(rmem_w(PC + 1));
-	push_w(cachedPC); // Stores the address of the next opcode minus one
-
 	log_instruction(2, "JSR #$%02X\t", addr);
+	
+	push_w(cachedPC); // Stores the address of the next opcode minus one
 
 	PC = addr;
 	cyclesThisSec += 6;
@@ -184,9 +182,8 @@ void jsr_absolute() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void php() {
-	push_b(P);
-
 	log_instruction(0, "PHP\t\t\t");
+	push_b(P);
 
 	PC++;
 	cyclesThisSec += 3;
@@ -197,9 +194,8 @@ void php() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void plp() {
-	P = pop_b();
-
 	log_instruction(0, "PLP\t\t\t");
+	P = pop_b();
 
 	PC++;
 	cyclesThisSec += 4;
@@ -210,9 +206,8 @@ void plp() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void pha() {
-	push_b(A);
-
 	log_instruction(0, "PHA\t\t\t");
+	push_b(A);
 
 	PC++;
 	cyclesThisSec += 3;
@@ -223,11 +218,10 @@ void pha() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void pla() {
+	log_instruction(0, "PLA\t\t\t");
 	A = pop_b();
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagN, bit_test(A, 7));
-
-	log_instruction(0, "PLA\t\t\t");
 
 	PC++;
 	cyclesThisSec += 4;
@@ -239,12 +233,11 @@ void pla() {
 
 
 void and(byte value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tAND #$%02X\t", value);
 	A &= value;
 	bit_val(&P, flagC, bit_test(value, 7));
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagN, bit_test(A, 7));
-
-	log_instruction(pcIncrease - 1, "\tAND #$%02X\t", value);
 
 	cyclesThisSec += cycles;
 	PC += pcIncrease;
@@ -294,13 +287,12 @@ void and_indirect_y() {
  * BIt Test checks if one or more bits of a memory position are set
  */
 void bit(byte value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tBIT #$%02X\t", value);
 
 	byte tmp = A & value;
 	bit_val(&P, flagZ, tmp != 0);
 	bit_val(&P, flagV, bit_test(value, 6));
 	bit_val(&P, flagN, bit_test(value, 7));
-
-	log_instruction(pcIncrease - 1, "\tBIT #$%02X\t", value);
 
 	cyclesThisSec += cycles;
 	PC += pcIncrease;
@@ -444,6 +436,8 @@ void iny() {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 void adc(byte value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tADC #$%02X\t", value);
+
 	byte carry = (byte) bit_test(P, flagC);
 	int result = A + carry + value;
 	carry = (byte) ((result & 0x100) >> 8);
@@ -456,8 +450,6 @@ void adc(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagV, isOverflown);
 	bit_val(&P, flagN, bit_test(A, 7));
-
-	log_instruction(pcIncrease - 1, "\tADC #$%02X\t",value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -506,9 +498,8 @@ void adc_indirect_y() {
 
 void try_branch(byte flag, int req_flag_val, const char *mnemonic) {
 	byte value = rmem_b(PC + 1);
-	cyclesThisSec += 2;//This is always constant
-
 	log_instruction(1, mnemonic, PC + 2 + value);
+	cyclesThisSec += 2;//This is always constant
 
 	PC += 2;
 	if (bit_test(P, flag) == req_flag_val) {
@@ -556,6 +547,7 @@ void beq() {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 void sbc(byte value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tSBC #$%02X\t", value);
 	byte carry = (byte) bit_test(P, flagC);
 	byte carryNop = (byte) !carry;
 	int result = A - value - carryNop;
@@ -569,8 +561,6 @@ void sbc(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagV, !isOverflown); // we need to clear the flagV
 	bit_val(&P, flagN, bit_test(A, 7));
-
-	log_instruction(pcIncrease - 1, "\tSBC #$%02X\t", value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -633,12 +623,12 @@ void delta_memory(word memAddr, int delta, int cycles, int pcIncrease) {
 }
 
 void inc_mem(word memAddr, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "INC #$%02X = %02X", memAddr, memAddr+1);
+	log_instruction(pcIncrease - 1, "INC #$%02X = %02X", memAddr, memAddr + 1);
 	delta_memory(memAddr, 1, cycles, pcIncrease);
 }
 
 void dec_mem(word memAddr, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "INC #$%02X = %02X", memAddr, memAddr-1);
+	log_instruction(pcIncrease - 1, "INC #$%02X = %02X", memAddr, memAddr - 1);
 	delta_memory(memAddr, -1, cycles, pcIncrease);
 }
 
@@ -688,12 +678,11 @@ void dec_mem_absolute_x() {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 void load_register(byte *regPtr, byte value, int cycles, int pcIncrease, const char *regMnemonic) {
+	log_instruction(pcIncrease - 1, regMnemonic, value);
 	*regPtr = value;
 
 	bit_val(&P, flagZ, *regPtr == 0);
 	bit_val(&P, flagN, bit_test(*regPtr, 7));
-
-	log_instruction(pcIncrease - 1, regMnemonic, value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -786,8 +775,8 @@ void ldy_absolute_x() {
  * Store the specified value onto the pointed register
  */
 void store_register(byte reg, word memAddr, int cycles, int pcIncrease, const char *regMnemonic) {
-	wmem_b(memAddr, reg);
 	log_instruction(pcIncrease - 1, regMnemonic, memAddr, reg);
+	wmem_b(memAddr, reg);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -850,9 +839,8 @@ void sty_absolute() {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 void rts() {
-	PC = pop_w();
-
 	log_instruction(0, "RTS\t\t\t");
+	PC = pop_w();
 
 	PC++; // JSR pushes the address -1, so when we recover (here) we have to add 1 to make up for that "1" lost
 	cyclesThisSec += 6;
@@ -860,7 +848,6 @@ void rts() {
 
 void rti() {
 	P = pop_b();
-
 	log_instruction(0, "RTI\t\t\t");
 
 	PC = pop_w(); //Unlike RTS. RTI pulls the correct PC address. No need to increment
@@ -873,11 +860,11 @@ void rti() {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease, const char *regMnemonic) {
+	log_instruction(pcIncrease - 1, regMnemonic, value);
+
 	bit_val(&P, flagC, *regPtr >= value);
 	bit_val(&P, flagN, *regPtr > value);
 	bit_val(&P, flagZ, *regPtr == value);
-
-	log_instruction(pcIncrease-1, regMnemonic, value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -948,6 +935,7 @@ void cpy_absolute() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void lsr(byte *value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "LSR #$%02X", value);
 
 	bit_val(&P, flagC, bit_test(*value, 0));
 
@@ -955,8 +943,6 @@ void lsr(byte *value, int cycles, int pcIncrease) {
 
 	bit_val(&P, flagZ, shifted == 0);
 	*value = shifted;
-
-	log_instruction(pcIncrease-1, "LSR #$%02X",value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -1000,6 +986,8 @@ void lsr_absolute_x() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void rol(byte *value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "ROL $%02X", value);
+
 	byte cachedFlagC = (byte) bit_test(P, flagC);
 	byte cached7 = (byte) bit_test(*value, 7);
 
@@ -1010,8 +998,6 @@ void rol(byte *value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, shifted == 0);
 	bit_val(&P, flagN, bit_test(shifted, 7));
 	*value = shifted;
-
-	log_instruction(pcIncrease -1, "ROL $%02X",value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -1051,6 +1037,8 @@ void rol_absolute_x() {
 
 
 void ror(byte *value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "ROR $%02X", value);
+
 	byte cachedFlagC = (byte) bit_test(P, flagC);
 	byte cached0 = (byte) bit_test(*value, 0);
 
@@ -1061,8 +1049,6 @@ void ror(byte *value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, shifted == 0);
 	bit_val(&P, flagN, bit_test(shifted, 7));
 	*value = shifted;
-
-	log_instruction(pcIncrease -1, "ROR $%02X",value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -1106,12 +1092,12 @@ void ror_absolute_x() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void eor(byte value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tEOR $%02X\t\t", value);
+
 	A ^= value;
 
 	bit_val(&P, flagN, bit_test(A, 7));
 	bit_val(&P, flagZ, A == 0);
-
-	log_instruction(pcIncrease -1, "\tEOR $%02X\t\t",value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;

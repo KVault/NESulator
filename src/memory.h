@@ -3,7 +3,7 @@
 
 #include "nes.h"
 
-#define MEM_SIZE 65535
+#define MEM_SIZE 65536
 
 byte memoryBank[MEM_SIZE];
 
