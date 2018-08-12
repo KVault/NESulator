@@ -508,7 +508,7 @@ void try_branch(byte flag, int req_flag_val, const char *mnemonic) {
 	byte value = rmem_b(PC + 1);
 	cyclesThisSec += 2;//This is always constant
 
-	log_instruction(1, mnemonic, PC);
+	log_instruction(1, mnemonic, PC + 2 + value);
 
 	PC += 2;
 	if (bit_test(P, flag) == req_flag_val) {
@@ -516,7 +516,6 @@ void try_branch(byte flag, int req_flag_val, const char *mnemonic) {
 		cyclesThisSec++;
 		//TODO +2 cycle if page crossed
 	}
-
 }
 
 void bpl() {
@@ -1449,7 +1448,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&invalid,
 		&sbc_absolute_x,//$FD       SBC $440&invalidX   SuBstract with Carry             3       4+
 		&inc_mem_absolute_x,//$FE     INC $440&invalidX   INcrement Memory               3       7
-		0
+		&invalid,
 };
 
 void cpu_cycle() {

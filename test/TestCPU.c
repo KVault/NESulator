@@ -7,34 +7,34 @@ void testOpcodes() {
 	//Now for the real deal. Test the NESTEST ROM!
 	test_NESTEST();
 
-	power_up(0);
-	// We did something wrong with the BRK opcode function, need to be fixed
-	test_BRK();
-	test_ORA();
-	test_ASL();
-	test_JSR();
-	test_PHP();
-	test_PLP();
-	test_PLA();
-	test_PHA();
-	test_AND();
-	test_BIT();
-	test_FLAGS();
-	test_REGISTERS();
-	test_ADC();
-	test_BRANCH();
-	test_NOP();
-	test_SBC();
-	test_INCDECMEM();
-	test_LOADREGISTER();
-	test_STOREREGISTER();
-	test_RTS();
-	test_RTI();
-	test_COMPAREREGISTER();
-	test_LSR();
-	test_ROTATE();
-	test_EOR();
-	test_JMP();
+	//power_up(0);
+	//// We did something wrong with the BRK opcode function, need to be fixed
+	//test_BRK();
+	//test_ORA();
+	//test_ASL();
+	//test_JSR();
+	//test_PHP();
+	//test_PLP();
+	//test_PLA();
+	//test_PHA();
+	//test_AND();
+	//test_BIT();
+	//test_FLAGS();
+	//test_REGISTERS();
+	//test_ADC();
+	//test_BRANCH();
+	//test_NOP();
+	//test_SBC();
+	//test_INCDECMEM();
+	//test_LOADREGISTER();
+	//test_STOREREGISTER();
+	//test_RTS();
+	//test_RTI();
+	//test_COMPAREREGISTER();
+	//test_LSR();
+	//test_ROTATE();
+	//test_EOR();
+	//test_JMP();
 
 
 }
@@ -873,6 +873,7 @@ void test_NESTEST() {
 	}
 
 	printf("NESTEST test passed? Or not :P Have a look at the logs!");
+	log_info("Error code: $%02X", rmem_b(0x0002));
 
 	ejectCartridge();
 
