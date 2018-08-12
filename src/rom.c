@@ -32,13 +32,16 @@ struct ROM *insertCartridge(char *filePath) {
 	rom.prgROM = malloc(rom.numPRGPages * PRG_PAGE_SIZE);
 	rom.chrROM = malloc(rom.numCHRPages * CHR_PAGE_SIZE);
 
-	for (int i = 0; i < rom.numPRGPages * PRG_PAGE_SIZE; ++i) {
-		fread(&rom.prgROM, 1, 1, file);
-	}
+	//for (int i = 0; i < rom.numPRGPages * PRG_PAGE_SIZE; ++i) {
+	//	fread(&rom.prgROM, 1, 1, file);
+	//}
 
-	for(int i = 0; i < rom.numCHRPages * CHR_PAGE_SIZE; i++){
-		fread(&rom.chrROM, 1, 1, file);
-	}
+	//for(int i = 0; i < rom.numCHRPages * CHR_PAGE_SIZE; i++){
+	//	fread(&rom.chrROM, 1, 1, file);
+	//}
+
+	fread(*&rom.prgROM, rom.numPRGPages * PRG_PAGE_SIZE, 1, file);
+	fread(*&rom.chrROM, rom.numCHRPages * PRG_PAGE_SIZE, 1, file);
 
 	fflush(file);
 	fclose(file);

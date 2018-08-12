@@ -35,7 +35,7 @@ void resetPC() {
 }
 
 void nop() {
-	log_instruction(0, "NOP");
+	log_instruction(0, "NOP\t\t\t");
 
 	PC++;
 	cyclesThisSec += 2;
@@ -65,7 +65,7 @@ void ora(byte b, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, A == 0x00);
 	bit_val(&P, flagN, bit_test(A, 7));
 
-	log_instruction(pcIncrease - 1, "ORA #$%X", b);
+	log_instruction(pcIncrease - 1, "\tORA #$%02X\t", b);
 
 	//Update cycles and pc
 	cyclesThisSec += cycles;
@@ -124,7 +124,7 @@ void asl(byte *b, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, A == 0);
 	*b = shifted;
 
-	log_instruction(pcIncrease - 1, "ASL #$%X", b);
+	log_instruction(pcIncrease - 1, "ASL #$%02X", b);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -173,7 +173,7 @@ void jsr_absolute() {
 	word addr = absolute_addr(rmem_w(PC + 1));
 	push_w(cachedPC); // Stores the address of the next opcode minus one
 
-	log_instruction(2, "JSR #$%X", addr);
+	log_instruction(2, "JSR #$%02X\t", addr);
 
 	PC = addr;
 	cyclesThisSec += 6;
@@ -186,7 +186,7 @@ void jsr_absolute() {
 void php() {
 	push_b(P);
 
-	log_instruction(0, "PHP");
+	log_instruction(0, "PHP\t\t\t");
 
 	PC++;
 	cyclesThisSec += 3;
@@ -199,7 +199,7 @@ void php() {
 void plp() {
 	P = pop_b();
 
-	log_instruction(0, "PLP");
+	log_instruction(0, "PLP\t\t\t");
 
 	PC++;
 	cyclesThisSec += 4;
@@ -212,7 +212,7 @@ void plp() {
 void pha() {
 	push_b(A);
 
-	log_instruction(0, "PHA");
+	log_instruction(0, "PHA\t\t\t");
 
 	PC++;
 	cyclesThisSec += 3;
@@ -227,7 +227,7 @@ void pla() {
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagN, bit_test(A, 7));
 
-	log_instruction(0, "PLA");
+	log_instruction(0, "PLA\t\t\t");
 
 	PC++;
 	cyclesThisSec += 4;
@@ -244,7 +244,7 @@ void and(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagN, bit_test(A, 7));
 
-	log_instruction(pcIncrease - 1, "AND #$%X", value);
+	log_instruction(pcIncrease - 1, "\tAND #$%02X\t", value);
 
 	cyclesThisSec += cycles;
 	PC += pcIncrease;
@@ -300,7 +300,7 @@ void bit(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagV, bit_test(value, 6));
 	bit_val(&P, flagN, bit_test(value, 7));
 
-	log_instruction(pcIncrease - 1, "BIT #$%X", value);
+	log_instruction(pcIncrease - 1, "\tBIT #$%02X\t", value);
 
 	cyclesThisSec += cycles;
 	PC += pcIncrease;
@@ -334,37 +334,37 @@ void set_flag_value(byte flag, int isSet) {
 }
 
 void clc() {
-	log_instruction(0, "CLC");
+	log_instruction(0, "CLC\t\t\t");
 	set_flag_value(flagC, 0);
 }
 
 void cld() {
-	log_instruction(0, "CLD");
+	log_instruction(0, "CLD\t\t\t");
 	set_flag_value(flagD, 0);
 }
 
 void cli() {
-	log_instruction(0, "CLI");
+	log_instruction(0, "CLI\t\t\t");
 	set_flag_value(flagI, 0);
 }
 
 void clv() {
-	log_instruction(0, "CLV");
+	log_instruction(0, "CLV\t\t\t");
 	set_flag_value(flagV, 0);
 }
 
 void sec() {
-	log_instruction(0, "SEC");
+	log_instruction(0, "SEC\t\t\t");
 	set_flag_value(flagC, 1);
 }
 
 void sei() {
-	log_instruction(0, "SEI");
+	log_instruction(0, "SEI\t\t\t");
 	set_flag_value(flagI, 1);
 }
 
 void sed() {
-	log_instruction(0, "SED");
+	log_instruction(0, "SED\t\t\t");
 	set_flag_value(flagD, 1);
 }
 
@@ -400,42 +400,42 @@ void inc_reg(byte *reg) {
 }
 
 void tax() {
-	log_instruction(0, "TAX");
+	log_instruction(0, "TAX\t\t\t");
 	transfer_reg(&A, &X);
 }
 
 void txa() {
-	log_instruction(0, "TXA");
+	log_instruction(0, "TXA\t\t\t");
 	transfer_reg(&X, &A);
 }
 
 void dex() {
-	log_instruction(0, "DEX");
+	log_instruction(0, "DEX\t\t\t");
 	dec_reg(&X);
 }
 
 void inx() {
-	log_instruction(0, "INX");
+	log_instruction(0, "INX\t\t\t");
 	inc_reg(&X);
 }
 
 void tay() {
-	log_instruction(0, "TAY");
+	log_instruction(0, "TAY\t\t\t");
 	transfer_reg(&A, &Y);
 }
 
 void tya() {
-	log_instruction(0, "TYA");
+	log_instruction(0, "TYA\t\t\t");
 	transfer_reg(&Y, &A);
 }
 
 void dey() {
-	log_instruction(0, "DEY");
+	log_instruction(0, "DEY\t\t\t");
 	dec_reg(&Y);
 }
 
 void iny() {
-	log_instruction(0, "INY");
+	log_instruction(0, "INY\t\t\t");
 	inc_reg(&Y);
 }
 
@@ -457,7 +457,7 @@ void adc(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagV, isOverflown);
 	bit_val(&P, flagN, bit_test(A, 7));
 
-	log_instruction(pcIncrease - 1, "ADC #$%X",value);
+	log_instruction(pcIncrease - 1, "\tADC #$%02X\t",value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -520,35 +520,35 @@ void try_branch(byte flag, int req_flag_val, const char *mnemonic) {
 }
 
 void bpl() {
-	try_branch(flagN, 0, "BPL $%X");
+	try_branch(flagN, 0, "\tBPL $%02X\t");
 }
 
 void bmi() {
-	try_branch(flagN, 1, "BMI $%X");
+	try_branch(flagN, 1, "\tBMI $%02X\t");
 }
 
 void bvc() {
-	try_branch(flagV, 0, "BVC $%X");
+	try_branch(flagV, 0, "\tBVC $%02X\t");
 }
 
 void bvs() {
-	try_branch(flagV, 1, "BVS $%X");
+	try_branch(flagV, 1, "\tBVS $%02X\t");
 }
 
 void bcc() {
-	try_branch(flagC, 0, "BCC $%X");
+	try_branch(flagC, 0, "\tBCC $%02X\t");
 }
 
 void bcs() {
-	try_branch(flagC, 1, "BCS $%X");
+	try_branch(flagC, 1, "\tBCS $%02X\t");
 }
 
 void bne() {
-	try_branch(flagZ, 0, "BNE $%X");
+	try_branch(flagZ, 0, "\tBNE $%02X\t");
 }
 
 void beq() {
-	try_branch(flagZ, 1, "BEQ $%X");
+	try_branch(flagZ, 1, "\tBEQ $%02X\t");
 }
 
 
@@ -571,7 +571,7 @@ void sbc(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagV, !isOverflown); // we need to clear the flagV
 	bit_val(&P, flagN, bit_test(A, 7));
 
-	log_instruction(pcIncrease - 1, "SBC #$%X", value);
+	log_instruction(pcIncrease - 1, "\tSBC #$%02X\t", value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -634,12 +634,12 @@ void delta_memory(word memAddr, int delta, int cycles, int pcIncrease) {
 }
 
 void inc_mem(word memAddr, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "INC #$%X = %X", memAddr, memAddr+1);
+	log_instruction(pcIncrease - 1, "INC #$%02X = %02X", memAddr, memAddr+1);
 	delta_memory(memAddr, 1, cycles, pcIncrease);
 }
 
 void dec_mem(word memAddr, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "INC #$%X = %X", memAddr, memAddr-1);
+	log_instruction(pcIncrease - 1, "INC #$%02X = %02X", memAddr, memAddr-1);
 	delta_memory(memAddr, -1, cycles, pcIncrease);
 }
 
@@ -701,80 +701,80 @@ void load_register(byte *regPtr, byte value, int cycles, int pcIncrease, const c
 }
 
 void lda_inmediate() {
-	load_register(&A, rmem_b(PC + 1), 2, 2, "A #$%X");
+	load_register(&A, rmem_b(PC + 1), 2, 2, "\tLDA #$%02X\t");
 }
 
 void lda_zpage() {
-	load_register(&A, zpage_param(), 3, 2, "A #$%X");
+	load_register(&A, zpage_param(), 3, 2, "\tLDA #$%02X\t");
 }
 
 void lda_zpage_x() {
-	load_register(&A, zpagex_param(), 4, 2, "A #$%X");
+	load_register(&A, zpagex_param(), 4, 2, "\tLDA #$%02X\t");
 }
 
 void lda_absolute() {
-	load_register(&A, absolute_param(), 4, 3, "A #$%X");
+	load_register(&A, absolute_param(), 4, 3, "\tLDA #$%02X\t");
 }
 
 void lda_absolute_x() {
 	word addr = absolutex_addr(rmem_w(PC + 1));
-	load_register(&A, rmem_b(addr), 4, 3, "A #$%X");
+	load_register(&A, rmem_b(addr), 4, 3, "\tLDA #$%02X\t");
 	// TODO +1 if page crossed
 }
 
 void lda_absolute_y() {
-	load_register(&A, absolutey_param(), 4, 3, "A #$%X");
+	load_register(&A, absolutey_param(), 4, 3, "\tLDA #$%02X\t");
 	// TODO +1 if page crossed
 }
 
 void lda_indirect_x() {
-	load_register(&A, absolutex_param(), 6, 2, "A #$%X");
+	load_register(&A, absolutex_param(), 6, 2, "\tLDA #$%02X\t");
 }
 
 void lda_indirect_y() {
-	load_register(&A, indirecty_param(), 5, 2, "A #$%X");
+	load_register(&A, indirecty_param(), 5, 2, "\tLDA #$%02X\t");
 	// TODO +1 if page crossed
 }
 
 void ldx_immediate() {
-	load_register(&X, rmem_b(PC + 1), 2, 2, "X #$%X");
+	load_register(&X, rmem_b(PC + 1), 2, 2, "\tLDX #$%02X\t");
 }
 
 void ldx_zpage() {
-	load_register(&X, zpage_param(), 3, 2, "X #$%X");
+	load_register(&X, zpage_param(), 3, 2, "\tLDX #$%02X\t");
 }
 
 void ldx_zpage_y() {
-	load_register(&X, zpagey_param(), 4, 2, "X #$%X");
+	load_register(&X, zpagey_param(), 4, 2, "\tLDX #$%02X\t");
 }
 
 void ldx_absolute() {
-	load_register(&X, absolute_param(), 4, 3, "X #$%X");
+	load_register(&X, absolute_param(), 4, 3, "\tLDX #$%02X\t");
 }
 
 void ldx_absolute_y() {
-	load_register(&X, absolutey_param(), 4, 3, "X #$%X");
+	load_register(&X, absolutey_param(), 4, 3, "\tLDX #$%02X\t");
 	// TODO +1 if page crossed
 }
 
 void ldy_immediate() {
-	load_register(&Y, rmem_b(PC + 1), 2, 2, "Y #$%X");
+	load_register(&Y, rmem_b(PC + 1), 2, 2, "\tLDY #$%02X\t");
 }
 
 void ldy_zpage() {
-	load_register(&Y, zpage_param(), 3, 2, "Y #$%X");
+	load_register(&Y, zpage_param(), 3, 2, "\tLDY #$%02X\t");
 }
 
 void ldy_zpage_x() {
-	load_register(&Y, zpagex_param(), 4, 2, "Y #$%X");
+	load_register(&Y, zpagex_param(), 4, 2, "\tLDY #$%02X\t");
 }
 
 void ldy_absolute() {
-	load_register(&Y, absolute_param(), 4, 3, "Y #$%X");
+	load_register(&Y, absolute_param(), 4, 3, "\tLDY #$%02X\t");
 }
 
 void ldy_absolute_x() {
-	load_register(&Y, absolutex_param(), 4, 3, "Y #$%X");
+	load_register(&Y, absolutex_param(), 4, 3, "\tLDY #$%02X\t");
 	// TODO +1 if page crossed
 }
 
@@ -795,55 +795,55 @@ void store_register(byte reg, word memAddr, int cycles, int pcIncrease, const ch
 }
 
 void sta_zpage() {
-	store_register(A, zpage_addr(rmem_b(PC + 1)), 3, 2, "A $%X = %X");
+	store_register(A, zpage_addr(rmem_b(PC + 1)), 3, 2, "\tSTA $%02X = %02X");
 }
 
 void sta_zpage_x() {
-	store_register(A, zpagex_addr(rmem_b(PC + 1)), 4, 2, "A $%X = %X");
+	store_register(A, zpagex_addr(rmem_b(PC + 1)), 4, 2, "\tSTA $%02X = %02X");
 }
 
 void sta_absolute() {
-	store_register(A, absolute_addr(rmem_b(PC + 1)), 4, 3, "A $%X = %X");
+	store_register(A, absolute_addr(rmem_b(PC + 1)), 4, 3, "\tSTA $%02X = %02X");
 }
 
 void sta_absolute_x() {
-	store_register(A, absolutex_addr(rmem_b(PC + 1)), 5, 3, "A $%X = %X");
+	store_register(A, absolutex_addr(rmem_b(PC + 1)), 5, 3, "\tSTA $%02X = %02X");
 }
 
 void sta_absolute_y() {
-	store_register(A, absolutey_addr(rmem_b(PC + 1)), 5, 3, "A $%X = %X");
+	store_register(A, absolutey_addr(rmem_b(PC + 1)), 5, 3, "\tSTA $%02X = %02X");
 }
 
 void sta_indirect_x() {
-	store_register(A, indirectx_addr(rmem_b(PC + 1)), 6, 2, "A $%X = %X");
+	store_register(A, indirectx_addr(rmem_b(PC + 1)), 6, 2, "\tSTA $%02X = %02X");
 }
 
 void sta_indirect_y() {
-	store_register(A, indirecty_addr(rmem_b(PC + 1)), 6, 2, "A $%X = %X");
+	store_register(A, indirecty_addr(rmem_b(PC + 1)), 6, 2, "\tSTA $%02X = %02X");
 }
 
 void stx_zpage() {
-	store_register(X, zpagex_addr(rmem_b(PC + 1)), 3, 2, "X $%X = %X");
+	store_register(X, zpagex_addr(rmem_b(PC + 1)), 3, 2, "\tSTX $%02X = %02X");
 }
 
 void stx_zpage_y() {
-	store_register(X, zpagey_addr(rmem_b(PC + 1)), 4, 2, "X $%X = %X");
+	store_register(X, zpagey_addr(rmem_b(PC + 1)), 4, 2, "\tSTX $%02X = %02X");
 }
 
 void stx_absolute() {
-	store_register(X, absolute_addr(rmem_b(PC + 1)), 4, 3, "X $%X = %X");
+	store_register(X, absolute_addr(rmem_b(PC + 1)), 4, 3, "\tSTX $%02X = %02X");
 }
 
 void sty_zpage() {
-	store_register(Y, zpage_addr(rmem_b(PC + 1)), 3, 2, "Y $%X = %X");
+	store_register(Y, zpage_addr(rmem_b(PC + 1)), 3, 2, "\tSTY $%02X = %02X");
 }
 
 void sty_zpage_x() {
-	store_register(Y, zpagex_addr(rmem_b(PC + 1)), 4, 2, "Y $%X = %X");
+	store_register(Y, zpagex_addr(rmem_b(PC + 1)), 4, 2, "\tSTY $%02X = %02X");
 }
 
 void sty_absolute() {
-	store_register(Y, absolute_addr(rmem_b(PC + 1)), 4, 3, "Y $%X = %X");
+	store_register(Y, absolute_addr(rmem_b(PC + 1)), 4, 3, "\tSTY $%02X = %02X");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -853,7 +853,7 @@ void sty_absolute() {
 void rts() {
 	PC = pop_w();
 
-	log_instruction(0, "RTS");
+	log_instruction(0, "RTS\t\t\t");
 
 	PC++; // JSR pushes the address -1, so when we recover (here) we have to add 1 to make up for that "1" lost
 	cyclesThisSec += 6;
@@ -862,7 +862,7 @@ void rts() {
 void rti() {
 	P = pop_b();
 
-	log_instruction(0, "RTI");
+	log_instruction(0, "RTI\t\t\t");
 
 	PC = pop_w(); //Unlike RTS. RTI pulls the correct PC address. No need to increment
 	cyclesThisSec += 6;
@@ -885,62 +885,62 @@ void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease, cons
 }
 
 void cmp_inmediate() {
-	compare_register(&A, rmem_b(PC + 1), 2, 2, "CMP #$%X");
+	compare_register(&A, rmem_b(PC + 1), 2, 2, "\tCMP #$%02X\t");
 }
 
 void cmp_zpage() {
-	compare_register(&A, zpage_param(), 3, 2, "CMP #$%X");
+	compare_register(&A, zpage_param(), 3, 2, "\tCMP #$%02X\t");
 }
 
 void cmp_zpage_x() {
-	compare_register(&A, zpagex_param(), 4, 2, "CMP #$%X");
+	compare_register(&A, zpagex_param(), 4, 2, "\tCMP #$%02X\t");
 }
 
 void cmp_absolute() {
-	compare_register(&A, absolute_param(), 4, 3, "CMP #$%X");
+	compare_register(&A, absolute_param(), 4, 3, "\tCMP #$%02X\t");
 }
 
 void cmp_absolute_x() {
-	compare_register(&A, absolutex_param(), 4, 3, "CMP #$%X");
+	compare_register(&A, absolutex_param(), 4, 3, "\tCMP #$%02X\t");
 	//TODO +1 if page crossed
 }
 
 void cmp_absolute_y() {
-	compare_register(&A, absolutey_param(), 4, 3, "CMP #$%X");
+	compare_register(&A, absolutey_param(), 4, 3, "\tCMP #$%02X\t");
 	//TODO +1 if page crossed
 }
 
 void cmp_indirect_x() {
-	compare_register(&A, indirectx_param(), 6, 2, "CMP #$%X");
+	compare_register(&A, indirectx_param(), 6, 2, "\tCMP #$%02X\t");
 }
 
 void cmp_indirect_y() {
-	compare_register(&A, indirecty_param(), 5, 2, "CMP #$%X");
+	compare_register(&A, indirecty_param(), 5, 2, "\tCMP #$%02X\t");
 	//TODO +1 if page crossed
 }
 
 void cpx_immediate() {
-	compare_register(&X, rmem_b(PC + 1), 2, 2, "CPX #$%X");
+	compare_register(&X, rmem_b(PC + 1), 2, 2, "\tCPX #$%02X\t");
 }
 
 void cpx_zpage() {
-	compare_register(&X, zpage_param(), 3, 2, "CPX #$%X");
+	compare_register(&X, zpage_param(), 3, 2, "\tCPX #$%02X\t");
 }
 
 void cpx_absolute() {
-	compare_register(&X, absolute_param(), 4, 3, "CPX #$%X");
+	compare_register(&X, absolute_param(), 4, 3, "\tCPX #$%02X\t");
 }
 
 void cpy_immediate() {
-	compare_register(&Y, rmem_b(PC + 1), 2, 2, "CPY #$%X");
+	compare_register(&Y, rmem_b(PC + 1), 2, 2, "\tCPY #$%02X\t");
 }
 
 void cpy_zpage() {
-	compare_register(&Y, zpage_param(), 2, 3, "CPY #$%X");
+	compare_register(&Y, zpage_param(), 2, 3, "\tCPY #$%02X\t");
 }
 
 void cpy_absolute() {
-	compare_register(&Y, absolute_param(), 3, 4, "CPY #$%X");
+	compare_register(&Y, absolute_param(), 3, 4, "\tCPY #$%02X\t");
 }
 
 
@@ -957,7 +957,7 @@ void lsr(byte *value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, shifted == 0);
 	*value = shifted;
 
-	log_instruction(pcIncrease-1, "LSR #$%X",value);
+	log_instruction(pcIncrease-1, "LSR #$%02X",value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -1012,7 +1012,7 @@ void rol(byte *value, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(shifted, 7));
 	*value = shifted;
 
-	log_instruction(pcIncrease -1, "ROL $%X",value);
+	log_instruction(pcIncrease -1, "ROL $%02X",value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -1063,7 +1063,7 @@ void ror(byte *value, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(shifted, 7));
 	*value = shifted;
 
-	log_instruction(pcIncrease -1, "ROR $%X",value);
+	log_instruction(pcIncrease -1, "ROR $%02X",value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -1112,7 +1112,7 @@ void eor(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(A, 7));
 	bit_val(&P, flagZ, A == 0);
 
-	log_instruction(pcIncrease -1, "EOR $%X",value);
+	log_instruction(pcIncrease -1, "\tEOR $%02X\t\t",value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -1159,14 +1159,14 @@ void eor_indirect_y() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void jmp(word addr, int cycles) {
-	log_instruction(2, "JMP $%X", addr);
+	log_instruction(2, "JMP $%02X\t", addr);
 
 	PC = addr;
 	cyclesThisSec += cycles;
 }
 
 void jmp_absolute() {
-	jmp(absolutey_param(), 3);
+	jmp(rmem_w(PC + 1), 3);
 }
 
 void jmp_indirect() {
@@ -1178,7 +1178,7 @@ void jmp_indirect() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void invalid() {
-	//log_error("Invalid opcode %X, PC=%X \n", currentOpcode, PC);
+	//log_error("Invalid opcode %02X, PC=%02X \n", currentOpcode, PC);
 	PC += 2;
 }
 
@@ -1514,9 +1514,9 @@ word indirect_param() {
 }
 
 void log_instruction(int num_params, const char *mnemonic, ...) {
-	log_info("%X %X ", PC, currentOpcode);
+	log_info("%02X %02X ", PC, currentOpcode);
 	for (uint i = 1; i <= num_params; i++) {
-		log_info("%X ", rmem_b(PC + i));
+		log_info("%02X ", rmem_b(PC + i));
 	}
 	log_info("\t");
 	if (num_params == 0) {
@@ -1527,5 +1527,5 @@ void log_instruction(int num_params, const char *mnemonic, ...) {
 	vlog(mnemonic, Info, args);
 	va_end(args);
 	log_info("\t\t\t");
-	log_info("A:%X X:%X Y:%X P:%X SP:%X CYC:%d \n", A, X, Y, P, SP, cyclesThisSec);
+	log_info("A:%02X X:%02X Y:%02X P:%02X SP:%02X CYC:%d \n", A, X, Y, P, SP, cyclesThisSec);
 }

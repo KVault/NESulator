@@ -4,6 +4,9 @@
  * Simply calls each function to test. It's going to get messy but what the hell!....
  */
 void testOpcodes() {
+	//Now for the real deal. Test the NESTEST ROM!
+	test_NESTEST();
+
 	power_up(0);
 	// We did something wrong with the BRK opcode function, need to be fixed
 	test_BRK();
@@ -33,8 +36,7 @@ void testOpcodes() {
 	test_EOR();
 	test_JMP();
 
-	//Now for the real deal. Test the NESTEST ROM!
-	test_NESTEST();
+
 }
 
 /**
