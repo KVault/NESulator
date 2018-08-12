@@ -5,7 +5,6 @@
  */
 void testOpcodes() {
 	//Now for the real deal. Test the NESTEST ROM!
-	test_wraparound();
 	test_NESTEST();
 
 	//power_up(0);
@@ -37,22 +36,6 @@ void testOpcodes() {
 	//test_EOR();
 	//test_JMP();
 
-
-}
-
-void test_wraparound() {
-	wmem_b(0x0000, 0x23);
-	wmem_b(0x0100, 0x32);
-
-	wmem_b(PC, 0xA2);
-	wmem_b(PC + 1, 0x01);
-	cpu_cycle();
-
-	wmem_b(PC, 0xB5);
-	wmem_b(PC + 1, 0xFF);
-	cpu_cycle();
-
-	assert(A == 0x23);
 
 }
 

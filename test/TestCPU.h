@@ -9,8 +9,6 @@
 
 void testOpcodes();
 
-void test_wraparound();
-
 void test_BRK();
 
 void test_ORA();
