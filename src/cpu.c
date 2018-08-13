@@ -42,8 +42,8 @@ void nop() {
 }
 
 void breakpoint() {
-	bit_set(&P, flagZ);
 	bit_set(&P, flagB);
+	bit_set(&P, 5);
 	cyclesThisSec += 7;
 	PC++;
 	//log_instruction(0, "BRK");
@@ -197,6 +197,10 @@ void plp() {
 	log_instruction(0, "PLP\t\t\t");
 	P = pop_b();
 
+	//Bit 5 of P is unused, so clear it. It should always be 1.
+	bit_set(&P, 5);
+	bit_clear(&P, flagB);
+
 	PC++;
 	cyclesThisSec += 4;
 }
@@ -235,7 +239,6 @@ void pla() {
 void and(byte value, int cycles, int pcIncrease) {
 	log_instruction(pcIncrease - 1, "\tAND #$%02X\t", value);
 	A &= value;
-	bit_val(&P, flagC, bit_test(value, 7));
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagN, bit_test(A, 7));
 
@@ -290,7 +293,7 @@ void bit(byte value, int cycles, int pcIncrease) {
 	log_instruction(pcIncrease - 1, "\tBIT #$%02X\t", value);
 
 	byte tmp = A & value;
-	bit_val(&P, flagZ, tmp != 0);
+	bit_val(&P, flagZ, tmp == 0);
 	bit_val(&P, flagV, bit_test(value, 6));
 	bit_val(&P, flagN, bit_test(value, 7));
 
@@ -863,7 +866,7 @@ void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease, cons
 	log_instruction(pcIncrease - 1, regMnemonic, value);
 
 	bit_val(&P, flagC, *regPtr >= value);
-	bit_val(&P, flagN, *regPtr > value);
+	bit_val(&P, flagN, *regPtr < value);
 	bit_val(&P, flagZ, *regPtr == value);
 
 	PC += pcIncrease;
