@@ -551,19 +551,16 @@ void beq() {
 
 void sbc(byte value, int cycles, int pcIncrease) {
 	log_instruction(pcIncrease - 1, "\tSBC #$%02X\t", value);
-	byte carry = (byte) bit_test(P, flagC);
-	byte carryNop = (byte) !carry;
-	int result = A - value - carryNop;
-	carry = (byte) ((result & 0x100) >> 8);
-	bit_val(&P, flagC, carry);
+	uint result = A - value - (!bit_test(P, flagC));
 
 	// If operands same source sign but different result sign
-	int isOverflown = ((A ^ result) & (value ^ result) & 0x80);
+	uint isOverflown = ((A ^ result) & (value ^ result) & 0x80);
 	A = (byte) result;
 
 	bit_val(&P, flagZ, A == 0);
-	bit_val(&P, flagV, !isOverflown); // we need to clear the flagV
+	bit_val(&P, flagV, isOverflown);
 	bit_val(&P, flagN, bit_test(A, 7));
+	bit_val(&P, flagC, !isOverflown);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -865,8 +862,12 @@ void rti() {
 void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease, const char *regMnemonic) {
 	log_instruction(pcIncrease - 1, regMnemonic, value);
 
+	byte temp_result = *regPtr - value;
+
 	bit_val(&P, flagC, *regPtr >= value);
-	bit_val(&P, flagN, *regPtr < value);
+
+	//Need to do this since there are some positive numbers that should trigger this flag. i.e. 0x80
+	bit_val(&P, flagN, bit_test(temp_result, 7));
 	bit_val(&P, flagZ, *regPtr == value);
 
 	PC += pcIncrease;
