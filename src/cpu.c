@@ -170,7 +170,7 @@ void jsr_absolute() {
 	word cachedPC = (word) (PC + 0x02);
 	word addr = absolute_addr(rmem_w(PC + 1));
 	log_instruction(2, "JSR #$%02X\t", addr);
-	
+
 	push_w(cachedPC); // Stores the address of the next opcode minus one
 
 	PC = addr;
@@ -557,16 +557,16 @@ void beq() {
 
 void sbc(byte value, int cycles, int pcIncrease) {
 	log_instruction(pcIncrease - 1, "\tSBC #$%02X\t", value);
-	uint result = A - value - (!bit_test(P, flagC));
+	int result = A - value - (!bit_test(P, flagC));
 
 	// If operands same source sign but different result sign
-	uint isOverflown = ((A ^ result) & (value ^ result) & 0x80);
+	int isOverflown = ((A ^ result) & (A ^ value) & 0x80);
 	A = (byte) result;
 
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagV, isOverflown);
 	bit_val(&P, flagN, bit_test(A, 7));
-	bit_val(&P, flagC, !isOverflown);
+	bit_val(&P, flagC, value >= A);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
