@@ -381,6 +381,8 @@ void transfer_reg(byte *from_reg, byte *to_reg) {
  */
 void dec_reg(byte *reg) {
 	(*reg)--;
+	bit_val(&P, flagZ, *reg == 0);
+	bit_val(&P, flagN, bit_test(*reg, 7));
 	PC++;
 	cyclesThisSec += 2;
 }
@@ -390,6 +392,8 @@ void dec_reg(byte *reg) {
  */
 void inc_reg(byte *reg) {
 	(*reg)++;
+	bit_val(&P, flagZ, *reg == 0);
+	bit_val(&P, flagN, bit_test(*reg, 7));
 	PC++;
 	cyclesThisSec += 2;
 }
