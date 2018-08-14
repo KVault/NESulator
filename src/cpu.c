@@ -372,6 +372,8 @@ void sed() {
  */
 void transfer_reg(byte *from_reg, byte *to_reg) {
 	*to_reg = *from_reg;
+	bit_val(&P, flagZ, *to_reg == 0);
+	bit_val(&P, flagN, bit_test(*to_reg, 7));
 	PC++;
 	cyclesThisSec += 2;
 }
