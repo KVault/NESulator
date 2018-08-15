@@ -566,7 +566,7 @@ void sbc(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagV, isOverflown);
 	bit_val(&P, flagN, bit_test(A, 7));
-	bit_val(&P, flagC, value >= A);
+	bit_val(&P, flagC, value >= A || value == 0);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
