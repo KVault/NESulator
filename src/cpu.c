@@ -564,9 +564,11 @@ void beq() {
 
 void sbc(byte value, int cycles, int pcIncrease) {
 	log_instruction(pcIncrease - 1, "\tSBC #$%02X\t", value);
-
-	//A sbc is the same as an addition with the negated parameter
-	adc_internal(~value);
+  
+	bit_val(&P, flagZ, A == 0);
+	bit_val(&P, flagV, isOverflown);
+	bit_val(&P, flagN, bit_test(A, 7));
+	bit_val(&P, flagC, value >= A || value == 0);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
