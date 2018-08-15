@@ -443,13 +443,13 @@ void iny() {
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////ADC REGION//////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
+void adc_internal(byte value);
 
-void adc(byte value, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "\tADC #$%02X\t", value);
-
+void adc_internal(byte value) {
 	byte carry = (byte) bit_test(P, flagC);
-	int result = A + carry + value;
+	uint result = A + carry + value;
 	carry = (byte) ((result & 0x100) >> 8);
+
 	bit_val(&P, flagC, carry);
 
 	// If operands same source sign but different result sign
@@ -459,6 +459,13 @@ void adc(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagV, isOverflown);
 	bit_val(&P, flagN, bit_test(A, 7));
+}
+
+
+void adc(byte value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tADC #$%02X\t", value);
+
+	adc_internal(value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -557,16 +564,9 @@ void beq() {
 
 void sbc(byte value, int cycles, int pcIncrease) {
 	log_instruction(pcIncrease - 1, "\tSBC #$%02X\t", value);
-	int result = A - value - (!bit_test(P, flagC));
 
-	// If operands same source sign but different result sign
-	int isOverflown = ((A ^ result) & (A ^ value) & 0x80);
-	A = (byte) result;
-
-	bit_val(&P, flagZ, A == 0);
-	bit_val(&P, flagV, isOverflown);
-	bit_val(&P, flagN, bit_test(A, 7));
-	bit_val(&P, flagC, value >= A);
+	//A sbc is the same as an addition with the negated parameter
+	adc_internal(~value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
