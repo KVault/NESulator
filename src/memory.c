@@ -33,7 +33,15 @@ void wmem(unsigned short amountBytes, uint initialPosition, byte *content) {
 		memoryBank[j] = content[i];
 	}
 
-	//TODO mirroring
+	if (initialPosition >= 0x0000 && initialPosition <= 0x07FF) {
+		for (int k = 0; k < 4; k++) {
+			uint mirrored_position = initialPosition + (0x0800 * k);
+			for (int j = mirrored_position; i < amountBytes; j++, i++) {
+				memoryBank[j] = content[i];
+			}
+		}
+	}
+	//TODO mirroring $2008-$3FFF
 }
 
 void rmem(unsigned short amountBytes, uint initialPosition, byte *destiny) {

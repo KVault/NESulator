@@ -232,6 +232,26 @@ void pla() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////TSX (Transfer Stack pointer to X) REGION///////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void tsx() {
+	log_instruction(0, "TSX\t\t\t");
+	transfer_reg(&SP, &X);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////TXS (Transfer X to Stack pointer) REGION///////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void txs() {
+	log_instruction(0, "TXS\t\t\t");
+	SP = X;
+	PC++;
+	cyclesThisSec += 2;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////AND (bitwise AND accumulator) REGION///////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -564,7 +584,12 @@ void beq() {
 
 void sbc(byte value, int cycles, int pcIncrease) {
 	log_instruction(pcIncrease - 1, "\tSBC #$%02X\t", value);
-  
+	int result = A - value - (!bit_test(P, flagC));
+
+	// If operands same source sign but different result sign
+	int isOverflown = ((A ^ result) & (A ^ value) & 0x80);
+	A = (byte) result;
+
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagV, isOverflown);
 	bit_val(&P, flagN, bit_test(A, 7));
@@ -1175,7 +1200,7 @@ void jmp_indirect() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void invalid() {
-	//log_error("Invalid opcode %02X, PC=%02X \n", currentOpcode, PC);
+	log_error("Invalid opcode %02X, PC=%02X \n", currentOpcode, PC);
 	PC += 2;
 }
 
@@ -1344,8 +1369,8 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&stx_zpage_y,   //96       STX $44, Y     STore X Register                  2       4
 		&invalid,
 		&tya,           //$98      TYA           Transfer Y to A                    1       2
-		&sta_absolute_y,//$9D      STA $440&invalidY    STore Accumulator                 3       5
-		&invalid,
+		&sta_absolute_y,//$99      STA $440&invalidY    STore Accumulator                 3       5
+		&txs,           //9A
 		&invalid,
 		&invalid,
 		&sta_absolute_x,//$9D      STA $440&invalidX    STore Accumulator                 3       5
@@ -1377,7 +1402,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&invalid,
 		&clv,           //$B8       CLV           CLear Overflow flag                1       2,
 		&lda_absolute_y,//$B9       LDA $440&invalidY   LoaD Accumulator                   3       4+
-		&invalid,
+		&tsx,           //BA
 		&invalid,
 		&ldy_absolute_x,//$A4      LDY $440&invalidY    LoaD Y Register                    3       4+
 		&lda_absolute_x,//BD       LDA $440&invalidX    LoaD Accumulator                   3       4+
