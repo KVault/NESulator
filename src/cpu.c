@@ -852,7 +852,7 @@ void stx_zpage_y() {
 }
 
 void stx_absolute() {
-	store_register(X, absolute_addr(rmem_b(PC + 1)), 4, 3, "\tSTX $%02X = %02X");
+	store_register(X, absolute_addr(rmem_w(PC + 1)), 4, 3, "\tSTX $%02X = %02X");
 }
 
 void sty_zpage() {
