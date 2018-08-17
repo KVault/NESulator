@@ -844,7 +844,8 @@ void test_JMP() {
  * the console, we'll enable the logs and run it from scratch
  */
 void test_NESTEST() {
-	set_log_level(Debug);
+	set_console_log_level(ConsoleError);
+	set_file_log_level(FileDebug);
 	set_clear_log_file();
 	set_log_path("../../log.txt");
 

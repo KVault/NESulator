@@ -1,16 +1,20 @@
 
 #include "log.h"
 
-enum LogLevelEnum log_level = Disabled;
+enum ConsoleLogLevelEnum console_log_level = ConsoleDisabled;
+enum FileLogLevelEnum file_log_level = FileInfo;
 
 char *log_file_path;
 int clean_file = 0;
 FILE *file;
 
 
-void vlog(const char *format, enum LogLevelEnum minLevel, va_list args) {
-	if (log_level >= minLevel) {
+void vlog(const char *format, enum ConsoleLogLevelEnum cmin_level, enum FileLogLevelEnum fmin_level,va_list args) {
+	if (console_log_level >= cmin_level) {
 		vfprintf(stdout, format, args);
+	}
+
+	if(file_log_level >= fmin_level){
 		log_to_file(format, args);
 	}
 }
@@ -18,21 +22,21 @@ void vlog(const char *format, enum LogLevelEnum minLevel, va_list args) {
 void log_info(const char *format, ...) {
 	va_list arg;
 	va_start (arg, format);
-	vlog(format, Info, arg);
+	vlog(format, ConsoleInfo, FileInfo, arg);
 	va_end (arg);
 }
 
 void log_debug(const char *format, ...) {
 	va_list arg;
 	va_start (arg, format);
-	vlog(format, Debug, arg);
+	vlog(format, ConsoleDebug, FileDebug, arg);
 	va_end (arg);
 }
 
 void log_error(const char *format, ...) {
 	va_list arg;
 	va_start (arg, format);
-	vlog(format, Error, arg);
+	vlog(format, ConsoleError, FileError, arg);
 	va_end (arg);
 }
 
@@ -52,8 +56,12 @@ void set_log_path(const char *path) {
 	log_file_path = (char *) path;
 }
 
-void set_log_level(enum LogLevelEnum level) {
-	log_level = level;
+void set_console_log_level(enum ConsoleLogLevelEnum level) {
+	console_log_level = level;
+}
+
+void set_file_log_level(enum FileLogLevelEnum level){
+	file_log_level = level;
 }
 
 void set_clear_log_file() {

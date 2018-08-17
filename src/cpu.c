@@ -880,9 +880,9 @@ void rts() {
 }
 
 void rti() {
-	P = pop_b();
 	log_instruction(0, "RTI\t\t\t");
-
+	P = pop_b();
+	bit_set(&P, flagUnused);//It has to be one. Always
 	PC = pop_w(); //Unlike RTS. RTI pulls the correct PC address. No need to increment
 	cyclesThisSec += 6;
 }
@@ -1546,7 +1546,7 @@ void log_instruction(int num_params, const char *mnemonic, ...) {
 	}
 	va_list args;
 	va_start(args, mnemonic);
-	vlog(mnemonic, Info, args);
+	vlog(mnemonic, ConsoleInfo, FileInfo, args);
 	va_end(args);
 	log_info("\t\t\t");
 	log_info("A:%02X X:%02X Y:%02X P:%02X SP:%02X CYC:%d \n", A, X, Y, P, SP, cyclesThisSec);
