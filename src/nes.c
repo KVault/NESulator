@@ -10,9 +10,10 @@ void stopEmulation() {
 }
 
 int main() {
-	set_log_level(Debug);
+	set_console_log_level(ConsoleDebug);
+	set_file_log_level(FileDebug);
 	set_clear_log_file();
-	set_log_path("../../log.txt");
+	set_log_path("../../logs/nesulator.log");
 
 	power_up(0);
 	isRunning = 1;

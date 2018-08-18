@@ -749,7 +749,7 @@ void lda_absolute_y() {
 }
 
 void lda_indirect_x() {
-	load_register(&A, absolutex_param(), 6, 2, "\tLDA #$%02X\t");
+	load_register(&A, indirectx_param(), 6, 2, "\tLDA #$%02X\t");
 }
 
 void lda_indirect_y() {
@@ -824,15 +824,15 @@ void sta_zpage_x() {
 }
 
 void sta_absolute() {
-	store_register(A, absolute_addr(rmem_b(PC + 1)), 4, 3, "\tSTA $%02X = %02X");
+	store_register(A, absolute_addr(rmem_w(PC + 1)), 4, 3, "\tSTA $%02X = %02X");
 }
 
 void sta_absolute_x() {
-	store_register(A, absolutex_addr(rmem_b(PC + 1)), 5, 3, "\tSTA $%02X = %02X");
+	store_register(A, absolutex_addr(rmem_w(PC + 1)), 5, 3, "\tSTA $%02X = %02X");
 }
 
 void sta_absolute_y() {
-	store_register(A, absolutey_addr(rmem_b(PC + 1)), 5, 3, "\tSTA $%02X = %02X");
+	store_register(A, absolutey_addr(rmem_w(PC + 1)), 5, 3, "\tSTA $%02X = %02X");
 }
 
 void sta_indirect_x() {
@@ -979,7 +979,7 @@ void lsr(byte *value, int cycles, int pcIncrease) {
 	byte shifted = *value >> 1;
 
 	bit_val(&P, flagZ, shifted == 0);
-	bit_val(&P, flagN, bit_test(shifted,7));
+	bit_val(&P, flagN, bit_test(shifted, 7));
 	*value = shifted;
 
 	PC += pcIncrease;

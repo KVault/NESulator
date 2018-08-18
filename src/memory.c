@@ -133,8 +133,12 @@ void zeroMemory() {
 word indirectx_addr(byte b) {
 	byte memContent[2] = {0};
 	b = (byte) zpagex_addr(b);
-
-	rmem(WORD, b, memContent);
+	if (b == 0xFF) {
+		memContent[0] = rmem_b(b);
+		memContent[1] = rmem_b(0x00);
+	} else {
+		rmem(WORD, b, memContent);
+	}
 
 	return to_mem_addr(memContent);
 }
@@ -156,7 +160,7 @@ word zpagey_addr(byte b) {
 	return (word) ((Y + b) & 0x00FF);
 }
 
-word zpage_addr(word w) {
+word zpage_addr(word w) { // should it be a byte?
 	return (word) (w & 0x00FF);
 }
 
