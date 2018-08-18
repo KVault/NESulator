@@ -121,7 +121,7 @@ void asl(byte *b, int cycles, int pcIncrease) {
 
 	byte shifted = *b << 1;
 	bit_val(&P, flagN, bit_test(shifted, 7));
-	bit_val(&P, flagZ, A == 0);
+	bit_val(&P, flagZ, shifted == 0);
 	*b = shifted;
 
 	PC += pcIncrease;
@@ -979,6 +979,7 @@ void lsr(byte *value, int cycles, int pcIncrease) {
 	byte shifted = *value >> 1;
 
 	bit_val(&P, flagZ, shifted == 0);
+	bit_val(&P, flagN, bit_test(shifted,7));
 	*value = shifted;
 
 	PC += pcIncrease;

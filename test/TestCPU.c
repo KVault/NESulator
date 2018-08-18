@@ -847,7 +847,7 @@ void test_NESTEST() {
 	set_console_log_level(ConsoleError);
 	set_file_log_level(FileDebug);
 	set_clear_log_file();
-	set_log_path("../../log.txt");
+	set_log_path("../../log.log");
 
 	power_up(0);
 	//If we need to initialize anything, it should go here
