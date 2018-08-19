@@ -864,7 +864,7 @@ void sty_zpage_x() {
 }
 
 void sty_absolute() {
-	store_register(Y, absolute_addr(rmem_b(PC + 1)), 4, 3, "\tSTY $%02X = %02X");
+	store_register(Y, absolute_addr(rmem_w(PC + 1)), 4, 3, "\tSTY $%02X = %02X");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1389,7 +1389,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&lda_inmediate, //$A9       LDA #$44      LoaD Accumulator                  2       2
 		&tax,           //$AA       TAX           Transfer A to X                   1       2
 		&invalid,
-		&ldy_absolute,  //$A4      LDY $4400     LoaD Y Register                    3       4
+		&ldy_absolute,  //$AC      LDY $4400     LoaD Y Register                    3       4
 		&lda_absolute,  //AD       LDA $4400     LoaD Accumulator                   3       4
 		&ldx_absolute,  //AE       LDA $4400     LoaD Accumulator                   3       4
 		&invalid,
