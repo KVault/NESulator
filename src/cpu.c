@@ -844,7 +844,7 @@ void sta_indirect_y() {
 }
 
 void stx_zpage() {
-	store_register(X, zpagex_addr(rmem_b(PC + 1)), 3, 2, "\tSTX $%02X = %02X");
+	store_register(X, zpage_addr(rmem_b(PC + 1)), 3, 2, "\tSTX $%02X = %02X");
 }
 
 void stx_zpage_y() {
@@ -959,11 +959,11 @@ void cpy_immediate() {
 }
 
 void cpy_zpage() {
-	compare_register(&Y, zpage_param(), 2, 3, "\tCPY #$%02X\t");
+	compare_register(&Y, zpage_param(), 3, 2, "\tCPY #$%02X\t");
 }
 
 void cpy_absolute() {
-	compare_register(&Y, absolute_param(), 3, 4, "\tCPY #$%02X\t");
+	compare_register(&Y, absolute_param(), 4, 3, "\tCPY #$%02X\t");
 }
 
 
