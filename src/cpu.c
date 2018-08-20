@@ -34,11 +34,27 @@ void resetPC() {
 	PC = rmem_w(0xFFFC);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////NOP REGION////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
 void nop() {
 	log_instruction(0, "NOP\t\t\t");
 
 	PC++;
 	cyclesThisSec += 2;
+}
+
+void nop1() {
+
+}
+
+void nop2() {
+
+}
+
+void nop3() {
+
 }
 
 void breakpoint() {
@@ -1221,7 +1237,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_ind_x,     //$01       ORA ($44, X)  bitwise OR with Accumulator     2       6
 		&invalid,
 		&invalid,
-		&invalid,
+		&nop,           //$04       NOP
 		&ora_zpage,     //$05       ORA $44       bitwise OR with Accumulator     2       3
 		&asl_zpage,     //$06       ASL $44       Arithmetic Shift Left           2       5
 		&invalid,
@@ -1229,7 +1245,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_immediate, //$09       ORA #$44      bitwise OR with Accumulator     2       2
 		&asl_accumulator,//$0A      ASL A         Arithmetic Shift Left           1       2
 		&invalid,
-		&invalid,
+		&nop,           //$0C       NOP
 		&ora_absolute,  //$0D       ORA $4400     bitwise OR with Accumulator     3       4
 		&asl_absolute,  //$0E       ASL $4400     Arithmetic Shift Left           3       6
 		&invalid,
@@ -1237,15 +1253,15 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_ind_y,     //$11       ORA ($44), Y  bitwise OR with Accumulator     2       6
 		&invalid,
 		&invalid,
-		&invalid,
+		&nop,           //$14       NOP
 		&ora_zpage_x,   //$15       ORA ($44), X  bitwise OR with Accumulator     2       4
 		&asl_zpage_x,   //$16       ASL $44, X    Arithmetic Shift Left           2       6
 		&invalid,
 		&clc,           //$18       CLC           CLear Carry flag                1       2
 		&ora_absolute_y,//$19       ORA $440&invalid, Y  bitwise OR with Accumulator     3       4+
+		&nop,           //$1A       NOP
 		&invalid,
-		&invalid,
-		&invalid,
+		&nop,           //$1C       NOP
 		&ora_absolute_x,//$1D       ORA $440&invalid, X  bitwise OR with Accumulator     3       4+
 		&asl_absolute_x,//$1E       ASL $440&invalid, X  Arithmetic Shift Left           3       7
 		&invalid,
@@ -1269,15 +1285,15 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&and_indirect_y,//$31       AND ($44), Y  bitwise AND with accumulator    2       5+
 		&invalid,
 		&invalid,
-		&invalid,
+		&nop,           //$34       NOP
 		&and_zpage_x,   //$35       AND $44, X    bitwise AND with accumulator    2       4
 		&rol_zpage_x,   //$36       ROL $44       Rotate Left                     2       6
 		&invalid,
 		&sec,           //$38       SEC           Sets Carry flag                 1       2
 		&and_absolute_y,//$39       AND $440&invalid, Y  bitwise AND with accumulator    3       4+
+		&nop,           //$3A       NOP
 		&invalid,
-		&invalid,
-		&invalid,
+		&nop,           //$3C       NOP
 		&and_absolute_x,//$3D       AND $440&invalid, X  bitwise AND with accumulator    3       4+
 		&rol_absolute_x,//$3E       ROL $44       Rotate Left                     3       7
 		&invalid,
@@ -1285,7 +1301,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&eor_indirect_x,//$41       EOR           Exclusive OR                    2       6
 		&invalid,
 		&invalid,
-		&invalid,
+		&nop,           //$44       NOP
 		&eor_zpage,     //$45       EOR           Exclusive OR                     2       3
 		&lsr_zpage,     //$46       LSR           Logical Shift Right              2       5
 		&invalid,
@@ -1301,15 +1317,15 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&eor_indirect_y,//$51       EOR           Exclusive OR                    2       5
 		&invalid,
 		&invalid,
-		&invalid,
+		&nop,           //$54       NOP
 		&eor_zpage_x,   //$55       EOR           Exclusive OR                      2       4
 		&lsr_zpage_x,   //$56       LSR           Logical Shift Right               2       6
 		&invalid,
 		&cli,           //$58       CLI           CLear Interrupt flag              1       2,
 		&eor_absolute_y,//$59       EOR           Exclusive OR                      3       4
+		&nop,           //$5A       NOP
 		&invalid,
-		&invalid,
-		&invalid,
+		&nop,           //$5C       NOP
 		&eor_absolute_x, //$5D       EOR           Exclusive OR                    3       4
 		&lsr_absolute_x, //$5E       LSR           Logical Shift Right             3       7
 		&invalid,
@@ -1317,7 +1333,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&adc_indirect_x, //$61      ADC ($44, X) ADd with Carry                    2       6
 		&invalid,
 		&invalid,
-		&invalid,
+		&nop,           //$64       NOP
 		&adc_zpage,     //$65       ADC $44      ADd with Carry                    2       3
 		&ror_zpage,     //$66       ROR $44      Rotate Right                      2       5
 		&invalid,
@@ -1333,28 +1349,28 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&adc_indirect_y,//$71      ADC ($44), X   ADd with Carry                   2       5+
 		&invalid,
 		&invalid,
-		&invalid,
+		&nop,           //$74       NOP
 		&adc_zpage_x,   //$75       ADC $44, X    ADd with Carry                    2       4
 		&ror_zpage_x,   //$76       ROR $44      Rotate Right                       2       6
 		&invalid,
 		&sei,           //$78       SEI           Sets Interrupt flag               1       2,
 		&adc_absolute_y,//$79       ADC $440&invalid, Y  ADd with Carry                    3       4+
+		&nop,           //$7A       NOP
 		&invalid,
-		&invalid,
-		&invalid,
+		&nop,           //$7C       NOP
 		&adc_absolute_x,//$7D       ADC $440&invalid, X  ADd with Carry                    3       4+
 		&ror_absolute_x,//$7E       ROR $44      Rotate Right                       3       7
 		&invalid,
-		&invalid,
+		&nop,           //$80       NOP
 		&sta_indirect_x,//$81      STA ($44,X)    STore Accumulator                 2       6
-		&invalid,
+		&nop,           //$82       NOP
 		&invalid,
 		&sty_zpage,     //$84      STX $44       STore Y Register                   2       3
 		&sta_zpage,     //$85      STA $44       STore Accumulator                  2       2
 		&stx_zpage,     //$86      STX $44       STore X Register                   2       2
 		&invalid,
 		&dey,           //$88       DEY           Decrements Y                      1       2
-		&invalid,
+		&nop,           //$89       NOP
 		&txa,           //$8A       TXA           Transfer X to A                   1       2
 		&invalid,
 		&sty_absolute,  //$8C       STX $4400     STore Y Register                  3       4
@@ -1411,7 +1427,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&invalid,
 		&cpy_immediate,     //$C0   CPX #$44      Compare                           2       2
 		&cmp_indirect_x,    //$C1   CMP ($44,X)   Compare                           2       6
-		&invalid,
+		&nop,           //$C2       NOP
 		&invalid,
 		&cpy_zpage,     //$C4       CPX $44       Compare                           2       3
 		&cmp_zpage,     //$C5       CMP $44       Compare                           2       3
@@ -1429,21 +1445,21 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&cmp_indirect_y,    //$D1   CMP ($44),X   Compare                           2       5+
 		&invalid,
 		&invalid,
-		&invalid,
+		&nop,           //$D4       NOP
 		&cmp_zpage_x,       //$D5      CMP $44,X     Compare                           2       4
 		&dec_mem_zpage_x,   //$D6      DEC $44,X     DEcrement Memory                  2       6
 		&invalid,
 		&cld,               //$D8      CLD           CLear Decimal flag                1       2
-		&cmp_absolute_y,    //$DD      CMP $440&invalidY   Compare                          3       4+
+		&cmp_absolute_y,    //$D9      CMP $440&invalidY   Compare                          3       4+
+		&nop,           //$DA       NOP
 		&invalid,
-		&invalid,
-		&invalid,
+		&nop,           //$DC       NOP
 		&cmp_absolute_x,    //$DD   CMP $440&invalidX   Compare                          3       4+
 		&dec_mem_absolute_x,//$DE   DEC $440&invalidX   DEcrement Memory                 3       7
 		&invalid,
 		&cpx_immediate,    //$E0    CPX #$44      Compare                          2       2
 		&sbc_indirect_x,//$E1       SBC ($44,X)   SuBstract with Carry             2       6
-		&invalid,
+		&nop,           //$E2       NOP
 		&invalid,
 		&cpx_zpage,    //$E4        CPX $44       Compare                          2       3
 		&sbc_zpage,     //$E5       SBC $44       SuBstract with Carry             2       3
@@ -1461,15 +1477,15 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&sbc_indirect_y,//$F1       SBC ($44),Y   SuBstract with Carry             2       5+
 		&invalid,
 		&invalid,
-		&invalid,
+		&nop,           //$F4       NOP
 		&sbc_zpage_x,   //$F5       SBC $44,X     SuBstract with Carry             2       4
 		&inc_mem_zpage_x,//$F6      INC $44, X    INcrement Memory                 2       6
 		&invalid,
 		&sed,           //$F8       SED           Sets Decimal flag                1       2
 		&sbc_absolute_y,//$F9       SBC $440&invalidY   SuBstract with Carry             3       4+
+		&nop,           //$FA       NOP
 		&invalid,
-		&invalid,
-		&invalid,
+		&nop,           //$FC       NOP
 		&sbc_absolute_x,//$FD       SBC $440&invalidX   SuBstract with Carry             3       4+
 		&inc_mem_absolute_x,//$FE     INC $440&invalidX   INcrement Memory               3       7
 		&invalid,
@@ -1535,8 +1551,7 @@ word indirect_param() {
 	if ((addr & 0xFF) == 0xFF) {
 		// Buggy code
 		targetAddr = (rmem_b(addr & 0xFF00) << 8) + rmem_b(addr);
-	}
-	else {
+	} else {
 		// Normal code
 		targetAddr = rmem_w(addr);
 	}
