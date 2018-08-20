@@ -146,7 +146,13 @@ word indirectx_addr(byte b) {
 word indirecty_addr(byte b) {
 	byte memContent[2] = {0};
 
-	rmem(WORD, b, memContent);
+	if (b == 0xFF) {
+		memContent[0] = rmem_b(b);
+		memContent[1] = rmem_b(0x00);
+	} else {
+		rmem(WORD, b, memContent);
+	}
+
 	word addr = to_mem_addr(memContent);
 
 	return addr + Y;

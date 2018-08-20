@@ -1530,10 +1530,18 @@ byte indirecty_param() {
 
 word indirect_param() {
 	word addr = rmem_w(PC + 1);
-	byte least_significant = rmem_b(addr);
-	byte most_significant = rmem_b(addr + 1);
+	word targetAddr = 0x0000;
+	// This is a 6502 bug when instead of reading from $C0FF/$C100 it reads from $C0FF/$C000
+	if ((addr & 0xFF) == 0xFF) {
+		// Buggy code
+		targetAddr = (rmem_b(addr & 0xFF00) << 8) + rmem_b(addr);
+	}
+	else {
+		// Normal code
+		targetAddr = rmem_w(addr);
+	}
 
-	return (most_significant << 8) + least_significant;
+	return targetAddr;
 }
 
 void log_instruction(int num_params, const char *mnemonic, ...) {
