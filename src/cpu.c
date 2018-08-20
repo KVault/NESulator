@@ -38,23 +38,23 @@ void resetPC() {
 ////////////////////////////////////NOP REGION////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void nop() {
+void nop(int cycles, int pcIncrease) {
 	log_instruction(0, "NOP\t\t\t");
 
-	PC++;
-	cyclesThisSec += 2;
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
 }
 
 void nop1() {
-
+	nop(2,1);
 }
 
 void nop2() {
-
+	nop(2,2);
 }
 
 void nop3() {
-
+	nop(3,3);
 }
 
 void breakpoint() {

@@ -135,7 +135,7 @@ void breakpoint();
 /**
  * The generic nop
  */
-void nop();
+void nop(int cycles, int pcIncrease);
 
 /**
  * Valid NOP opcode
