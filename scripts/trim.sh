@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 
 mkdir -p logs
 
-tr -d ' # \f\t' < logs/nestest.log > logs/nestest_trim.log
-tr -d ' # \f\t' < logs/nesulator.log > logs/nesulator_trim.log
+tr -d ' * # \f\t' < logs/nestest.log > logs/nestest_trim.log
+tr -d ' * # \f\t' < logs/nesulator.log > logs/nesulator_trim.log
 
 vimdiff logs/nesulator_trim.log logs/nestest_trim.log
