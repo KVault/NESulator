@@ -1237,7 +1237,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_ind_x,     //$01       ORA ($44, X)  bitwise OR with Accumulator     2       6
 		&invalid,
 		&invalid,
-		&nop,           //$04       NOP
+		&nop2,          //$04       NOP
 		&ora_zpage,     //$05       ORA $44       bitwise OR with Accumulator     2       3
 		&asl_zpage,     //$06       ASL $44       Arithmetic Shift Left           2       5
 		&invalid,
@@ -1245,7 +1245,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_immediate, //$09       ORA #$44      bitwise OR with Accumulator     2       2
 		&asl_accumulator,//$0A      ASL A         Arithmetic Shift Left           1       2
 		&invalid,
-		&nop,           //$0C       NOP
+		&nop2,          //$0C       NOP
 		&ora_absolute,  //$0D       ORA $4400     bitwise OR with Accumulator     3       4
 		&asl_absolute,  //$0E       ASL $4400     Arithmetic Shift Left           3       6
 		&invalid,
@@ -1253,13 +1253,13 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ora_ind_y,     //$11       ORA ($44), Y  bitwise OR with Accumulator     2       6
 		&invalid,
 		&invalid,
-		&nop,           //$14       NOP
+		&nop3,          //$14       NOP
 		&ora_zpage_x,   //$15       ORA ($44), X  bitwise OR with Accumulator     2       4
 		&asl_zpage_x,   //$16       ASL $44, X    Arithmetic Shift Left           2       6
 		&invalid,
 		&clc,           //$18       CLC           CLear Carry flag                1       2
 		&ora_absolute_y,//$19       ORA $440&invalid, Y  bitwise OR with Accumulator     3       4+
-		&nop,           //$1A       NOP
+		&nop1,          //$1A       NOP
 		&invalid,
 		&nop,           //$1C       NOP
 		&ora_absolute_x,//$1D       ORA $440&invalid, X  bitwise OR with Accumulator     3       4+
