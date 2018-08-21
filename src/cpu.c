@@ -1256,6 +1256,29 @@ void lax_indirect_y(){
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////SAX REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * SAX ANDs the contents of the A and X registers (leaving the contents of A
+ * intact), subtracts an immediate value, and then stores the result in X.
+ */
+void sax(){
+	byte value = rmem_b(PC + 1);
+
+	log_instruction(1, "\tSAX $%02X\t", value);
+
+	byte xAndA = A & X;
+
+	X = xAndA - value;
+
+	bit_val(&P, flagC, xAndA >= value);
+
+	PC += 2;
+	cyclesThisSec += 2;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////Invalid Opcodes REGION/////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1407,7 +1430,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&nop2,          //$80       NOP
 		&sta_indirect_x,//$81      STA ($44,X)    STore Accumulator                 2       6
 		&nop2,          //$82       NOP
-		&invalid,
+		&sax,           //$83      SAX                                              2       2
 		&sty_zpage,     //$84      STX $44       STore Y Register                   2       3
 		&sta_zpage,     //$85      STA $44       STore Accumulator                  2       2
 		&stx_zpage,     //$86      STX $44       STore X Register                   2       2
