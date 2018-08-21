@@ -1218,30 +1218,41 @@ void jmp_indirect() {
 
 void lax(byte value, int cycles, int pcIncrease){
 
+	log_instruction(pcIncrease - 1, "\tLAX $%02X\t", value);
+	X = value;
+	A = value;
+
+	bit_val(&P, flagZ, value == 0);
+	bit_val(&P, flagN, bit_test(value, 7));
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
 }
 
 void lax_absolute(){
-
+	lax(absolute_param(), 4, 3);
 }
 
 void lax_absolute_y(){
-
+	lax(absolutey_param(), 4, 3);
+	//TODO +1 if page crossed
 }
 
 void lax_zpage(){
-
+	lax(zpage_param(), 3, 2);
 }
 
 void lax_zpage_y(){
-
+	lax(zpagey_param(), 4, 2);
 }
 
 void lax_indirect_x(){
-
+	lax(indirectx_param(), 6, 2);
 }
 
 void lax_indirect_y(){
-	
+	lax(indirecty_param(), 5, 2);
+	//TODO +1 if page crossed
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1428,11 +1439,11 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ldy_immediate, //A0       LDA #$44       LoaD Accumulator                  2       2
 		&lda_indirect_x,//A1       LDA ($44,X)    LoaD Accumulator                  2       6
 		&ldx_immediate, //A2       LDA #$44       LoaD Accumulator                  2       2
-		&invalid,
+		&lax_indirect_x,//$A3       LAX $4400     Load Accumulator and X            2       6
 		&ldy_zpage,     //$A4       LDA $44       LoaD Accumulator                  2       3
 		&lda_zpage,     //$A5       LDA $44       LoaD Accumulator                  2       3
 		&ldx_zpage,     //$A6       LDA $44       LoaD Accumulator                  2       3
-		&invalid,
+		&lax_zpage,     //$A7       LAX 44        Load Accumulator and X            2       3
 		&tay,           //$A8       TAY           Transfer A to Y                   1       2
 		&lda_inmediate, //$A9       LDA #$44      LoaD Accumulator                  2       2
 		&tax,           //$AA       TAX           Transfer A to X                   1       2
@@ -1440,23 +1451,23 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ldy_absolute,  //$AC      LDY $4400     LoaD Y Register                    3       4
 		&lda_absolute,  //AD       LDA $4400     LoaD Accumulator                   3       4
 		&ldx_absolute,  //AE       LDA $4400     LoaD Accumulator                   3       4
-		&invalid,
+		&lax_absolute,  //$AF      LAX $4400     Load Accumulator and X             3       4
 		&bcs,           //$B0       BCS           Branch id carry set               2       2(+2)
 		&lda_indirect_y,//B1        LDA ($44),Y   LoaD Accumulator                  2       5+
 		&invalid,
-		&invalid,
+		&lax_indirect_y,//$B3       LAX $4400     Load Accumulator and X             2       5+
 		&ldy_zpage_x,   //$B4       LDY $44, X    LoaD Y Register                    2       6
 		&lda_zpage_x,   //$B5       LDA $44, X    LoaD Accumulator                   2       4
 		&ldx_zpage_y,   //$B6       LDX $44, Y    LoaD Accumulator                   2       4
-		&invalid,
+		&lax_zpage_y,   //$B7       LAX $44, Y    Load Accumulator and X             2       4
 		&clv,           //$B8       CLV           CLear Overflow flag                1       2,
 		&lda_absolute_y,//$B9       LDA $440&invalidY   LoaD Accumulator                   3       4+
 		&tsx,           //BA
 		&invalid,
-		&ldy_absolute_x,//$A4      LDY $440&invalidY    LoaD Y Register                    3       4+
+		&ldy_absolute_x,//$BC      LDY $440&invalidY    LoaD Y Register                    3       4+
 		&lda_absolute_x,//BD       LDA $440&invalidX    LoaD Accumulator                   3       4+
 		&ldx_absolute_y,//BE       LDA $440&invalidY    LoaD Accumulator                   3       4+
-		&invalid,
+		&lax_absolute_y,  //$BF    LAX $4400,Y          Load Accumulator and X             3       4+
 		&cpy_immediate,     //$C0   CPX #$44      Compare                           2       2
 		&cmp_indirect_x,    //$C1   CMP ($44,X)   Compare                           2       6
 		&nop2,          //$C2       NOP
