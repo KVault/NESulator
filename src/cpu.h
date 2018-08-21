@@ -924,7 +924,14 @@ void lax_indirect_y();
  * SAX ANDs the contents of the A and X registers (leaving the contents of A
  * intact), subtracts an immediate value, and then stores the result in X.
  */
-void sax();
+void sax(byte value, int cycles, int pcIncrease);
+
+void sax_indirect_x();
+void sax_zpage();
+void sax_zpage_y();
+void sax_absolute();
+
+
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
