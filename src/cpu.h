@@ -917,19 +917,20 @@ void lax_indirect_y();
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////SAX REGION/////////////////////////////////////////////////////
+///////////////////////////AXS REGION/////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * SAX ANDs the contents of the A and X registers (leaving the contents of A
- * intact), subtracts an immediate value, and then stores the result in X.
+ * AXS ANDs the contents of the A and X registers (without changing the
+ * contents of either register) and stores the result in memory.
+ * AXS does not affect any flags in the processor status register.
  */
-void sax(byte value, int cycles, int pcIncrease);
+void axs(word addr, int cycles, int pcIncrease);
 
-void sax_indirect_x();
-void sax_zpage();
-void sax_zpage_y();
-void sax_absolute();
+void axs_indirect_x();
+void axs_zpage();
+void axs_zpage_y();
+void axs_absolute();
 
 
 

@@ -1256,40 +1256,33 @@ void lax_indirect_y() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////SAX REGION/////////////////////////////////////////////////////
+///////////////////////////AXS REGION/////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * SAX ANDs the contents of the A and X registers (leaving the contents of A
- * intact), subtracts an immediate value, and then stores the result in X.
- */
-void sax(byte value, int cycles, int pcIncrease) {
-	log_instruction(1, "\tSAX $%02X\t", value);
+void axs(word addr, int cycles, int pcIncrease) {
+	log_instruction(1, "\tSAX $%02X\t", addr);
 
-	byte xAndA = A & X;
-
-	X = xAndA - value;
-
-	bit_val(&P, flagC, xAndA >= value);
+	byte value = A & X;
+	wmem_b(addr, value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
 }
 
-void sax_indirect_x() {
-	sax(indirectx_param(), 6, 2);
+void axs_indirect_x() {
+	axs(indirectx_addr(rmem_b(PC + 1)), 6, 2);
 }
 
-void sax_zpage() {
-	sax(zpage_param(), 3, 2);
+void axs_zpage() {
+	axs(zpage_addr(rmem_b(PC + 1)), 3, 2);
 }
 
-void sax_zpage_y() {
-	sax(zpagey_param(), 4, 2);
+void axs_zpage_y() {
+	axs(zpagey_addr(rmem_b(PC + 1)), 4, 2);
 }
 
-void sax_absolute() {
-	sax(absolute_param(), 4, 3);
+void axs_absolute() {
+	axs(absolute_addr(rmem_w(PC + 1)), 4, 3);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1444,11 +1437,11 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&nop2,          //$80       NOP
 		&sta_indirect_x,//$81      STA ($44,X)    STore Accumulator                 2       6
 		&nop2,          //$82       NOP
-		&sax_indirect_x,           //$83      SAX                                              2       2
+		&axs_indirect_x,//$83      AXS                                              2       2
 		&sty_zpage,     //$84      STX $44       STore Y Register                   2       3
 		&sta_zpage,     //$85      STA $44       STore Accumulator                  2       2
 		&stx_zpage,     //$86      STX $44       STore X Register                   2       2
-		&sax_zpage,
+		&axs_zpage,     //$87      AXS
 		&dey,           //$88       DEY           Decrements Y                      1       2
 		&nop2,          //$89       NOP
 		&txa,           //$8A       TXA           Transfer X to A                   1       2
@@ -1456,7 +1449,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&sty_absolute,  //$8C       STX $4400     STore Y Register                  3       4
 		&sta_absolute,  //$8D       STA $4400     STore Accumulator                 3       4
 		&stx_absolute,  //$8E       STX $4400     STore X Register                  3       4
-		&sax_zpage_y,
+		&axs_absolute,  //$8F       AXS
 		&bcc,           //$90       BCC           Branch if carry clear             2       2(+2)
 		&sta_indirect_y,//$91      STA ($44),Y    STore Accumulator                 2       6
 		&invalid,
@@ -1464,7 +1457,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&sty_zpage_x,   //$94      STX $44,Y      STore Y Register                  2       4
 		&sta_zpage_x,   //$95      STA $44,X      STore Accumulator                 2       4
 		&stx_zpage_y,   //96       STX $44, Y     STore X Register                  2       4
-		&sax_absolute,
+		&axs_zpage_y,   //$97      AXS
 		&tya,           //$98      TYA           Transfer Y to A                    1       2
 		&sta_absolute_y,//$99      STA $440&invalidY    STore Accumulator           3       5
 		&txs,           //9A
