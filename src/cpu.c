@@ -1346,22 +1346,13 @@ void dcm_indirect_y(){
  * It is the equivalent as to do a dec_mem and a cmp, so we'll just execute those two on order. It should be fine
  */
 void ins(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tINS $%04X", addr);
+	log_instruction(pcIncrease - 1, "\tINS $%04X\t", addr);
 
 	delta_memory(addr, 1, 0, 0);
 
 	byte value = rmem_b(addr);
 
-	int result = A - value - (!bit_test(P, flagC));
-
-	// If operands same source sign but different result sign
-	int isOverflown = ((A ^ result) & (A ^ value) & 0x80);
-	A = (byte) result;
-
-	bit_val(&P, flagZ, A == 0);
-	bit_val(&P, flagV, isOverflown);
-	bit_val(&P, flagN, bit_test(A, 7));
-	bit_val(&P, flagC, value >= A || value == 0);
+	adc_internal(~value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
