@@ -1286,6 +1286,59 @@ void axs_absolute() {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////DCM (DCP) REGION///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * It is the equivalent as to do a dec_mem and a cmp, so we'll just execute those two on order. It should be fine
+ */
+void dcm(word addr, int cycles, int pcIncrease){
+	log_instruction(pcIncrease - 1, "\tDCP $%04X", addr);
+
+	delta_memory(addr, -1, 0, 0);
+
+	byte value = rmem_b(addr);
+	byte temp_result = A - value;
+
+	bit_val(&P, flagC, A >= value);
+
+	//Need to do this since there are some positive numbers that should trigger this flag. i.e. 0x80
+	bit_val(&P, flagN, bit_test(temp_result, 7));
+	bit_val(&P, flagZ, A == value);
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void dcm_absolute(){
+	dcm(absolute_addr(rmem_w(PC + 1)), 6, 3);
+}
+
+void dcm_absolute_x(){
+	dcm(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void dcm_absolute_y(){
+	dcm(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void dcm_zpage(){
+	dcm(zpage_addr(rmem_b(PC + 1)), 5, 2);
+}
+
+void dcm_zpage_x(){
+	dcm(zpagex_addr(rmem_b(PC + 1)), 6, 2);
+}
+
+void dcm_indirect_x(){
+	dcm(indirectx_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+void dcm_indirect_y(){
+	dcm(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////Invalid Opcodes REGION/////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1306,7 +1359,7 @@ void invalid() {
  */
 gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		//              Opcode      Syntax        Description                     Len     Tim
-		&breakpoint,           //$00       BRK           BReaK                           1       7
+		&breakpoint,    //$00       BRK           BReaK                           1       7
 		&ora_ind_x,     //$01       ORA ($44, X)  bitwise OR with Accumulator     2       6
 		&invalid,
 		&invalid,
@@ -1501,11 +1554,11 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&cpy_immediate,     //$C0   CPX #$44      Compare                           2       2
 		&cmp_indirect_x,    //$C1   CMP ($44,X)   Compare                           2       6
 		&nop2,          //$C2       NOP
-		&invalid,
+		&dcm_indirect_x,//$C3       DCM $44       Decrement and CoMpare
 		&cpy_zpage,     //$C4       CPX $44       Compare                           2       3
 		&cmp_zpage,     //$C5       CMP $44       Compare                           2       3
 		&dec_mem_zpage, //$C6       DEC $44       DEcrement Memory                  2       5
-		&invalid,
+		&dcm_zpage,     //$C7       DCM $44       Decrement and CoMpare
 		&iny,           //$C8       INY           Increments Y                      1       2
 		&cmp_inmediate, //$C9       CMP #$44      Compare                           2       2
 		&dex,           //$CA       DEX           Decrements X register             1       2
@@ -1513,23 +1566,23 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&cpy_absolute,    //$CC     CPX $4400     Compare                           3       4
 		&cmp_absolute,    //$CD     CMP $4400     Compare                           3       4
 		&dec_mem_absolute,//$CE     DEC $4400     DEcrement Memory                  3       6
-		&invalid,
+		&dcm_absolute,    //$CF     DCM $4400     Decrement and CoMpare
 		&bne,           //$D0       BNE           Branch now equals                 2       2(+2)
 		&cmp_indirect_y,    //$D1   CMP ($44),X   Compare                           2       5+
 		&invalid,
-		&invalid,
+		&dcm_indirect_y,//$Dqa:::qqa::3       DCM $44       Decrement and CoMpare
 		&nop2,          //$D4       NOP
 		&cmp_zpage_x,       //$D5      CMP $44,X     Compare                           2       4
 		&dec_mem_zpage_x,   //$D6      DEC $44,X     DEcrement Memory                  2       6
-		&invalid,
+		&dcm_zpage_x,       //$D7      DCM $44       Decrement and CoMpare
 		&cld,               //$D8      CLD           CLear Decimal flag                1       2
 		&cmp_absolute_y,    //$D9      CMP $440&invalidY   Compare                          3       4+
 		&nop1,          //$DA       NOP
-		&invalid,
+		&dcm_absolute_y,//$DF       DCM $4400     Decrement and CoMpare
 		&nop3,          //$DC       NOP
 		&cmp_absolute_x,    //$DD   CMP $440&invalidX   Compare                          3       4+
 		&dec_mem_absolute_x,//$DE   DEC $440&invalidX   DEcrement Memory                 3       7
-		&invalid,
+		&dcm_absolute_x,    //$DF   DCM $4400     Decrement and CoMpare
 		&cpx_immediate,    //$E0    CPX #$44      Compare                          2       2
 		&sbc_indirect_x,//$E1       SBC ($44,X)   SuBstract with Carry             2       6
 		&nop2,          //$E2       NOP
@@ -1541,7 +1594,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&inx,           //$E8       INX           Increments X register            1       7
 		&sbc_immediate, //$E9       SBC #$44      SuBstract with Carry             2       2
 		&nop1,          //$EA       NOP           No OPeration                     1       2
-		&invalid,
+		&sbc_immediate, //$EB      SBC #$44       Invalid opcode. works like sbc
 		&cpx_absolute,  //$EC      CPX $4400       Compare                         3       4
 		&sbc_absolute, //$ED       SBC $4400       SuBstract with Carry            3       4
 		&inc_mem_absolute,//$EE    INC $4400       INcrement Memory                3       6
