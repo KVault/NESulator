@@ -1339,6 +1339,64 @@ void dcm_indirect_y(){
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////DCM (DCP) REGION///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * It is the equivalent as to do a dec_mem and a cmp, so we'll just execute those two on order. It should be fine
+ */
+void ins(word addr, int cycles, int pcIncrease){
+	log_instruction(pcIncrease - 1, "\tINS $%04X", addr);
+
+	delta_memory(addr, 1, 0, 0);
+
+	byte value = rmem_b(addr);
+
+	int result = A - value - (!bit_test(P, flagC));
+
+	// If operands same source sign but different result sign
+	int isOverflown = ((A ^ result) & (A ^ value) & 0x80);
+	A = (byte) result;
+
+	bit_val(&P, flagZ, A == 0);
+	bit_val(&P, flagV, isOverflown);
+	bit_val(&P, flagN, bit_test(A, 7));
+	bit_val(&P, flagC, value >= A || value == 0);
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void ins_absolute(){
+	ins(absolute_addr(rmem_w(PC + 1)), 6, 3);
+}
+
+void ins_absolute_x(){
+	ins(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void ins_absolute_y(){
+	ins(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void ins_zpage(){
+	ins(zpage_addr(rmem_b(PC + 1)), 5, 2);
+}
+
+void ins_zpage_x(){
+	ins(zpagex_addr(rmem_b(PC + 1)), 6, 2);
+}
+
+void ins_indirect_x(){
+	ins(indirectx_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+void ins_indirect_y(){
+	ins(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////Invalid Opcodes REGION/////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1586,11 +1644,11 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&cpx_immediate,    //$E0    CPX #$44      Compare                          2       2
 		&sbc_indirect_x,//$E1       SBC ($44,X)   SuBstract with Carry             2       6
 		&nop2,          //$E2       NOP
-		&invalid,
+		&ins_indirect_x,//$E3      INS
 		&cpx_zpage,    //$E4        CPX $44       Compare                          2       3
 		&sbc_zpage,     //$E5       SBC $44       SuBstract with Carry             2       3
 		&inc_mem_zpage, //$E6       INC $44       INcrement Memory                 2       5
-		&invalid,
+		&ins_zpage,     //$E7      INS
 		&inx,           //$E8       INX           Increments X register            1       7
 		&sbc_immediate, //$E9       SBC #$44      SuBstract with Carry             2       2
 		&nop1,          //$EA       NOP           No OPeration                     1       2
@@ -1598,23 +1656,23 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&cpx_absolute,  //$EC      CPX $4400       Compare                         3       4
 		&sbc_absolute, //$ED       SBC $4400       SuBstract with Carry            3       4
 		&inc_mem_absolute,//$EE    INC $4400       INcrement Memory                3       6
-		&invalid,
+		&ins_absolute,  //$EF      INS
 		&beq,           //$F0       BEQ           Branch if equals                 2       2(+2)
 		&sbc_indirect_y,//$F1       SBC ($44),Y   SuBstract with Carry             2       5+
 		&invalid,
-		&invalid,
+		&ins_indirect_y,//$F3      INS
 		&nop2,          //$F4       NOP
 		&sbc_zpage_x,   //$F5       SBC $44,X     SuBstract with Carry             2       4
 		&inc_mem_zpage_x,//$F6      INC $44, X    INcrement Memory                 2       6
-		&invalid,
+		&ins_zpage_x,   //$E7      INS
 		&sed,           //$F8       SED           Sets Decimal flag                1       2
 		&sbc_absolute_y,//$F9       SBC $440&invalidY   SuBstract with Carry             3       4+
 		&nop1,          //$FA       NOP
-		&invalid,
+		&ins_absolute_y,//$EF      INS
 		&nop3,          //$FC       NOP
 		&sbc_absolute_x,//$FD       SBC $440&invalidX   SuBstract with Carry             3       4+
 		&inc_mem_absolute_x,//$FE     INC $440&invalidX   INcrement Memory               3       7
-		&invalid,
+		&ins_absolute_x,//$EF      INS
 };
 
 void cpu_cycle() {
