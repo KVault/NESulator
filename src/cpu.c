@@ -1344,6 +1344,7 @@ void dcm_indirect_y(){
 
 /**
  * It is the equivalent as to do a dec_mem and a cmp, so we'll just execute those two on order. It should be fine
+ * Bear in mind, an sbc is the same as an asl with the parameter ~'ed
  */
 void ins(word addr, int cycles, int pcIncrease){
 	log_instruction(pcIncrease - 1, "\tINS $%04X\t", addr);
@@ -1386,6 +1387,58 @@ void ins_indirect_y(){
 	ins(indirecty_addr(rmem_b(PC + 1)), 8, 2);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////ASO (SLO) REGION///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void aso(word addr, int cycles, int pcIncrease){
+	log_instruction(pcIncrease - 1, "\tASO $%04X", addr);
+
+	//ASL
+	byte value = rmem_b(addr);
+	bit_val(&P, flagC, bit_test(value, flagN));
+
+	byte shifted = value << 1;
+	wmem_b(addr, shifted);
+
+	//Now the ORA
+	A = A | shifted;
+	//Set the flags
+	bit_val(&P, flagZ, A == 0x00);
+	bit_val(&P, flagN, bit_test(A, 7));
+
+	//Update cycles and pc
+	cyclesThisSec += cycles;
+	PC += pcIncrease;
+}
+
+void aso_absolute(){
+	aso(absolute_addr(rmem_w(PC + 1)), 6, 3);
+}
+
+void aso_absolute_x(){
+	aso(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void aso_absolute_y(){
+	aso(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void aso_zpage(){
+	aso(zpage_addr(rmem_b(PC + 1)), 5, 2);
+}
+
+void aso_zpage_x(){
+	aso(zpagex_addr(rmem_b(PC + 1)), 6, 2);
+}
+
+void aso_indirect_x(){
+	aso(indirectx_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+void aso_indirect_y(){
+	aso(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////Invalid Opcodes REGION/////////////////////////////////////////
@@ -1411,11 +1464,11 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&breakpoint,    //$00       BRK           BReaK                           1       7
 		&ora_ind_x,     //$01       ORA ($44, X)  bitwise OR with Accumulator     2       6
 		&invalid,
-		&invalid,
+		&aso_indirect_x,//$03       ASO
 		&nop2,          //$04       NOP
 		&ora_zpage,     //$05       ORA $44       bitwise OR with Accumulator     2       3
 		&asl_zpage,     //$06       ASL $44       Arithmetic Shift Left           2       5
-		&invalid,
+		&aso_zpage,     //$07       ASO
 		&php,           //$08       PHP           PusH Processor status           1       3
 		&ora_immediate, //$09       ORA #$44      bitwise OR with Accumulator     2       2
 		&asl_accumulator,//$0A      ASL A         Arithmetic Shift Left           1       2
@@ -1423,23 +1476,23 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&nop3,          //$0C       NOP
 		&ora_absolute,  //$0D       ORA $4400     bitwise OR with Accumulator     3       4
 		&asl_absolute,  //$0E       ASL $4400     Arithmetic Shift Left           3       6
-		&invalid,
+		&aso_absolute,  //$0F       ASO
 		&bpl,           //$10       BPL           Branch if plus                  2       2(+2)
 		&ora_ind_y,     //$11       ORA ($44), Y  bitwise OR with Accumulator     2       6
 		&invalid,
-		&invalid,
+		&aso_indirect_y,//$13       ASO
 		&nop2,          //$14       NOP
 		&ora_zpage_x,   //$15       ORA ($44), X  bitwise OR with Accumulator     2       4
 		&asl_zpage_x,   //$16       ASL $44, X    Arithmetic Shift Left           2       6
-		&invalid,
+		&aso_zpage_x,   //$07       ASO
 		&clc,           //$18       CLC           CLear Carry flag                1       2
 		&ora_absolute_y,//$19       ORA $440&invalid, Y  bitwise OR with Accumulator     3       4+
 		&nop1,          //$1A       NOP
-		&invalid,
+		&aso_absolute_y,//$1B       ASO
 		&nop3,          //$1C       NOP
 		&ora_absolute_x,//$1D       ORA $440&invalid, X  bitwise OR with Accumulator     3       4+
 		&asl_absolute_x,//$1E       ASL $440&invalid, X  Arithmetic Shift Left           3       7
-		&invalid,
+		&aso_absolute_x,//$1F       ASO
 		&jsr_absolute,  //$20       JSR $4400     Jump to SubRoutine              3       6
 		&and_indirect_x,//$21       AND ($44, X)  bitwise AND with accumulator    2       6
 		&invalid,
