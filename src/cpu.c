@@ -1089,10 +1089,9 @@ void rol_absolute_x() {
 	wmem_w(addr, data);
 }
 
+void ror_internal(byte *value);
 
-void ror(byte *value, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "ROR $%02X", value);
-
+void ror_internal(byte *value){
 	byte cachedFlagC = (byte) bit_test(P, flagC);
 	byte cached0 = (byte) bit_test(*value, 0);
 
@@ -1103,6 +1102,12 @@ void ror(byte *value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, shifted == 0);
 	bit_val(&P, flagN, bit_test(shifted, 7));
 	*value = shifted;
+}
+
+void ror(byte *value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "ROR $%02X", value);
+
+	ror_internal(value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -1508,7 +1513,7 @@ void rla_indirect_y(){
 
 void lse(word addr, int cycles, int pcIncrease){
 	log_instruction(pcIncrease - 1, "\tLSE $%04X\t", addr);
-	
+
 	byte data = rmem_b(addr);
 	lsr_internal(&data);
 	wmem_b(addr, data);
@@ -1545,6 +1550,54 @@ void lse_indirect_x(){
 
 void lse_indirect_y(){
 	lse(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////RRA REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * RRA RORs the contents of a memory location and then ADCs the result with the accumulator.
+ */
+void rra(word addr, int cycles, int pcIncrease){
+	log_instruction(pcIncrease - 1, "\tRRA $%04X\t", addr);
+
+	byte value = rmem_b(addr);
+	ror_internal(&value);
+	wmem_b(addr, value);
+
+	adc_internal(value);
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void rra_absolute(){
+	rra(absolute_addr(rmem_w(PC + 1)), 6, 3);
+}
+
+void rra_absolute_x(){
+	rra(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void rra_absolute_y(){
+	rra(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void rra_zpage(){
+	rra(zpage_addr(rmem_b(PC + 1)), 5, 2);
+}
+
+void rra_zpage_x(){
+	rra(zpagex_addr(rmem_b(PC + 1)), 6, 2);
+}
+
+void rra_indirect_x(){
+	rra(indirectx_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+void rra_indirect_y(){
+	rra(indirecty_addr(rmem_b(PC + 1)), 8, 2);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1667,11 +1720,11 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&rts,            //$60      RTS          Returns from Subroutine           1       6
 		&adc_indirect_x, //$61      ADC ($44, X) ADd with Carry                    2       6
 		&invalid,
-		&invalid,
+		&rra_indirect_x,//$63       RRA
 		&nop2,          //$64       NOP
 		&adc_zpage,     //$65       ADC $44      ADd with Carry                    2       3
 		&ror_zpage,     //$66       ROR $44      Rotate Right                      2       5
-		&invalid,
+		&rra_zpage,     //$67       RRA
 		&pla,           //$68       PLA           PuLl Acumulator                  1       4
 		&adc_immediate, //$69       ADC #$44      ADd with Carry                   2       2
 		&ror_accumulator,//$6A      ROR $44      Rotate Right                      1       2
@@ -1679,23 +1732,23 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&jmp_indirect,  //$6C       JMP          JuMP                              3       5
 		&adc_absolute,  //$6D       ADC $4400    ADd with Carry                    3       4
 		&ror_absolute,  //$6E       ROR $44      Rotate Right                      3       6
-		&invalid,
+		&rra_absolute,  //$6F      RRA
 		&bvs,           //$70      BVS           Branch if plus                    2       2(+2)
 		&adc_indirect_y,//$71      ADC ($44), X   ADd with Carry                   2       5+
 		&invalid,
-		&invalid,
+		&rra_indirect_y,//$73       RRA
 		&nop2,          //$74       NOP
 		&adc_zpage_x,   //$75       ADC $44, X    ADd with Carry                    2       4
 		&ror_zpage_x,   //$76       ROR $44      Rotate Right                       2       6
-		&invalid,
+		&rra_zpage_x,   //$77       RRA
 		&sei,           //$78       SEI           Sets Interrupt flag               1       2,
 		&adc_absolute_y,//$79       ADC $440&invalid, Y  ADd with Carry             3       4+
 		&nop1,          //$7A       NOP
-		&invalid,
+		&rra_absolute_y,//$7B       RRA
 		&nop3,          //$7C       NOP
 		&adc_absolute_x,//$7D       ADC $440&invalid, X  ADd with Carry             3       4+
 		&ror_absolute_x,//$7E       ROR $44      Rotate Right                       3       7
-		&invalid,
+		&rra_absolute_x,//$7F       RRA
 		&nop2,          //$80       NOP
 		&sta_indirect_x,//$81      STA ($44,X)    STore Accumulator                 2       6
 		&nop2,          //$82       NOP
