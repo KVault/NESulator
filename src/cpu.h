@@ -3,13 +3,14 @@
 
 #include "nes.h"
 #include "Utils.h"
+#include "log.h"
 
 #define OPCODE_COUNT 256
 
 typedef void (*gen_opcode_func)();
 
 enum StateFlagEnum {
-	flagC = 0, flagZ = 1, flagI = 2, flagD = 3, flagB = 4, flagV = 6, flagN = 7
+	flagC = 0, flagZ = 1, flagI = 2, flagD = 3, flagB = 4, flagUnused = 5, flagV = 6, flagN = 7
 };
 
 byte A;     // Accumulator, deal with carry, overflow and so on...
@@ -40,6 +41,11 @@ byte currentOpcode; // The opcode of this cycle
  * to the right value. Basically it simulates switching on the NES.
  */
 void power_up(int clockSpeed);
+
+/**
+ * Resets the PC to the value held in the reset vector $FFFC and $FFFD
+ */
+void resetPC();
 
 /**
  * Fetch the next X bytes (TBD) from where the PC is pointing to. It will map it and decide which opcode is
@@ -105,18 +111,46 @@ word indirect_param();
  */
 void cpu_cycle();
 
+/**
+ * Log an instruction with all the CPU information at that point: PC and registers.
+ */
+void log_instruction(int num_params, const char *mnemonic, ...);
+
 
 /**
  * BRK causes a non-maskable interrupt and increments the program counter by one.
  * Therefore an RTI will go to the address of the BRK +2 so that BRK may be used to replace a two-byte instruction
  * for debugging and the subsequent RTI will be correct.
  */
-void brk();
+void breakpoint();
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////NOP REGION////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+ * There are a bunch of invalid opcodes that are NOPs. This is a workaround to fix that.
+ */
+/**
+ * The generic nop
+ */
+void nop(int cycles, int pcIncrease);
 
 /**
- * Just nop
+ * Valid NOP opcode
  */
-void nop();
+void nop1();
+
+/**
+ * Invalid NOP opcode
+ */
+void nop2();
+
+/**
+ * Invalid NOP opcode
+ */
+void nop3();
 
 //////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////ORA REGION////////////////////////////////////////////
@@ -230,7 +264,7 @@ void php();
 void plp();
 
 //////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////PHA (PusH Acumulator) REGION/////////////////////////
+///////////////////////////PHA (PusH Acumulator) REGION///////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -239,13 +273,25 @@ void plp();
 void pha();
 
 //////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////PLA (PuLl Acumulator) REGION/////////////////////////
+///////////////////////////PLA (PuLl Acumulator) REGION///////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * PuLl Acumulator makes a pull from the stack onto the acumulator register
  */
 void pla();
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////TSX (Transfer Stack pointer to X) REGION///////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void tsx();
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////TXS (Transfer X to Stack pointer) REGION///////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void txs();
 
 //////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////AND (bitwise AND accumulator) REGION///////////////////////////
@@ -476,7 +522,7 @@ void adc_indirect_y();
  * Tries to branch the PC by adding the relative displacement (value) if the flag's value
  * has the req_flag_value.
  */
-void try_branch(byte flag, int req_flag_val);
+void try_branch(byte flag, int req_flag_val, const char *mnemonic);
 
 void bpl();
 
@@ -581,8 +627,9 @@ void dec_mem_absolute_x();
 
 /**
  * Loads the specified value onto the pointed register
+ * the mnemonic is only used for logging purposes
  */
-void load_register(byte *regPtr, byte value, int cycles, int pcIncrease);
+void load_register(byte *regPtr, byte value, int cycles, int pcIncrease, const char *regMnemonic);
 
 void lda_inmediate();
 
@@ -626,8 +673,9 @@ void ldy_absolute_x();
 
 /**
  * Loads the specified value onto the pointed register
+ * The mnmemonic is used for logging
  */
-void store_register(byte reg, word memAddr, int cycles, int pcIncrease);
+void store_register(byte reg, word memAddr, int cycles, int pcIncrease, const char *regMnemonic);
 
 void sta_zpage();
 
@@ -676,7 +724,7 @@ void rti();
 /**
  * Compares the specified value with the pointed register
  */
-void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease);
+void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease, const char *regMnemonic);
 
 void cmp_inmediate();
 
@@ -844,6 +892,143 @@ void jmp_absolute();
 
 void jmp_indirect();
 
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////LAX REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Transfers the content of a memory location to both the X and the A registers
+ */
+void lax(byte value, int cycles, int pcIncrease);
+
+void lax_absolute();
+
+void lax_absolute_y();
+
+void lax_zpage();
+
+void lax_zpage_y();
+
+void lax_indirect_x();
+
+void lax_indirect_y();
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////AXS REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * AXS ANDs the contents of the A and X registers (without changing the
+ * contents of either register) and stores the result in memory.
+ * AXS does not affect any flags in the processor status register.
+ */
+void axs(word addr, int cycles, int pcIncrease);
+
+void axs_indirect_x();
+void axs_zpage();
+void axs_zpage_y();
+void axs_absolute();
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////DCM (DCP) REGION///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This opcode DECs the contents of a memory location and then CMPs the result with the A register.
+ */
+void dcm(word addr, int cycles, int pcIncrease);
+void dcm_absolute();
+void dcm_absolute_x();
+void dcm_absolute_y();
+void dcm_zpage();
+void dcm_zpage_x();
+void dcm_indirect_x();
+void dcm_indirect_y();
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////INS (ISC) REGION///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This opcode INCs the contents of a memory location and then SBCs the result from the A register.
+ */
+void ins(word addr, int cycles, int pcIncrease);
+void ins_absolute();
+void ins_absolute_x();
+void ins_absolute_y();
+void ins_zpage();
+void ins_zpage_x();
+void ins_indirect_x();
+void ins_indirect_y();
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////ASO (SLO) REGION///////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * This opcode ASLs the contents of a memory location and then ORs the result with the accumulator.
+ */
+void aso(word addr, int cycles, int pcIncrease);
+void aso_absolute();
+void aso_absolute_x();
+void aso_absolute_y();
+void aso_zpage();
+void aso_zpage_x();
+void aso_indirect_x();
+void aso_indirect_y();
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////RLA REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * RLA ROLs the contents of a memory location and then ANDs the result with the accumulator.
+ */
+void rla(word addr, int cycles, int pcIncrease);
+void rla_absolute();
+void rla_absolute_x();
+void rla_absolute_y();
+void rla_zpage();
+void rla_zpage_x();
+void rla_indirect_x();
+void rla_indirect_y();
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////LSE REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * LSE LSRs the contents of a memory location and then EORs the result with the accumulator.
+ */
+void lse(word addr, int cycles, int pcIncrease);
+void lse_absolute();
+void lse_absolute_x();
+void lse_absolute_y();
+void lse_zpage();
+void lse_zpage_x();
+void lse_indirect_x();
+void lse_indirect_y();
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////RRA REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * RRA RORs the contents of a memory location and then ADCs the result with the accumulator.
+ */
+void rra(word addr, int cycles, int pcIncrease);
+void rra_absolute();
+void rra_absolute_x();
+void rra_absolute_y();
+void rra_zpage();
+void rra_zpage_x();
+void rra_indirect_x();
+void rra_indirect_y();
 
 //////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////Invalid Opcodes REGION/////////////////////////////////////////

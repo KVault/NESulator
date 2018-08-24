@@ -1,6 +1,7 @@
 #ifndef NESULATOR_TESTCPU_H
 #define NESULATOR_TESTCPU_H
 
+#include "../src/rom.h"
 #include "../src/Utils.h"
 #include "../src/cpu.h"
 #include "../src/memory.h"
@@ -59,5 +60,7 @@ void test_ROTATE();
 void test_EOR();
 
 void test_JMP();
+
+void test_NESTEST();
 
 #endif //NESULATOR_TESTCPU_H

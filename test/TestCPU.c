@@ -4,34 +4,39 @@
  * Simply calls each function to test. It's going to get messy but what the hell!....
  */
 void testOpcodes() {
-	power_up(0);
-	// We did something wrong with the BRK opcode function, need to be fixed
-	test_BRK();
-	test_ORA();
-	test_ASL();
-	test_JSR();
-	test_PHP();
-	test_PLP();
-	test_PLA();
-	test_PHA();
-	test_AND();
-	test_BIT();
-	test_FLAGS();
-	test_REGISTERS();
-	test_ADC();
-	test_BRANCH();
-	test_NOP();
-	test_SBC();
-	test_INCDECMEM();
-	test_LOADREGISTER();
-	test_STOREREGISTER();
-	test_RTS();
-	test_RTI();
-	test_COMPAREREGISTER();
-	test_LSR();
-	test_ROTATE();
-	test_EOR();
-	test_JMP();
+	//Now for the real deal. Test the NESTEST ROM!
+	test_NESTEST();
+
+	//power_up(0);
+	//// We did something wrong with the BRK opcode function, need to be fixed
+	//test_BRK();
+	//test_ORA();
+	//test_ASL();
+	//test_JSR();
+	//test_PHP();
+	//test_PLP();
+	//test_PLA();
+	//test_PHA();
+	//test_AND();
+	//test_BIT();
+	//test_FLAGS();
+	//test_REGISTERS();
+	//test_ADC();
+	//test_BRANCH();
+	//test_NOP();
+	//test_SBC();
+	//test_INCDECMEM();
+	//test_LOADREGISTER();
+	//test_STOREREGISTER();
+	//test_RTS();
+	//test_RTI();
+	//test_COMPAREREGISTER();
+	//test_LSR();
+	//test_ROTATE();
+	//test_EOR();
+	//test_JMP();
+
+
 }
 
 /**
@@ -43,7 +48,7 @@ void test_BRK() {
 	int cachedCyclesThisSec = cyclesThisSec;
 	bit_clear(&P, flagB);
 	assert(bit_test(P, flagB) == 0);
-	wmem_b(PC, 0x00); // brk opcode injected
+	wmem_b(PC, 0x00); // breakpoint opcode injected
 	cpu_cycle();
 	assert(cachedPC + 1 == PC);
 	assert(bit_test(P, flagB) == 1);
@@ -832,4 +837,44 @@ void test_JMP() {
 	assert(cachedCyclesThisSec + 5 == cyclesThisSec);
 
 	printf("Test JMP passed!\n");
+}
+
+/**
+ * At this moment, this won't assert anything, just run it and spit out the logs. We'll have a fresh new instance of
+ * the console, we'll enable the logs and run it from scratch
+ */
+void test_NESTEST() {
+	set_console_log_level(ConsoleError);
+	set_file_log_level(FileDebug);
+	set_clear_log_file();
+	set_log_path("../../logs/nesulator.log");
+
+	power_up(0);
+	//If we need to initialize anything, it should go here
+
+	//Read the ROM, that we're going to execute and all that stuff
+	struct ROM *rom = insertCartridge("../../rom/nestest.nes");
+	loadROM(rom);
+
+	int isRunning = 1;
+
+	//For this ROM to work in non-GUI mode we need to setup the PC to $C000 manually
+	PC = 0xC000;
+
+	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
+	//control this with a debugger, or an UI. But for now, it simply runs forever
+	while (isRunning) {
+		cpu_cycle();
+
+		//Stop the emulation once the PC reaches $FFFF
+		if (PC >= 0xFFFF) {
+			isRunning = 0;
+		}
+	}
+
+	printf("NESTEST test passed? Or not :P Have a look at the logs!");
+	log_info("Error code: $%02X", rmem_b(0x0002));
+
+	ejectCartridge();
+
 }

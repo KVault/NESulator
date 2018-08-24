@@ -7,12 +7,12 @@
  * Write from content in a specific memory address
  * It also deals with memory mirroring
  */
-void wmem(unsigned short amountBytes, unsigned int initialPosition, byte *content);
+void wmem(unsigned short amountBytes, uint initialPosition, byte *content);
 
 /**
  * Read content from a specific memory address and write to destiny
  */
-void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destiny);
+void rmem(unsigned short amountBytes, uint initialPosition, byte *destiny);
 
 /*
  * Address range  Size  Device
@@ -27,23 +27,31 @@ void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destin
  * $4020-$FFFF    $BFE0  Cartridge space: PRG ROM, PRG RAM, and mapper registers
  */
 
-void wmem(unsigned short amountBytes, unsigned int initialPosition, byte *content) {
+void wmem(unsigned short amountBytes, uint initialPosition, byte *content) {
 	int i = 0;
 	for (int j = initialPosition; i < amountBytes; j++, i++) {
 		memoryBank[j] = content[i];
 	}
 
-	//TODO mirroring
+	if (initialPosition >= 0x0000 && initialPosition <= 0x07FF) {
+		for (int k = 0; k < 4; k++) {
+			uint mirrored_position = initialPosition + (0x0800 * k);
+			for (int j = mirrored_position; i < amountBytes; j++, i++) {
+				memoryBank[j] = content[i];
+			}
+		}
+	}
+	//TODO mirroring $2008-$3FFF
 }
 
-void rmem(unsigned short amountBytes, unsigned int initialPosition, byte *destiny) {
+void rmem(unsigned short amountBytes, uint initialPosition, byte *destiny) {
 	int i = 0;
 	for (int j = initialPosition; i < amountBytes; i++, j++) {
 		destiny[i] = memoryBank[j];
 	}
 }
 
-byte rmem_b(unsigned int address) {
+byte rmem_b(uint address) {
 	byte destiny = 0;
 	rmem(BYTE, address, &destiny);
 	return destiny;
@@ -53,30 +61,30 @@ byte rmem_b(unsigned int address) {
  * Reads two bytes from the starting position and returns it as a memory address.
  * It will do the calculation for you, that's how nice this bad boy is
  */
-word rmem_w(unsigned int address) {
+word rmem_w(uint address) {
 	byte destiny[2] = {0};
 	rmem(WORD, address, destiny);
 	return to_mem_addr(destiny);
 }
 
-void wmem_b(unsigned int address, byte content) {
+void wmem_b(uint address, byte content) {
 	wmem(BYTE, address, &content);
 }
 
-void wmem_w(unsigned int address, word content) {
+void wmem_w(uint address, word content) {
 	byte wordVal[2] = {0};
 	to_mem_bytes(content, wordVal);
 	wmem(WORD, address, wordVal);
 }
 
 byte pop_b() {
-	unsigned int bankPointer = SP + 1 + 0x100; // The stack is between 0x100 and 0x1FF
+	uint bankPointer = SP + 1 + 0x100; // The stack is between 0x100 and 0x1FF
 	SP++;
 	return rmem_b(bankPointer);
 }
 
 word pop_w() {
-	unsigned int bankPointer = SP + 1 + 0x100; // The stack is between 0x100 and 0x1FF
+	uint bankPointer = SP + 1 + 0x100; // The stack is between 0x100 and 0x1FF
 	SP += 2;
 	return rmem_w(bankPointer);
 }
@@ -96,14 +104,14 @@ word peek_w() {
 }
 
 void push_b(byte content) {
-	unsigned int bankPointer = SP + 0x100; // The stack is between 0x100 and 0x1FF
+	uint bankPointer = SP + 0x100; // The stack is between 0x100 and 0x1FF
 	wmem_b(bankPointer, content);
 	SP -= 1;
 }
 
 void push_w(word content) {
 	//TODO. this is wrong, but atm I just want to make it compile
-	unsigned int bankPointer = SP + 0xFF; // 100 - 1 but in hex -> 99 is 0xFF
+	uint bankPointer = SP + 0xFF; // 100 - 1 but in hex -> 99 is 0xFF
 	wmem_w(bankPointer, content);
 	SP -= 2;
 }
@@ -112,7 +120,7 @@ void push_w(word content) {
  * Zeroes the memory, pum, bam, gone, stiff, cold, dead.
  */
 void zeroMemory() {
-	for (unsigned int i = 0; i < MEM_SIZE; i++) {
+	for (uint i = 0; i < MEM_SIZE; i++) {
 		wmem_b(i, 0);
 	}
 }
@@ -125,8 +133,12 @@ void zeroMemory() {
 word indirectx_addr(byte b) {
 	byte memContent[2] = {0};
 	b = (byte) zpagex_addr(b);
-
-	rmem(WORD, b, memContent);
+	if (b == 0xFF) {
+		memContent[0] = rmem_b(b);
+		memContent[1] = rmem_b(0x00);
+	} else {
+		rmem(WORD, b, memContent);
+	}
 
 	return to_mem_addr(memContent);
 }
@@ -134,7 +146,13 @@ word indirectx_addr(byte b) {
 word indirecty_addr(byte b) {
 	byte memContent[2] = {0};
 
-	rmem(WORD, b, memContent);
+	if (b == 0xFF) {
+		memContent[0] = rmem_b(b);
+		memContent[1] = rmem_b(0x00);
+	} else {
+		rmem(WORD, b, memContent);
+	}
+
 	word addr = to_mem_addr(memContent);
 
 	return addr + Y;
@@ -148,7 +166,7 @@ word zpagey_addr(byte b) {
 	return (word) ((Y + b) & 0x00FF);
 }
 
-word zpage_addr(word w) {
+word zpage_addr(word w) { // should it be a byte?
 	return (word) (w & 0x00FF);
 }
 
