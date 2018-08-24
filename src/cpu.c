@@ -600,16 +600,8 @@ void beq() {
 
 void sbc(byte value, int cycles, int pcIncrease) {
 	log_instruction(pcIncrease - 1, "\tSBC #$%02X\t", value);
-	int result = A - value - (!bit_test(P, flagC));
 
-	// If operands same source sign but different result sign
-	int isOverflown = ((A ^ result) & (A ^ value) & 0x80);
-	A = (byte) result;
-
-	bit_val(&P, flagZ, A == 0);
-	bit_val(&P, flagV, isOverflown);
-	bit_val(&P, flagN, bit_test(A, 7));
-	bit_val(&P, flagC, value >= A || value == 0);
+	adc_internal(~value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -987,9 +979,10 @@ void cpy_absolute() {
 ///////////////////////////LSR (Logical Shift Right) REGION///////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void lsr(byte *value, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "LSR #$%02X", value);
 
+void lsr_internal(byte *value);
+
+void lsr_internal(byte *value){
 	bit_val(&P, flagC, bit_test(*value, 0));
 
 	byte shifted = *value >> 1;
@@ -997,6 +990,13 @@ void lsr(byte *value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, shifted == 0);
 	bit_val(&P, flagN, bit_test(shifted, 7));
 	*value = shifted;
+}
+
+
+void lsr(byte *value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "LSR #$%02X", value);
+
+	lsr_internal(value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -1144,14 +1144,19 @@ void ror_absolute_x() {
 //////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////EOR REGION/////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
+void eor_internal(byte value);
 
-void eor(byte value, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "\tEOR $%02X\t\t", value);
-
+void eor_internal(byte value){
 	A ^= value;
 
 	bit_val(&P, flagN, bit_test(A, 7));
 	bit_val(&P, flagZ, A == 0);
+}
+
+void eor(byte value, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tEOR $%02X\t\t", value);
+
+	eor_internal(value);
 
 	PC += pcIncrease;
 	cyclesThisSec += cycles;
@@ -1441,6 +1446,108 @@ void aso_indirect_y(){
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////RLA REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * RLA ROLs the contents of a memory location and then ANDs the result with the accumulator.
+ */
+void rla(word addr, int cycles, int pcIncrease){
+	log_instruction(pcIncrease - 1, "\tRLA $%04X\t", addr);
+
+	byte value = rmem_b(addr);
+
+	byte cachedFlagC = (byte) bit_test(P, flagC);
+	byte cached7 = (byte) bit_test(value, 7);
+
+	bit_val(&P, flagC, cached7);
+	byte shifted = value << 1;
+
+	bit_val(&shifted, 0, cachedFlagC);
+	wmem_b(addr,shifted);
+
+	A &= shifted;
+	bit_val(&P, flagZ, A == 0);
+	bit_val(&P, flagN, bit_test(A, 7));
+
+	cyclesThisSec += cycles;
+	PC += pcIncrease;
+}
+
+void rla_absolute(){
+	rla(absolute_addr(rmem_w(PC + 1)), 6, 3);
+}
+
+void rla_absolute_x(){
+	rla(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void rla_absolute_y(){
+	rla(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void rla_zpage(){
+	rla(zpage_addr(rmem_b(PC + 1)), 5, 2);
+}
+
+void rla_zpage_x(){
+	rla(zpagex_addr(rmem_b(PC + 1)), 6, 2);
+}
+
+void rla_indirect_x(){
+	rla(indirectx_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+void rla_indirect_y(){
+	rla(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////LSE REGION/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void lse(word addr, int cycles, int pcIncrease){
+	log_instruction(pcIncrease - 1, "\tLSE $%04X\t", addr);
+	
+	byte data = rmem_b(addr);
+	lsr_internal(&data);
+	wmem_b(addr, data);
+
+	eor_internal(data);
+
+	PC += pcIncrease;
+	cyclesThisSec += cycles;
+}
+
+void lse_absolute(){
+	lse(absolute_addr(rmem_w(PC + 1)), 6, 3);
+}
+
+void lse_absolute_x(){
+	lse(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void lse_absolute_y(){
+	lse(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+}
+
+void lse_zpage(){
+	lse(zpage_addr(rmem_b(PC + 1)), 5, 2);
+}
+
+void lse_zpage_x(){
+	lse(zpagex_addr(rmem_b(PC + 1)), 6, 2);
+}
+
+void lse_indirect_x(){
+	lse(indirectx_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+void lse_indirect_y(){
+	lse(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////Invalid Opcodes REGION/////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1496,11 +1603,11 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&jsr_absolute,  //$20       JSR $4400     Jump to SubRoutine              3       6
 		&and_indirect_x,//$21       AND ($44, X)  bitwise AND with accumulator    2       6
 		&invalid,
-		&invalid,
+		&rla_indirect_x, //$23      RLA
 		&bit_zpage,     //$24       BIT $44       BIt Test                        2       3
 		&and_zpage,     //$25       AND $44       bitwise AND with accumulator    2       3
 		&rol_zpage,     //$26       ROL $44       Rotate Left                     2       5
-		&invalid,
+		&rla_zpage,     //$27       RLA
 		&plp,           //$28       PLP           PuLl to status                  1       4
 		&and_immediate, //$29       AND #$44      bitwise AND with accumulator    2       2
 		&rol_accumulator,//$2A      ROL $44       Rotate Left                     1       2
@@ -1508,31 +1615,31 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&bit_absolute,  //$2C       BIT $4400     BIt Test                        3       4
 		&and_absolute,  //$2D       AND $4400     bitwise AND with accumulator    3       4
 		&rol_absolute,  //$2E       ROL $44       Rotate Left                     3       6
-		&invalid,
+		&rla_absolute,  //$2F       RLA
 		&bmi,           //$30       BPL           Branch if minus                 2       2(+2)
 		&and_indirect_y,//$31       AND ($44), Y  bitwise AND with accumulator    2       5+
 		&invalid,
-		&invalid,
+		&rla_indirect_y,//$33      RLA
 		&nop2,          //$34       NOP
 		&and_zpage_x,   //$35       AND $44, X    bitwise AND with accumulator    2       4
 		&rol_zpage_x,   //$36       ROL $44       Rotate Left                     2       6
-		&invalid,
+		&rla_zpage_x,   //$37       RLA
 		&sec,           //$38       SEC           Sets Carry flag                 1       2
 		&and_absolute_y,//$39       AND $440&invalid, Y  bitwise AND with accumulator    3       4+
 		&nop1,          //$3A       NOP
-		&invalid,
+		&rla_absolute_y,//$3B       RLA
 		&nop3,          //$3C       NOP
 		&and_absolute_x,//$3D       AND $440&invalid, X  bitwise AND with accumulator    3       4+
 		&rol_absolute_x,//$3E       ROL $44       Rotate Left                     3       7
-		&invalid,
+		&rla_absolute_x,//$3F       RLA
 		&rti,           //$40       RTI           Returns from Interrupt          1       6
 		&eor_indirect_x,//$41       EOR           Exclusive OR                    2       6
 		&invalid,
-		&invalid,
+		&lse_indirect_x,//$43       LSE
 		&nop2,          //$44       NOP
 		&eor_zpage,     //$45       EOR           Exclusive OR                     2       3
 		&lsr_zpage,     //$46       LSR           Logical Shift Right              2       5
-		&invalid,
+		&lse_zpage,     //$47       LSE
 		&pha,           //$48       PHA           PusH Acumulator                  1       3
 		&eor_immediate,  //$49       EOR          Exclusive OR                     2       2
 		&lsr_accumulator,//$4A       LSR          Logical Shift Right              1       2
@@ -1540,23 +1647,23 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&jmp_absolute,  //$4C       JMP           JuMP                              3       3
 		&eor_absolute,  //$4D       EOR           Exclusive OR                      3       4
 		&lsr_absolute,  //$4E       LSR           Logical Shift Right               3       6
-		&invalid,
+		&lse_absolute,  //$4F       LSE
 		&bvc,           //$50       BVC           Branch if Overflow Clear        2       2(+2)
 		&eor_indirect_y,//$51       EOR           Exclusive OR                    2       5
 		&invalid,
-		&invalid,
+		&lse_indirect_y,//$53       LSE
 		&nop2,          //$54       NOP
 		&eor_zpage_x,   //$55       EOR           Exclusive OR                      2       4
 		&lsr_zpage_x,   //$56       LSR           Logical Shift Right               2       6
-		&invalid,
+		&lse_zpage_x,   //$57       LSE
 		&cli,           //$58       CLI           CLear Interrupt flag              1       2,
 		&eor_absolute_y,//$59       EOR           Exclusive OR                      3       4
 		&nop1,          //$5A       NOP
-		&invalid,
+		&lse_absolute_y,//$5B       LSE
 		&nop3,          //$5C       NOP
 		&eor_absolute_x, //$5D       EOR           Exclusive OR                    3       4
 		&lsr_absolute_x, //$5E       LSR           Logical Shift Right             3       7
-		&invalid,
+		&lse_absolute_x,  //$5F       LSE
 		&rts,            //$60      RTS          Returns from Subroutine           1       6
 		&adc_indirect_x, //$61      ADC ($44, X) ADd with Carry                    2       6
 		&invalid,
