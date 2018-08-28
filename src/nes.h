@@ -9,10 +9,10 @@
 #include "apu.h"
 #include <stdio.h>
 
-
-#define SDL_main main
-
 void stopEmulation();
+
+//So that SDL stops complaining
+#undef main
 
 int main();
 

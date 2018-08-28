@@ -10,7 +10,7 @@ void stopEmulation() {
 }
 
 int main() {
-	set_console_log_level(ConsoleDebug);
+	set_console_log_level(ConsoleError);
 	set_file_log_level(FileDebug);
 	set_clear_log_file();
 	set_log_path("../../logs/nesulator.log");
@@ -20,7 +20,7 @@ int main() {
 	//If we need to initialize anything, it should go here
 
 	//Read the ROM, that we're going to execute and all that stuff
-	struct ROM *rom = insertCartridge("../../rom/cpu_dummy_reads.nes");
+	struct ROM *rom = insertCartridge("../../rom/nestest.nes");
 	loadROM(rom);
 	resetPC();
 
