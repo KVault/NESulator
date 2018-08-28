@@ -10,6 +10,7 @@ void stopEmulation() {
 }
 
 int main() {
+	//LOGS
 	set_console_log_level(ConsoleError);
 	set_file_log_level(FileDebug);
 	set_clear_log_file();
@@ -24,6 +25,7 @@ int main() {
 	loadROM(rom);
 	resetPC();
 
+	//SDL Load
 	build_window();
 
 	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
@@ -33,11 +35,15 @@ int main() {
 		ppu_cycle();
 		apu_cycle();
 
+		//SDL stuff. Not related with the actual emulator
+		gui_cycle();
+
 		//TODO At some point we would need to run the cpu and ppu independently. Different frequencies
 	}
 
 	//Cleans up our stuff
 	ejectCartridge();
+	close_window();
 
 	return 0;
 }

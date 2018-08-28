@@ -1,12 +1,10 @@
 #include "mainWindow.h"
+#include "../nes.h"
 
+SDL_Window *window;
+SDL_Event e;
 
 int build_window(){
-
-	//First version. It'll change in the future
-	SDL_Window *window = NULL;
-	SDL_Surface *surface = NULL;
-
 	if(SDL_Init(SDL_INIT_VIDEO) < 0){
 		log_error("SDL could not initialize: %s", SDL_GetError());
 		return 0;
@@ -21,4 +19,16 @@ int build_window(){
 	}
 
 	SDL_UpdateWindowSurface( window );
+}
+
+void gui_cycle(){
+	while(SDL_PollEvent(&e) != 0){
+		if(e.type == SDL_QUIT){
+			stopEmulation();
+		}
+	}
+}
+
+int close_window(){
+	SDL_Quit();
 }
