@@ -24,6 +24,8 @@ int main() {
 	loadROM(rom);
 	resetPC();
 
+	build_window();
+
 	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
 	//control this with a debugger, or an UI. But for now, it simply runs forever
 	while (isRunning) {
