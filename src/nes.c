@@ -5,7 +5,7 @@ int isRunning;
 /**
  * Simply stops the emulation.
  */
-void stopEmulation() {
+int stop_emulation(SDL_Event e){
 	isRunning = 0;
 }
 
@@ -28,6 +28,9 @@ int main() {
 	//SDL Load
 	build_window();
 
+
+	register_events();
+
 	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
 	//control this with a debugger, or an UI. But for now, it simply runs forever
 	while (isRunning) {
@@ -43,7 +46,19 @@ int main() {
 
 	//Cleans up our stuff
 	ejectCartridge();
-	close_window();
+	cleanup_events();
 
 	return 0;
+}
+
+void register_events(){
+	sevent(SDL_QUIT, 0, &stop_emulation);
+	sevent(SDL_QUIT, 0, &on_close_window);
+	sevent(SDL_WINDOWEVENT, SDL_WINDOWEVENT_RESIZED, &on_window_resized_event);
+}
+
+void cleanup_events(){
+	uevent(SDL_QUIT, 0, &stop_emulation);
+	uevent(SDL_QUIT, 0, &on_close_window);
+	uevent(SDL_WINDOWEVENT, SDL_WINDOWEVENT_RESIZED, &on_window_resized_event);
 }

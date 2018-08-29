@@ -9,11 +9,14 @@
 #include "apu.h"
 #include <stdio.h>
 
-void stopEmulation();
+int stop_emulation(SDL_Event);
 
 //So that SDL stops complaining
 #undef main
 
 int main();
+
+void register_events();
+void cleanup_events();
 
 #endif //NESULATOR_NES_H
