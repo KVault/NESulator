@@ -3,6 +3,7 @@
 
 #include "../../lib/SDL2/include/SDL.h"
 #include "../log.h"
+#include "../Utils.h"
 
 #define SCREEN_WIDTH 256
 #define SCREEN_HEIGHT 240
@@ -39,12 +40,12 @@ void gui_cycle();
  * Subscribes to the given event with a function to be called when the event is raised
  * @return 1 if succeeded, something else if didn't
  */
-int sevent(SDL_EventType event,Uint8 event_id, sdl_event_func func);
+int sevent(SDL_EventType event,uint event_id, sdl_event_func func);
 
 /**
  * Unsubscribes from the given event
  * @return 1 if succeeded, something else if didn't
  */
-void uevent(SDL_EventType event,Uint8 event_id, sdl_event_func func);
+void uevent(SDL_EventType event,uint event_id, sdl_event_func func);
 
 #endif //NESULATOR_MAINWINDOW_H

@@ -52,13 +52,13 @@ int main() {
 }
 
 void register_events(){
-	sevent(SDL_QUIT, 0, &stop_emulation);
-	sevent(SDL_QUIT, 0, &on_close_window);
+	sevent(SDL_QUIT, SDL_QUIT, &stop_emulation);
+	sevent(SDL_QUIT, SDL_QUIT, &on_close_window);
 	sevent(SDL_WINDOWEVENT, SDL_WINDOWEVENT_RESIZED, &on_window_resized_event);
 }
 
 void cleanup_events(){
-	uevent(SDL_QUIT, 0, &stop_emulation);
-	uevent(SDL_QUIT, 0, &on_close_window);
+	uevent(SDL_QUIT, SDL_QUIT, &stop_emulation);
+	uevent(SDL_QUIT, SDL_QUIT, &on_close_window);
 	uevent(SDL_WINDOWEVENT, SDL_WINDOWEVENT_RESIZED, &on_window_resized_event);
 }
