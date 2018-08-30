@@ -30,7 +30,7 @@ void power_up(int clockSpeed) {
 	//TODO LFSR stuff
 }
 
-void resetPC() {
+void reset_pc() {
 	PC = rmem_w(0xFFFC);
 }
 

@@ -53,7 +53,7 @@ struct ROM *insertCartridge(char *filePath);
 /**
  * Begins the copy process from the ROM to the RAM. It will also apply any mappings when necessary
  */
-void loadROM(struct ROM *rom);
+void load_ROM(struct ROM *rom);
 
 /**
  * Cleans up the memory from the ROM. Basically it releases the mallocs

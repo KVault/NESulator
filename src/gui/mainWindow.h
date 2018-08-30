@@ -10,10 +10,9 @@
 #define WINDOW_TITLE "NESulator"
 
 /**
- * How many functions can be subscribed to a given event.
+ * Function header for the callbacks. Every function has to match this header to be able to register itself
+ * as a callback.
  */
-#define MAX_FUNC_PER_EVENT 20
-
 typedef int (*sdl_event_func)(SDL_Event event);
 
 /**
@@ -23,11 +22,17 @@ typedef int (*sdl_event_func)(SDL_Event event);
 int build_window();
 
 /**
- * Close and cleanup of all the bits and pieces being used by SDL
- * @return 1 if succeeded, something else if didn't
+ * Called when the user clicks on the X, red button or whatever depending on your OS. Basically que user
+ * wants to quit the app, so it does it.
  */
 int on_close_window(SDL_Event);
 
+/**
+ * Resize the background canvas to fill in the desired size of the window. It will also keep the NES's frame with
+ * the desired aspect ratio and centered.
+ *
+ * This function WILL scale up or down the image
+ */
 int on_window_resized_event(SDL_Event);
 
 /**

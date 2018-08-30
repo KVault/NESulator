@@ -851,7 +851,7 @@ void test_NESTEST() {
 
 	//Read the ROM, that we're going to execute and all that stuff
 	struct ROM *rom = insertCartridge("../../rom/nestest.nes");
-	loadROM(rom);
+	load_ROM(rom);
 
 	int isRunning = 1;
 
