@@ -7,7 +7,8 @@
 #include "ppu.h"
 #include "rom.h"
 #include "apu.h"
-#include <stdio.h>
+#include "stdlib.h"
+#include "stdio.h"
 
 int stop_emulation(SDL_Event);
 
@@ -17,6 +18,6 @@ int stop_emulation(SDL_Event);
 int main();
 
 void register_events();
-void cleanup_events();
+void every_second();
 
 #endif //NESULATOR_NES_H

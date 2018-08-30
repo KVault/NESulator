@@ -1,3 +1,4 @@
+#include <time.h>
 #include "nes.h"
 
 int is_running;
@@ -11,7 +12,7 @@ int stop_emulation(SDL_Event e){
 
 int main() {
 	//LOGS
-	set_console_log_level(ConsoleError);
+	set_console_log_level(ConsoleInfo);
 	set_file_log_level(FileDebug);
 	set_clear_log_file();
 	set_log_path("../../logs/nesulator.log");
@@ -41,6 +42,9 @@ int main() {
 		//SDL stuff. Not related with the actual emulator
 		gui_cycle();
 
+		//TODO change this to accept every how many miliseconds to run. For now, this will do
+		every_second();
+
 		//TODO At some point we would need to run the cpu and ppu independently. Different frequencies
 	}
 
@@ -48,6 +52,20 @@ int main() {
 	ejectCartridge();
 
 	return 0;
+}
+
+void every_second() {
+	static long last_second = 0;
+	static long ctime = 0;
+	ctime = time(NULL);
+
+	//More than one second elapsed
+	if(ctime - last_second > 1){
+		last_second = time(NULL);
+		log_info("Processor speed: %iHz\n", cyclesThisSec);
+		cyclesThisSec = 0;
+	}
+
 }
 
 void register_events(){
