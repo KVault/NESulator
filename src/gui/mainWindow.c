@@ -106,7 +106,7 @@ int on_window_resized_event(SDL_Event e){
 }
 
 int sevent(SDL_EventType event, uint event_id, sdl_event_func func) {
-	//Asign the callback to the first empty position. It does not guarantee the order
+	//Assign the callback to the first empty position. It does not guarantee the order
 	for (int i = 0; i < efunc_size; ++i) {
 		if(event_callbacks[i].callback == NULL){
 			event_callbacks[i].callback = func;
