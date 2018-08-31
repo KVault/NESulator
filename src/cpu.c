@@ -30,7 +30,7 @@ void power_up(int clockSpeed) {
 	//TODO LFSR stuff
 }
 
-void resetPC() {
+void reset_pc() {
 	PC = rmem_w(0xFFFC);
 }
 
@@ -1948,18 +1948,18 @@ word indirect_param() {
 }
 
 void log_instruction(int num_params, const char *mnemonic, ...) {
-	log_info("%02X %02X ", PC, currentOpcode);
+	log_debug("%02X %02X ", PC, currentOpcode);
 	for (uint i = 1; i <= num_params; i++) {
-		log_info("%02X ", rmem_b(PC + i));
+		log_debug("%02X ", rmem_b(PC + i));
 	}
-	log_info("\t");
+	log_debug("\t");
 	if (num_params == 0) {
-		log_info("\t");
+		log_debug("\t");
 	}
 	va_list args;
 	va_start(args, mnemonic);
-	vlog(mnemonic, ConsoleInfo, FileInfo, args);
+	vlog(mnemonic, ConsoleDebug, FileDebug, args);
 	va_end(args);
-	log_info("\t\t\t");
-	log_info("A:%02X X:%02X Y:%02X P:%02X SP:%02X CYC:%d \n", A, X, Y, P, SP, cyclesThisSec);
+	log_debug("\t\t\t");
+	log_debug("A:%02X X:%02X Y:%02X P:%02X SP:%02X CYC:%d \n", A, X, Y, P, SP, cyclesThisSec);
 }

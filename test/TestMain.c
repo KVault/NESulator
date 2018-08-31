@@ -8,7 +8,7 @@
  */
 void testUtils();
 
-int main() {
+int main(int i, char **c) {
 	//Good old utils :3
 	testUtils();
 
