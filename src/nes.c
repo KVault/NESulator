@@ -6,7 +6,7 @@ int is_running;
 /**
  * Simply stops the emulation.
  */
-int stop_emulation(SDL_Event e){
+int stop_emulation(SDL_Event e) {
 	is_running = 0;
 }
 
@@ -27,7 +27,7 @@ int main() {
 	reset_pc();
 
 	//SDL Load
-	build_window();
+	build_window(60);
 
 	//Subscribe to all the events that we care about.
 	register_events();
@@ -60,15 +60,18 @@ void every_second() {
 	ctime = time(NULL);
 
 	//More than one second elapsed
-	if(ctime - last_second > 1){
+	if (ctime - last_second > 1) {
 		last_second = time(NULL);
 		log_info("Processor speed: %iHz\n", cyclesThisSec);
 		cyclesThisSec = 0;
+		log_info("GUI FPS: %i\n", debug_speed);
+		debug_speed = 0;
 	}
+
 
 }
 
-void register_events(){
+void register_events() {
 	sevent(SDL_QUIT, SDL_QUIT, &stop_emulation);
 	sevent(SDL_QUIT, SDL_QUIT, &on_close_window);
 	sevent(SDL_WINDOWEVENT, SDL_WINDOWEVENT_RESIZED, &on_window_resized_event);
