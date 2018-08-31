@@ -6,28 +6,28 @@
  * the results by accessing the array directly. We wouldn't do that usually.
  */
 void testWrite() {
-	zeroMemory();
+	zero_ram();
 
 	//Test one byte write
-	assert(memoryBank[0] == 0);
+	assert(ram_bank[0] == 0);
 	wmem_b(0, 'd');
-	assert(memoryBank[0] == 'd');
+	assert(ram_bank[0] == 'd');
 
-	zeroMemory();
+	zero_ram();
 
 	//Test two byte write on random positions
-	assert(memoryBank[512] == 0);
-	assert(memoryBank[513] == 0);
-	assert(memoryBank[514] == 0);
+	assert(ram_bank[512] == 0);
+	assert(ram_bank[513] == 0);
+	assert(ram_bank[514] == 0);
 	wmem_w(512, 0x6969);
 
-	assert(memoryBank[512] == 0x69);
-	assert(memoryBank[513] == 0x69);
+	assert(ram_bank[512] == 0x69);
+	assert(ram_bank[513] == 0x69);
 
 	//Test the memory write repeat
-	zeroMemory();
-	assert(memoryBank[512] == 0);
-	assert(memoryBank[513] == 0);
+	zero_ram();
+	assert(ram_bank[512] == 0);
+	assert(ram_bank[513] == 0);
 
 	printf("Write memory test passed!\n");
 }
@@ -37,7 +37,7 @@ void testWrite() {
  * We can assume it works fine so we'll use wmem to ease out the writing
  */
 void testRead() {
-	zeroMemory();
+	zero_ram();
 
 	//Test one byte read
 	assert(rmem_b(0) == 0);
@@ -48,7 +48,7 @@ void testRead() {
 
 	//Test three bytes read
 	//Test the empty values
-	zeroMemory();
+	zero_ram();
 	assert(rmem_w(512) == 0x0000);
 	//Fill in the test data
 	wmem_w(512, (word) 0x6942);
@@ -62,13 +62,13 @@ void testRead() {
  */
 void testStack() {
 	power_up(0);
-	zeroMemory();
+	zero_ram();
 	word pushParam = 0x6942;
 
 	push_w(pushParam);
 	assert(SP == 0xFB);
-	assert(memoryBank[0x01FD] == 0x69);
-	assert(memoryBank[0x01FC] == 0x42);
+	assert(ram_bank[0x01FD] == 0x69);
+	assert(ram_bank[0x01FC] == 0x42);
 	assert(peek_w() == 0x6942);
 	assert(SP == 0xFB);
 	assert(pop_w() == 0x6942);
@@ -83,14 +83,14 @@ void testStack() {
 void testIndirectXAddr() {
 	word addr = 0;
 	// First test
-	zeroMemory();
+	zero_ram();
 	wmem_w(112, 0xAC30);
 	X = 100;
 	addr = indirectx_addr(12);
 	assert(addr == 0xAC30);
 
 	// Second test. Example got from here http://www.emulator101.com/6502-addressing-modes.html
-	zeroMemory();
+	zero_ram();
 	wmem_w(126, 0x2074);
 	X = 100;
 	addr = indirectx_addr(26);
@@ -101,7 +101,7 @@ void testIndirectXAddr() {
 
 void testIndirectYAddr() {
 	//First test. Example got from here http://www.emulator101.com/6502-addressing-modes.html
-	zeroMemory();
+	zero_ram();
 	wmem_w(0x86, 0x4028);
 	Y = 0x10;
 	word addr = indirecty_addr(0x86);
@@ -111,7 +111,7 @@ void testIndirectYAddr() {
 
 void testZeroPageAddr() {
 	//First test. http://www.emulator101.com/6502-addressing-modes.html
-	zeroMemory();
+	zero_ram();
 	word addr = 0;
 
 	// zpagex_addr test
@@ -134,21 +134,21 @@ void testZeroPageAddr() {
 
 void testAbsoluteAddr() {
 	//First test. Absolute. I know, silly but necessary
-	zeroMemory();
+	zero_ram();
 	word addr;
 	word param = 0x6969;
 	addr = absolute_addr(param);
 	assert(addr == 0x6969);
 
 	//Second test. Absolute X
-	zeroMemory();
+	zero_ram();
 	word param2 = 0x6959;
 	X = 0x10;
 	addr = absolutex_addr(param2);
 	assert(addr == 0x6969);
 
 	//Third test. Absolute Y
-	zeroMemory();
+	zero_ram();
 	word param3 = 0x6949;
 	Y = 0x20;
 	addr = absolutey_addr(param3);

@@ -3,14 +3,16 @@
 
 #include "nes.h"
 
-#define MEM_SIZE 65536
+#define RAM_MEM_SIZE 65536
+#define VRAM_MEM_SIZE 65536
 
-byte memoryBank[MEM_SIZE];
+byte ram_bank[RAM_MEM_SIZE];
+byte vram_bank[VRAM_MEM_SIZE];
 
 /**
  * Fills in the memory with zeroes. Just so we know what an empty memory looks like instead of garbage
  */
-void zeroMemory();
+void zero_ram();
 
 /**
  * Reads one byte from the specified memory position

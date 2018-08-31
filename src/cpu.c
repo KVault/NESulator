@@ -14,7 +14,7 @@
  *  The first time the LFSR is clocked from the all-0s state, it will shift in a 1.
  */
 void power_up(int clockSpeed) {
-	zeroMemory();
+	zero_ram();
 	A = X = Y = 0;
 	P = 0x24;
 	SP = 0xFD;
