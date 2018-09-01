@@ -2,16 +2,19 @@
 #define NESULATOR_MAINWINDOW_H
 
 #include <time.h>
+#include <math.h>
 #include "../../lib/SDL2/include/SDL.h"
-#include "../log.h"
-#include "../Utils.h"
+#include "../utils/log.h"
+#include "../utils/Utils.h"
 
 #define SCREEN_WIDTH 256
 #define SCREEN_HEIGHT 240
 #define WINDOW_TITLE "NESulator"
 
-// TODO DELETE ME
-int debug_speed;
+/**
+ * Used to keep track of the FPS
+ */
+int gui_fps;
 
 /**
  * Function header for the callbacks. Every function has to match this header to be able to register itself

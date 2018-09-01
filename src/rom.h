@@ -1,7 +1,7 @@
 #ifndef NESULATOR_ROM_H
 #define NESULATOR_ROM_H
 
-#include "Utils.h"
+#include "utils/Utils.h"
 #include <stdio.h>
 
 

@@ -64,8 +64,8 @@ void every_second() {
 		last_second = time(NULL);
 		log_info("Processor speed: %iHz\n", cyclesThisSec);
 		cyclesThisSec = 0;
-		log_info("GUI FPS: %i\n", debug_speed);
-		debug_speed = 0;
+		log_info("GUI FPS: %i\n", gui_fps);
+		gui_fps = 0;
 	}
 
 

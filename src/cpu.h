@@ -2,8 +2,8 @@
 #define NESULATOR_CPU_H
 
 #include "nes.h"
-#include "Utils.h"
-#include "log.h"
+#include "utils/Utils.h"
+#include "utils/log.h"
 
 #define OPCODE_COUNT 256
 
@@ -1035,6 +1035,5 @@ void rra_indirect_y();
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void invalid();
-
 
 #endif //NESULATOR_CPU_H

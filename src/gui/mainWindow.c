@@ -3,13 +3,15 @@
 
 SDL_Window *window;
 SDL_Renderer *renderer;
+SDL_Texture *back_buffer_tex;
 SDL_Event e;
-static int refresh_rate;
+static int refresh_rate;//Normally the GUI refresh rate is measured in FPS, not Hz but we'll assume it's the same
+uint back_buffer[SCREEN_WIDTH][SCREEN_HEIGHT];
 
 /**
  * Size of event_callbacks array. This can be incremented if needed, but for now this number will do
  */
-#define efunc_size 20
+#define efunc_size 10
 
 /**
  * Holds the information to accurately match a callback with an event type and the id within that type
@@ -43,6 +45,8 @@ int build_window(int speed) {
 	}
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	back_buffer_tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888,
+			SDL_TEXTUREACCESS_STATIC, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	//Initialize the struct array to a known value. NULL for the callback and -1 for the events.
 	for (int i = 0; i < efunc_size; ++i) {
@@ -79,16 +83,24 @@ void process_event_callbacks(SDL_Event *pEvent) {
 	}
 }
 
+/**
+ * Determines whether enough time has elapsed since the last call to this function so that the gui should refresh
+ *
+ * @return 0 if it shouldn't, something else otherwise
+ */
 int should_refresh() {
 	static double last_refresh = 0;
 	static double current_time = 0;
-	static double s = 0;
+	static double frame_time = 0;
 	struct timespec ts;
 
-	s = (1.0 / refresh_rate) * 1000;
+	//This comes in seconds, multiply by 1000 to convert it it to milliseconds
+	frame_time = (1.0 / refresh_rate) * 1000;
 	clock_gettime(CLOCK_REALTIME, &ts);
-	current_time = ts.tv_nsec / 2.0e6;
-	if (fabs(current_time - last_refresh) > s) {
+	current_time = ts.tv_nsec / 2.0e6;//ts.tv_nsec comes in nanoseconds. This will convert it to milliseconds as well.
+
+	//Now we're all on the same page, we can compare it
+	if (fabs(current_time - last_refresh) > frame_time) {
 		last_refresh = current_time;
 		return 1;
 	}
@@ -97,19 +109,32 @@ int should_refresh() {
 
 void gui_cycle() {
 	if (!should_refresh()) return;
-	debug_speed++;
+
+	gui_fps++;
 	//Handle the events
 	while (SDL_PollEvent(&e) != 0) {
 		process_event_callbacks(&e);
 	}
 
 	//Redraw the image
+	for (int i = 0; i < SCREEN_WIDTH; ++i) {
+		for (int j = 0; j < SCREEN_HEIGHT; ++j) {
+			back_buffer[i][j] = (unsigned)(i * j);
+		}
+	}
+	SDL_UpdateTexture(back_buffer_tex, NULL, back_buffer, SCREEN_WIDTH* sizeof(uint));
+	SDL_RenderClear(renderer);
+	SDL_RenderCopy(renderer, back_buffer_tex, NULL, NULL);
+	SDL_RenderPresent(renderer);
 
 	//Update the surfaces
 	SDL_UpdateWindowSurface(window);
 }
 
 int on_close_window(SDL_Event e) {
+	SDL_DestroyTexture(back_buffer_tex);
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
 
@@ -117,12 +142,8 @@ int on_close_window(SDL_Event e) {
  * This function WILL scale up or down the image
  */
 int on_window_resized_event(SDL_Event e) {
-	//Just paint it white for now.
 	//TODO resize the canvas (But keep the aspect ratio of the NES's)
 	SDL_RenderSetViewport(renderer, NULL);
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_RenderClear(renderer);
-	SDL_RenderPresent(renderer);
 }
 
 int sevent(SDL_EventType event, uint event_id, sdl_event_func func) {
