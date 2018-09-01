@@ -1,6 +1,8 @@
 #ifndef NESULATOR_PPU_H
 #define NESULATOR_PPU_H
 
+#include "memory.h"
+
 #define PPUCTRL 0x2000
 #define PPUMASK 0x2001
 #define PPUSTATUS 0x2002
@@ -11,9 +13,9 @@
 #define PPUDATA 0x2007
 #define OAMDMA 0x4014
 
-int speed = 0; // the speed of the PPU
-int scanline_ptr = 0; // in which scanline the PPU is currently. From 0 to 261
-int cycle_ptr = 0; // the cycle within the scanline. From 0 to 340
+//int speed = 0; // the speed of the PPU
+//int scanline_ptr = 0; // in which scanline the PPU is currently. From 0 to 261
+//int cycle_ptr = 0; // the cycle within the scanline. From 0 to 340
 
 /**
  * Executes an instruction on the PPU.
