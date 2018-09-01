@@ -17,7 +17,7 @@ int main() {
 	set_clear_log_file();
 	set_log_path("../../logs/nesulator.log");
 
-	power_up(0);
+	cpu_power_up(0);
 	is_running = 1;
 	//If we need to initialize anything, it should go here
 

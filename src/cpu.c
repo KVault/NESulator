@@ -13,7 +13,7 @@
  *  All 15 bits of noise channel LFSR = $0000.
  *  The first time the LFSR is clocked from the all-0s state, it will shift in a 1.
  */
-void power_up(int clockSpeed) {
+void cpu_power_up(int clock_speed) {
 	zero_ram();
 	A = X = Y = 0;
 	P = 0x24;
@@ -24,7 +24,7 @@ void power_up(int clockSpeed) {
 		wmem_b(i, 0);
 	}
 
-	speed = clockSpeed;
+	speed = clock_speed;
 	cyclesThisSec = 0;
 	//TODO IRQ stuff
 	//TODO LFSR stuff

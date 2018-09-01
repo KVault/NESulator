@@ -61,7 +61,7 @@ void testRead() {
  * Tests how the stack works
  */
 void testStack() {
-	power_up(0);
+	cpu_power_up(0);
 	zero_ram();
 	word pushParam = 0x6942;
 
