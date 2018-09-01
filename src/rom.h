@@ -4,6 +4,9 @@
 #include "utils/Utils.h"
 #include <stdio.h>
 
+#include "mappers/NROM.h"
+#include "mappers/CNROM.h"
+
 
 #define PRG_PAGE_SIZE 16384
 #define CHR_PAGE_SIZE 8192
@@ -59,8 +62,5 @@ void load_ROM(struct ROM *rom);
  * Cleans up the memory from the ROM. Basically it releases the mallocs
  */
 void ejectCartridge();
-
-#include "mappers/NROM.h"
-#include "mappers/CNROM.h"
 
 #endif //NESULATOR_ROM_H
