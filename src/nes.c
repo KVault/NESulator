@@ -1,4 +1,3 @@
-#include <time.h>
 #include "nes.h"
 
 int is_running;
@@ -26,8 +25,8 @@ int main() {
 	load_ROM(rom);
 	reset_pc();
 
-	//SDL Load
-	build_window(60);
+	//Start the gui, SDL and all the stuff
+	gui_init();
 
 	//Subscribe to all the events that we care about.
 	register_events();
@@ -42,9 +41,6 @@ int main() {
 		//SDL stuff. Not related with the actual emulator
 		gui_cycle();
 
-		//TODO change this to accept every how many miliseconds to run. For now, this will do
-		every_second();
-
 		//TODO At some point we would need to run the cpu and ppu independently. Different frequencies
 	}
 
@@ -54,6 +50,7 @@ int main() {
 	return 0;
 }
 
+/** Don't really need this right now.
 void every_second() {
 	static long last_second = 0;
 	static long ctime = 0;
@@ -64,12 +61,9 @@ void every_second() {
 		last_second = time(NULL);
 		log_info("Processor speed: %iHz\n", cyclesThisSec);
 		cyclesThisSec = 0;
-		log_info("GUI FPS: %i\n", gui_fps);
-		gui_fps = 0;
 	}
-
-
 }
+*/
 
 void register_events() {
 	sevent(SDL_QUIT, SDL_QUIT, &stop_emulation);

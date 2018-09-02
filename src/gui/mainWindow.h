@@ -1,15 +1,17 @@
 #ifndef NESULATOR_MAINWINDOW_H
 #define NESULATOR_MAINWINDOW_H
 
-#include <time.h>
-#include <math.h>
-#include "../../lib/SDL2/include/SDL.h"
-#include "../utils/log.h"
-#include "../utils/Utils.h"
+#include "gui.h"
 
 #define SCREEN_WIDTH 256
 #define SCREEN_HEIGHT 240
 #define WINDOW_TITLE "NESulator"
+
+struct main_window{
+	SDL_Window *window;
+	SDL_Renderer *renderer;
+	SDL_Texture *back_buffer_tex;
+};
 
 /**
  * Used to keep track of the FPS
@@ -17,16 +19,10 @@
 int gui_fps;
 
 /**
- * Function header for the callbacks. Every function has to match this header to be able to register itself
- * as a callback.
- */
-typedef int (*sdl_event_func)(SDL_Event event);
-
-/**
  * Builds and creates the SDL window what holds the emulator
  * @return 1 if succeeded, something else if didn't
  */
-int build_window(int speed);
+int build_main_window(int speed);
 
 /**
  * Called when the user clicks on the X, red button or whatever depending on your OS. Basically que user
@@ -43,21 +39,8 @@ int on_close_window(SDL_Event);
 int on_window_resized_event(SDL_Event);
 
 /**
- * Handles any event, input or draw call from the gui. This "cycle" isn't dependant on the emulator
- * and it only shares its name for clarity.
+ * Called every gui cycle
  */
-void gui_cycle();
-
-/**
- * Subscribes to the given event with a function to be called when the event is raised
- * @return 1 if succeeded, something else if didn't
- */
-int sevent(SDL_EventType event, uint event_id, sdl_event_func func);
-
-/**
- * Unsubscribes from the given event
- * @return 1 if succeeded, something else if didn't
- */
-void uevent(SDL_EventType event, uint event_id, sdl_event_func func);
+int cycle_main_window();
 
 #endif //NESULATOR_MAINWINDOW_H
