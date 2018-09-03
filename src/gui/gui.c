@@ -1,4 +1,5 @@
 #include "gui.h"
+#include "nametableViewer.h"
 
 /**
  * Size of event_callbacks array. This can be incremented if needed, but for now this number will do
@@ -39,18 +40,18 @@ void process_event_callbacks(SDL_Event *pEvent) {
 	for (int i = 0; i < efunc_size; ++i) {
 
 		//Cache the reference. It looks cleaner
-		struct Event_Callback_Info_Struct ec = event_callbacks[i];
+		struct Event_Callback_Info_Struct *ec = &event_callbacks[i];
 
 		//Sorry :'(
-		if (ec.etype == pEvent->type &&
-		    (ec.eid == pEvent->display.event
-		     || ec.eid == pEvent->window.event
-		     || ec.eid == pEvent->button.button
-		     || ec.eid == pEvent->common.type
-		     || ec.eid == pEvent->quit.type
-		     || ec.eid == pEvent->key.keysym.sym
-		     || ec.eid == pEvent->user.code)) {
-			ec.callback(*pEvent); //And all of that for this little thing. Where the magic happens
+		if (ec->etype == pEvent->type &&
+		    (ec->eid == pEvent->display.event
+		     || ec->eid == pEvent->window.event
+		     || ec->eid == pEvent->button.button
+		     || ec->eid == pEvent->common.type
+		     || ec->eid == pEvent->quit.type
+		     || ec->eid == pEvent->key.keysym.sym
+		     || ec->eid == pEvent->user.code)) {
+			ec->callback(*pEvent); //And all of that for this little thing. Where the magic happens
 		}
 	}
 }
@@ -103,7 +104,7 @@ void uevent(SDL_EventType event, uint event_id, sdl_event_func func) {
 
 int gui_init(){
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		log_error("SDL comuld not initialize: %s", SDL_GetError());
+		log_error("SDL could not initialize: %s", SDL_GetError());
 		return 0;
 	}
 
@@ -115,7 +116,23 @@ int gui_init(){
 		event_callbacks[i].etype = -1;
 	}
 
+	//Now Build all the windows
 	build_main_window(60);
+	build_nametable_viewer(20);
+}
+
+double has_time_elapsed(double last_refresh, double time){
+	static struct timespec ts;
+	static double current_time = 0;
+
+	clock_gettime(CLOCK_REALTIME, &ts);
+	current_time = ts.tv_nsec / 2.0e6;//ts.tv_nsec comes in nanoseconds. This will convert it to milliseconds as well.
+
+	//Now we're all on the same page, we can compare it
+	if (fabs(current_time - last_refresh) > time) {
+		return current_time;
+	}
+	return 0;
 }
 
 void gui_cycle() {

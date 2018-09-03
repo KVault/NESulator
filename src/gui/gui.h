@@ -8,6 +8,8 @@
 #include "../utils/Utils.h"
 #include "mainWindow.h"
 
+#define MILLISECOND 1000.0
+
 /**
  * Function header for the callbacks. Every function has to match this header to be able to register itself
  * as a callback.
@@ -45,6 +47,13 @@ void uevent(SDL_EventType event, uint event_id, sdl_event_func func);
  * @return
  */
 int register_window_cycle(gui_window_cycle cycle_func);
+
+/**
+ * Determines whether enough time has elapsed since the last call to this function so that the gui should refresh
+ *
+ * @return 0 if it hasn't, the timestamp (in milliseconds) if it has
+ */
+double has_time_elapsed(double last_check, double time);
 
 /**
  * Init SDL and every window. It doesn't mean they'll be visible or active or doing something. That's down to

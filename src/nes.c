@@ -67,6 +67,4 @@ void every_second() {
 
 void register_events() {
 	sevent(SDL_QUIT, SDL_QUIT, &stop_emulation);
-	sevent(SDL_QUIT, SDL_QUIT, &on_close_window);
-	sevent(SDL_WINDOWEVENT, SDL_WINDOWEVENT_RESIZED, &on_window_resized_event);
 }
