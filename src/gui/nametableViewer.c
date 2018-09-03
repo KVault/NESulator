@@ -43,7 +43,7 @@ int cycle_nametable_viewer() {
 	if((time_aux = has_time_elapsed(last_check, refresh_time))){
 		last_check = time_aux;
 
-		//SDL_UpdateTexture(nametable_window.back_buffer_tex, NULL, &vram_bank[0], NAMETABLE_WINDOW_WIDTH * sizeof(uint));
+		SDL_UpdateTexture(nametable_window.back_buffer_tex, NULL, &vram_bank[0], NAMETABLE_WINDOW_WIDTH);
 		SDL_RenderClear(nametable_window.renderer);
 		SDL_RenderCopy(nametable_window.renderer, nametable_window.back_buffer_tex, NULL, NULL);
 		SDL_RenderPresent(nametable_window.renderer);

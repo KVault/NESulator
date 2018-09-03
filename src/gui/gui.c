@@ -50,7 +50,8 @@ void process_event_callbacks(SDL_Event *pEvent) {
 		     || ec->eid == pEvent->common.type
 		     || ec->eid == pEvent->quit.type
 		     || ec->eid == pEvent->key.keysym.sym
-		     || ec->eid == pEvent->user.code)) {
+		     || ec->eid == pEvent->user.code
+		     || ec->eid == pEvent->common.type)) {
 			ec->callback(*pEvent); //And all of that for this little thing. Where the magic happens
 		}
 	}

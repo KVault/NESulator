@@ -16,4 +16,9 @@ void mapper0(struct ROM *rom) {
 		wmem_b(second_rom_page + i, rom->prgROM[i + mirror_starting_point]);
 	}
 	// TODO CHR stuff goes here
+
+	//TODO Debug stuff. Delete
+	for(word j = 0; j < CHR_PAGE_SIZE; j++){
+		wmem_b_vram(j, rom->chrROM[j]);
+	}
 }

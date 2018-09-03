@@ -145,6 +145,29 @@ void wmem_w(uint address, word content) {
 	wmem_r(WORD, address, wordVal);
 }
 
+byte rmem_b_vram(uint address){
+	byte destiny = 0;
+	rmem_vram(BYTE, address, &destiny);
+	return destiny;
+}
+
+word rmem_w_vram(uint start_address){
+	byte destiny[2] = {0};
+	rmem_vram(WORD, start_address, destiny);
+	return to_mem_addr(destiny);
+}
+
+void wmem_b_vram(uint address, byte content){
+	wmem_vram(BYTE, address, &content);
+}
+
+void wmem_w_vram(uint start_address, word content){
+	byte wordVal[2] = {0};
+	to_mem_bytes(content, wordVal);
+	wmem_vram(WORD, start_address, wordVal);
+}
+
+
 byte pop_b() {
 	uint bankPointer = SP + 1 + 0x100; // The stack is between 0x100 and 0x1FF
 	SP++;
