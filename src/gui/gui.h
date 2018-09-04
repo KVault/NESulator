@@ -23,6 +23,12 @@ typedef int (*sdl_event_func)(SDL_Event event);
 typedef int (*gui_window_cycle)();
 
 /**
+ * This is a bit messy function, but it needs to happen somewhere. Basically search in the event_callbacks array
+ * for the one (if any) that matches the raised event. if found then call the function within it.
+ */
+void process_event_callbacks(SDL_Event *pEvent);
+
+/**
  * Handles any event, input or draw call from the gui. This "cycle" isn't dependant on the emulator
  * and it only shares its name for clarity.
  *

@@ -14,9 +14,10 @@ int main() {
 	set_console_log_level(ConsoleInfo);
 	set_file_log_level(FileDebug);
 	set_clear_log_file();
-	set_log_path("../../logs/nesulator.log");
+	set_log_path("../../logs/donkey_kong.log");
 
 	cpu_power_up(0);
+	ppu_power_up(0);//TODO this powerup has to wait those 20k cycles
 	is_running = 1;
 	//If we need to initialize anything, it should go here
 

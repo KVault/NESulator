@@ -40,6 +40,12 @@ int on_quit_main_window(SDL_Event e) {
 		SDL_DestroyRenderer(main_window.renderer);
 		SDL_DestroyWindow(main_window.window);
 
+		//Manually raise a QUIT event
+		e.type = SDL_QUIT;
+		e.quit.type = SDL_QUIT;
+		SDL_PushEvent(&e);
+
+		process_event_callbacks(&e);
 		SDL_Quit();
 	}
 }

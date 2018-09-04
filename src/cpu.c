@@ -734,34 +734,34 @@ void lda_inmediate() {
 }
 
 void lda_zpage() {
-	load_register(&A, zpage_param(), 3, 2, "\tLDA #$%02X\t");
+	load_register(&A, zpage_param(), 3, 2, "LDA #$%02X\t");
 }
 
 void lda_zpage_x() {
-	load_register(&A, zpagex_param(), 4, 2, "\tLDA #$%02X\t");
+	load_register(&A, zpagex_param(), 4, 2, "LDA #$%02X\t");
 }
 
 void lda_absolute() {
-	load_register(&A, absolute_param(), 4, 3, "\tLDA #$%02X\t");
+	load_register(&A, absolute_param(), 4, 3, "LDA #$%02X\t");
 }
 
 void lda_absolute_x() {
 	word addr = absolutex_addr(rmem_w(PC + 1));
-	load_register(&A, rmem_b(addr), 4, 3, "\tLDA #$%02X\t");
+	load_register(&A, rmem_b(addr), 4, 3, "LDA #$%02X\t");
 	// TODO +1 if page crossed
 }
 
 void lda_absolute_y() {
-	load_register(&A, absolutey_param(), 4, 3, "\tLDA #$%02X\t");
+	load_register(&A, absolutey_param(), 4, 3, "LDA #$%02X\t");
 	// TODO +1 if page crossed
 }
 
 void lda_indirect_x() {
-	load_register(&A, indirectx_param(), 6, 2, "\tLDA #$%02X\t");
+	load_register(&A, indirectx_param(), 6, 2, "LDA #$%02X\t");
 }
 
 void lda_indirect_y() {
-	load_register(&A, indirecty_param(), 5, 2, "\tLDA #$%02X\t");
+	load_register(&A, indirecty_param(), 5, 2, "LDA #$%02X\t");
 	// TODO +1 if page crossed
 }
 
@@ -824,27 +824,27 @@ void store_register(byte reg, word memAddr, int cycles, int pcIncrease, const ch
 }
 
 void sta_zpage() {
-	store_register(A, zpage_addr(rmem_b(PC + 1)), 3, 2, "\tSTA $%02X = %02X");
+	store_register(A, zpage_addr(rmem_b(PC + 1)), 3, 2, "STA $%02X = %02X");
 }
 
 void sta_zpage_x() {
-	store_register(A, zpagex_addr(rmem_b(PC + 1)), 4, 2, "\tSTA $%02X = %02X");
+	store_register(A, zpagex_addr(rmem_b(PC + 1)), 4, 2, "STA $%02X = %02X");
 }
 
 void sta_absolute() {
-	store_register(A, absolute_addr(rmem_w(PC + 1)), 4, 3, "\tSTA $%02X = %02X");
+	store_register(A, absolute_addr(rmem_w(PC + 1)), 4, 3, "STA $%02X = %02X");
 }
 
 void sta_absolute_x() {
-	store_register(A, absolutex_addr(rmem_w(PC + 1)), 5, 3, "\tSTA $%02X = %02X");
+	store_register(A, absolutex_addr(rmem_w(PC + 1)), 5, 3, "STA $%02X = %02X");
 }
 
 void sta_absolute_y() {
-	store_register(A, absolutey_addr(rmem_w(PC + 1)), 5, 3, "\tSTA $%02X = %02X");
+	store_register(A, absolutey_addr(rmem_w(PC + 1)), 5, 3, "STA $%02X = %02X");
 }
 
 void sta_indirect_x() {
-	store_register(A, indirectx_addr(rmem_b(PC + 1)), 6, 2, "\tSTA $%02X = %02X");
+	store_register(A, indirectx_addr(rmem_b(PC + 1)), 6, 2, "STA $%02X = %02X");
 }
 
 void sta_indirect_y() {
