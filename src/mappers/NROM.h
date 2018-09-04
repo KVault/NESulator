@@ -3,6 +3,7 @@
 
 #include "../rom.h"
 
+struct ROM;
 void mapper0(struct ROM *rom);
 
 #endif //NESULATOR_NROM_H
