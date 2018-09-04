@@ -1,4 +1,6 @@
 #include "nametableViewer.h"
+#include "patterntableViewer.h"
+
 
 struct nametable_viewer_window nametable_window;
 
@@ -53,3 +55,4 @@ int cycle_nametable_viewer() {
 	}
 	return 0;
 }
+

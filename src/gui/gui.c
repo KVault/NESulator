@@ -1,5 +1,6 @@
 #include "gui.h"
 #include "nametableViewer.h"
+#include "patterntableViewer.h"
 
 /**
  * Size of event_callbacks array. This can be incremented if needed, but for now this number will do
@@ -30,6 +31,7 @@ struct Event_Callback_Info_Struct {
  *Array of fixed size. It could be done better, but for this many items, it doesn't matter
  */
 struct Event_Callback_Info_Struct event_callbacks[efunc_size];
+
 void process_event_callbacks(SDL_Event *pEvent);
 
 /**
@@ -76,9 +78,9 @@ int sevent(SDL_EventType event, uint event_id, sdl_event_func func) {
 	return 1;//Means error
 }
 
-int register_window_cycle(gui_window_cycle cycle_func){
+int register_window_cycle(gui_window_cycle cycle_func) {
 	for (int i = 0; i < GUI_WINDOW_COUNT; ++i) {
-		if(window_cycles[i] == NULL){
+		if (window_cycles[i] == NULL) {
 			window_cycles[i] = *cycle_func;
 			return 1;
 		}
@@ -103,7 +105,7 @@ void uevent(SDL_EventType event, uint event_id, sdl_event_func func) {
 	log_error("The function given for the EventType: %i and the EventID: %i couldn't be found.\n", event, event_id);
 }
 
-int gui_init(){
+int gui_init() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		log_error("SDL could not initialize: %s", SDL_GetError());
 		return 0;
@@ -120,9 +122,10 @@ int gui_init(){
 	//Now Build all the windows
 	build_main_window(60);
 	build_nametable_viewer(20);
+	build_patterntable_viewer(20);
 }
 
-double has_time_elapsed(double last_refresh, double time){
+double has_time_elapsed(double last_refresh, double time) {
 	static struct timespec ts;
 	static double current_time = 0;
 
@@ -147,7 +150,7 @@ void gui_cycle() {
 	 * or if the window is visible or not, this function does not care about that. It's not its job.
 	 */
 	for (int i = 0; i < GUI_WINDOW_COUNT; ++i) {
-		if(window_cycles[i]!= NULL){
+		if (window_cycles[i] != NULL) {
 			window_cycles[i]();
 		}
 	}
