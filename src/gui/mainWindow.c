@@ -26,7 +26,7 @@ int build_main_window(int speed) {
 
 	main_window.renderer = SDL_CreateRenderer(main_window.window, -1, SDL_RENDERER_ACCELERATED);
 	main_window.back_buffer_tex = SDL_CreateTexture(main_window.renderer, SDL_PIXELFORMAT_ARGB8888,
-			SDL_TEXTUREACCESS_STATIC, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
+	                                                SDL_TEXTUREACCESS_STATIC, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
 
 	//Register to the main gui cycle loop
 	register_window_cycle(&cycle_main_window);

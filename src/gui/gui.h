@@ -7,6 +7,8 @@
 #include "../utils/log.h"
 #include "../utils/Utils.h"
 #include "mainWindow.h"
+#include "nametableViewer.h"
+#include "patterntableViewer.h"
 
 #define MILLISECOND 1000.0
 

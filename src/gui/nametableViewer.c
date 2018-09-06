@@ -1,6 +1,4 @@
 #include "nametableViewer.h"
-#include "patterntableViewer.h"
-
 
 struct nametable_viewer_window nametable_window;
 
@@ -38,7 +36,6 @@ int on_quit_nametable_viewer_window(SDL_Event e) {
 	return 0;
 }
 
-
 int cycle_nametable_viewer() {
 	static double last_check = 0;
 	double time_aux = 0;
@@ -55,4 +52,3 @@ int cycle_nametable_viewer() {
 	}
 	return 0;
 }
-
