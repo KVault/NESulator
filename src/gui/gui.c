@@ -118,9 +118,9 @@ int gui_init() {
 	}
 
 	//Now Build all the windows
-	build_main_window(60);
-	build_nametable_viewer(20);
-	build_patterntable_viewer(10);
+	//build_main_window(60);
+	//build_nametable_viewer(20);
+	build_patterntable_viewer(60);
 }
 
 double has_time_elapsed(double last_refresh, double time) {
