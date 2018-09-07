@@ -2,9 +2,18 @@
 #define NESULATOR_PPU_UTILS_H
 
 #include "colour_palette.h"
-#include <malloc.h>
 
-struct tile{
+#ifdef _WIN32
+# ifndef __clang__
+#  include <malloc.h>
+# endif
+# else
+
+#  include <stdlib.h>
+
+#endif
+
+struct tile {
 	/**
 	 * matrix of numbers from 0 to 3. Defines the shape of the tile
 	 */
