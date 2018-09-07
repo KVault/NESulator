@@ -2,12 +2,11 @@
 #define NESULATOR_PPU_UTILS_H
 
 #include "colour_palette.h"
+#include <stdlib.h>
 
 #define TILE_ROW_SIZE 8
 #define TILE_COLUMN_SIZE 8
 #define TILES_PER_TABLE 0xFF
-
-# include <stdlib.h>
 
 struct tile {
 	/**
