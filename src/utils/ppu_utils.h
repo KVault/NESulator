@@ -12,7 +12,7 @@ struct tile {
 	/**
 	 * matrix of numbers from 0 to 3. Defines the shape of the tile
 	 */
-	byte pattern[8][8];
+	byte pattern[TILE_ROW_SIZE][TILE_COLUMN_SIZE];
 };
 
 /**
