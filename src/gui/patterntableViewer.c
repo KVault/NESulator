@@ -48,23 +48,25 @@ int cycle_patterntable_viewer() {
 	static double last_check;
 	static struct tile *tiles;
 	double time_aux = 0;
+
+	//Only allocate it the first time
 	if(tiles == NULL){
-		tiles = calloc(0x100, sizeof(struct tile));
+		tiles = calloc(TILES_PER_TABLE + 1, sizeof(struct tile));
 	}
 
 	if((time_aux = has_time_elapsed(last_check, refresh_time))) {
 		last_check = time_aux;
 
-		encode_as_tiles(vram_bank, 0xFF, tiles);
+		encode_as_tiles(vram_bank, TILES_PER_TABLE-1, tiles);
 
 		//IS THIS MAGIC? WTF is this shit
-		for (byte i = 0; i < 0xFF; ++i) {
-			for (int j = 0; j < 8; ++j) {
-				for (int k = 0; k < 8; ++k) {
-					byte columnIndex = (byte)(i & 0x0F);
-					byte rowIndex = i >> 4;
+		for (byte i = 0; i < TILES_PER_TABLE; ++i) {
+			for (int j = 0; j < TILE_ROW_SIZE; ++j) {
+				for (int k = 0; k < TILE_COLUMN_SIZE; ++k) {
+					int columnIndex = ((i & 0x0F) * TILE_COLUMN_SIZE) + k;
+					int rowIndex = ((i >> 4) * TILE_ROW_SIZE) + j;
 					if(tiles[i].pattern[j][k] != 0){
-						back_buffer[(abs((rowIndex * 8) + j)-8)][(columnIndex* 8)+ k] = 255;//COLOUR_PALETTE[patterns[i].pattern[j][k] + 0x05];
+						back_buffer[rowIndex][columnIndex] = 255;//COLOUR_PALETTE[patterns[i].pattern[j][k] + 0x05];
 					}
 				}
 			}

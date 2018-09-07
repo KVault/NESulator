@@ -4,6 +4,10 @@
 #include "colour_palette.h"
 #include <malloc.h>
 
+#define TILE_ROW_SIZE 8
+#define TILE_COLUMN_SIZE 8
+#define TILES_PER_TABLE 0xFF
+
 struct tile{
 	/**
 	 * matrix of numbers from 0 to 3. Defines the shape of the tile
