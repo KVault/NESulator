@@ -2,8 +2,8 @@
 
 struct patterntable_viewer_window patterntable_window;
 double refresh_time;
-uint back_buffer_left[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
-uint back_buffer_right[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
+pixel back_buffer_left[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
+pixel back_buffer_right[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
 
 int build_patterntable_viewer(int refresh_rate) {
 	refresh_time = (1.0 / refresh_rate) * MILLISECOND;
@@ -17,8 +17,8 @@ int build_patterntable_viewer(int refresh_rate) {
 	}
 
 	patterntable_window.renderer = SDL_CreateRenderer(patterntable_window.window, -1, SDL_RENDERER_ACCELERATED);
-
-	patterntable_window.left = SDL_CreateTexture(patterntable_window.renderer, SDL_PIXELFORMAT_RGB888,
+	
+	patterntable_window.left = SDL_CreateTexture(patterntable_window.renderer, 3,
 	                                             SDL_TEXTUREACCESS_STATIC, PATTERNTABLE_TEXTURE_WIDTH,
 	                                             PATTERNTABLE_TEXTURE_HEIGHT);
 
@@ -37,8 +37,8 @@ int build_patterntable_viewer(int refresh_rate) {
 	patterntable_window.right_rect.w = PATTERNTABLE_WINDOW_WIDTH / 2;
 
 
-	memset(back_buffer_left, 0, PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT * sizeof(uint));
-	memset(back_buffer_right, 0, PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT * sizeof(uint));
+	memset(back_buffer_left, 0, PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT * sizeof(pixel));
+	memset(back_buffer_right, 0, PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT * sizeof(pixel));
 	register_window_cycle(&cycle_patterntable_viewer);
 
 	sevent(SDL_WINDOWEVENT, SDL_WINDOWEVENT_CLOSE, &on_quit_patterntable_viewer_window);
@@ -62,14 +62,15 @@ int on_quit_patterntable_viewer_window(SDL_Event e) {
 	return 0;
 }
 
-void render_tiles(struct tile *tiles, uint *back_buffer) {
+void render_tiles(struct tile *tiles, pixel *back_buffer) {
 	for (byte i = 0; i < TILES_PER_TABLE; ++i) {
 		for (int j = 0; j < TILE_ROW_SIZE; ++j) {
 			for (int k = 0; k < TILE_COLUMN_SIZE; ++k) {
 				int columnIndex = ((i & 0x0F) * TILE_COLUMN_SIZE) + k;
 				int rowIndex = ((i >> 4) * TILE_ROW_SIZE) + j;
 				if (tiles[i].pattern[j][k] != 0) {
-					back_buffer[PATTERNTABLE_TEXTURE_HEIGHT * rowIndex + columnIndex] = 255;
+					back_buffer[PATTERNTABLE_TEXTURE_HEIGHT * rowIndex +
+					            columnIndex] = COLOUR_PALETTE[tiles[i].pattern[j][k]];
 				}
 			}
 		}

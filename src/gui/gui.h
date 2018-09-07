@@ -70,4 +70,6 @@ double has_time_elapsed(double last_check, double time);
  */
 int gui_init();
 
+Uint32 set_pixel(SDL_Window *window, byte *colour_palette_component);
+
 #endif //NESULATOR_GUI_H

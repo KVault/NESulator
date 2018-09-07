@@ -155,3 +155,15 @@ void gui_cycle() {
 
 
 }
+
+Uint32 set_pixel(SDL_Window *window, byte *colour_palette_component) {
+	struct SDL_PixelFormat pixel_format = {
+		SDL_PIXELFORMAT_RGB888,
+		NULL,
+		24,
+		3,
+	};
+	return SDL_MapRGB(&pixel_format, colour_palette_component[0],
+	                  colour_palette_component[1],
+	                  colour_palette_component[2]);
+}
