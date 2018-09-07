@@ -5,7 +5,7 @@
 #include "../utils/ppu_utils.h"
 #include "../memory.h"
 
-#define PATTERNTABLE_WINDOW_WIDTH 512
+#define PATTERNTABLE_WINDOW_WIDTH 1024
 #define PATTERNTABLE_WINDOW_HEIGHT 512
 #define PATTERNTABLE_TEXTURE_WIDTH 128
 #define PATTERNTABLE_TEXTURE_HEIGHT 128
@@ -14,7 +14,10 @@
 struct patterntable_viewer_window {
 	SDL_Window *window;
 	SDL_Renderer *renderer;
-	SDL_Texture *back_buffer_tex;
+	SDL_Texture *left;
+	SDL_Texture *right;
+	SDL_Rect left_rect;
+	SDL_Rect right_rect;
 	int refresh_rate;
 };
 
