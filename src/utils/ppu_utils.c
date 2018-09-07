@@ -4,11 +4,7 @@
 
 
 void encode_as_tiles(byte *mem_addr, byte number_tiles, struct tile *tiles) {
-	byte tile_count = 0;
-	//Allocate the memory needed to fit in the list of tiles.
-
-	for (int i = 0; tile_count < number_tiles; i+=16, ++tile_count) { //Each tile is defined by 16 bytes
-
+	for (int i, tile_count = i = 0; tile_count < number_tiles; i+=16, ++tile_count) { //Each tile is defined by 16 bytes
 		for (int j = 0; j < 8; ++j) { //And each byte defines a row of pixels with a value from 0 to 3
 			for (byte k = 0; k < 8; ++k) {
 				//Get the bit j from the current iteration and 8 positions ahead. Then add those two bits so that

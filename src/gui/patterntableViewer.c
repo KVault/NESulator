@@ -49,7 +49,7 @@ int cycle_patterntable_viewer() {
 	static struct tile *tiles;
 	double time_aux = 0;
 	if(tiles == NULL){
-		tiles = calloc(0xFF, sizeof(struct tile));
+		tiles = calloc(0x100, sizeof(struct tile));
 	}
 
 	if((time_aux = has_time_elapsed(last_check, refresh_time))) {

@@ -51,21 +51,6 @@ int main() {
 	return 0;
 }
 
-/** Don't really need this right now.
-void every_second() {
-	static long last_second = 0;
-	static long ctime = 0;
-	ctime = time(NULL);
-
-	//More than one second elapsed
-	if (ctime - last_second > 1) {
-		last_second = time(NULL);
-		log_info("Processor speed: %iHz\n", cyclesThisSec);
-		cyclesThisSec = 0;
-	}
-}
-*/
-
 void register_events() {
 	sevent(SDL_QUIT, SDL_QUIT, &stop_emulation);
 }
