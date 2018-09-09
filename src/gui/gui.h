@@ -9,6 +9,7 @@
 #include "mainWindow.h"
 #include "nametableViewer.h"
 #include "patterntableViewer.h"
+#include "../utils/colour_palette.h"
 
 #define MILLISECOND 1000.0
 
@@ -70,6 +71,6 @@ double has_time_elapsed(double last_check, double time);
  */
 int gui_init();
 
-Uint32 set_pixel(SDL_Window *window, const struct pixel *pixel);
+Uint32 set_pixel(SDL_Window *window, const struct pixel pixel);
 
 #endif //NESULATOR_GUI_H

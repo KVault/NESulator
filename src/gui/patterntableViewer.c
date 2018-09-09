@@ -69,8 +69,10 @@ void render_tiles(struct tile *tiles, uint *back_buffer) {
 				int columnIndex = ((i & 0x0F) * TILE_COLUMN_SIZE) + k;
 				int rowIndex = ((i >> 4) * TILE_ROW_SIZE) + j;
 				if (tiles[i].pattern[j][k] != 0) {
+
+					//TODO remove that magic number. For debug only
 					back_buffer[PATTERNTABLE_TEXTURE_HEIGHT * rowIndex + columnIndex]
-					= set_pixel(patterntable_window.window, &COLOUR_PALETTE[tiles[i].pattern[j+5][k+5]]);
+					= set_pixel(patterntable_window.window, COLOUR_PALETTE[tiles[i].pattern[j][k] + 15]);
 				}
 			}
 		}
