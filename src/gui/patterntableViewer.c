@@ -2,8 +2,9 @@
 
 struct patterntable_viewer_window patterntable_window;
 double refresh_time;
-uint back_buffer_left[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
 uint back_buffer_right[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
+uint back_buffer_left [PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
+
 
 int build_patterntable_viewer(int refresh_rate) {
 	refresh_time = (1.0 / refresh_rate) * MILLISECOND;
@@ -49,7 +50,6 @@ int on_quit_patterntable_viewer_window(SDL_Event e) {
 		SDL_DestroyTexture(patterntable_window.left);
 		SDL_DestroyTexture(patterntable_window.right);
 		SDL_DestroyRenderer(patterntable_window.renderer);
-		SDL_DestroyWindow(patterntable_window.window);
 
 		//Manually raise a QUIT event
 		e.type = SDL_QUIT;
@@ -57,6 +57,8 @@ int on_quit_patterntable_viewer_window(SDL_Event e) {
 		SDL_PushEvent(&e);
 
 		process_event_callbacks(&e);
+
+		SDL_DestroyWindow(patterntable_window.window);
 		SDL_Quit();
 	}
 	return 0;
@@ -96,8 +98,8 @@ int cycle_patterntable_viewer() {
 	if ((time_aux = has_time_elapsed(last_check, refresh_time))) {
 		last_check = time_aux;
 
-		encode_as_tiles(vram_bank, TILES_PER_TABLE, left_tiles);
-		encode_as_tiles(vram_bank + 0x1000, TILES_PER_TABLE, right_tiles);
+		encode_as_tiles(&PPU_PATTERN_LEFT, TILES_PER_TABLE, left_tiles);
+		encode_as_tiles(&PPU_PATTERN_RIGHT, TILES_PER_TABLE, right_tiles);
 		render_tiles(left_tiles, back_buffer_left);
 		render_tiles(right_tiles, back_buffer_right);
 

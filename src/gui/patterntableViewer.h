@@ -3,7 +3,6 @@
 
 #include "gui.h"
 #include "../utils/ppu_utils.h"
-#include "../memory.h"
 
 #define PATTERNTABLE_WINDOW_WIDTH 1024
 #define PATTERNTABLE_WINDOW_HEIGHT 512

@@ -3,10 +3,14 @@
 
 #include "colour_palette.h"
 #include <stdlib.h>
+#include "../memory.h"
 
 #define TILE_ROW_SIZE 8
 #define TILE_COLUMN_SIZE 8
 #define TILES_PER_TABLE 0xFF
+#define PPU_PATTERN_LEFT vram_bank[0x0000]
+#define PPU_PATTERN_RIGHT vram_bank[0x1000]
+
 
 struct tile {
 	/**
