@@ -17,7 +17,7 @@ struct patterntable_viewer_window {
 	SDL_Texture *right;
 	SDL_Rect left_rect;
 	SDL_Rect right_rect;
-	int refresh_rate;
+	double refresh_time; //In ms
 };
 
 int build_patterntable_viewer(int refresh_rate);

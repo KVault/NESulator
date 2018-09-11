@@ -58,6 +58,11 @@ void uevent(SDL_EventType event, uint event_id, sdl_event_func func);
 int register_window_cycle(gui_window_cycle cycle_func);
 
 /**
+ * Removes a window from the main gui cycle loop
+ */
+int unregister_window_cycle(gui_window_cycle cycle_func);
+
+/**
  * Determines whether enough time has elapsed since the last call to this function so that the gui should refresh
  *
  * @return 0 if it hasn't, the timestamp (in milliseconds) if it has

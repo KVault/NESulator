@@ -26,4 +26,12 @@ struct tile {
  */
 void encode_as_tiles(byte *mem_addr, byte number_tiles, struct tile *tiles);
 
+/**
+ * Gets a tile ID and returns a pointer to the first byte of that tile.
+ * Note: To determine whether the tile comes from the left or the right PPUCTRL flag is used
+ * @param tile_id
+ * @return a pointer to the first byte
+ */
+byte *tile_addr(byte tile_id);
+
 #endif //NESULATOR_PPU_UTILS_H

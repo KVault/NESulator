@@ -86,6 +86,16 @@ int register_window_cycle(gui_window_cycle cycle_func) {
 	return 0;
 }
 
+int unregister_window_cycle(gui_window_cycle cycle_func){
+	for (int i = 0; i < GUI_WINDOW_COUNT; ++i) {
+		if (window_cycles[i] == cycle_func) {
+			window_cycles[i] = NULL;
+			//return 1;
+		}
+	}
+	return 0;
+}
+
 void uevent(SDL_EventType event, uint event_id, sdl_event_func func) {
 	//Search for the subscribed event and if found, NULL the callback.
 	for (int i = 0; i < efunc_size; ++i) {
@@ -118,9 +128,9 @@ int gui_init() {
 	}
 
 	//Now Build all the windows
-	//build_main_window(60);
-	//build_nametable_viewer(20);
-	build_patterntable_viewer(10);
+	build_main_window(60);
+	build_nametable_viewer(20);
+	build_patterntable_viewer(5);
 }
 
 double has_time_elapsed(double last_refresh, double time) {

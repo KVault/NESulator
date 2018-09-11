@@ -12,7 +12,7 @@ struct nametable_viewer_window{
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	SDL_Texture *back_buffer_tex;
-	int refresh_rate;//Normally the GUI refresh rate is measured in FPS, not Hz but we'll assume it's the same
+	double refresh_time;//In ms
 };
 
 /**
@@ -25,6 +25,10 @@ int build_nametable_viewer(int refresh_rate);
  */
 int on_quit_nametable_viewer_window(SDL_Event);
 
+/**
+ * Renders the nametable sprites onto the back buffer
+ */
+void render_nametable();
 
 int cycle_nametable_viewer();
 

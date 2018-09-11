@@ -13,6 +13,10 @@
 #define PPUDATA 0x2007
 #define OAMDMA 0x4014
 
+enum PPUCTRL_{
+	flagC = 0, flagZ = 1, flagI = 2, flagD = 3, flagB = 4, flagUnused = 5, flagV = 6, flagN = 7
+};
+
 //int speed = 0; // the speed of the PPU
 //int scanline_ptr = 0; // in which scanline the PPU is currently. From 0 to 261
 //int cycle_ptr = 0; // the cycle within the scanline. From 0 to 340

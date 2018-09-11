@@ -21,3 +21,7 @@ void encode_as_tiles(byte *mem_addr, byte number_tiles, struct tile *tiles) {
 		}
 	}
 }
+
+byte *tile_addr(byte tile_id) {
+
+}
