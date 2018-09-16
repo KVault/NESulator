@@ -8,9 +8,9 @@
 #define TILE_ROW_SIZE 8
 #define TILE_COLUMN_SIZE 8
 #define TILES_PER_TABLE 0xFF
+#define TILE_SIZE 64
 #define PPU_PATTERN_LEFT vram_bank[0x0000]
 #define PPU_PATTERN_RIGHT vram_bank[0x1000]
-
 
 struct tile {
 	/**
@@ -26,12 +26,6 @@ struct tile {
  */
 void encode_as_tiles(byte *mem_addr, byte number_tiles, struct tile *tiles);
 
-/**
- * Gets a tile ID and returns a pointer to the first byte of that tile.
- * Note: To determine whether the tile comes from the left or the right PPUCTRL flag is used
- * @param tile_id
- * @return a pointer to the first byte
- */
-byte *tile_addr(byte tile_id);
+struct tile nametable_tile(uint tile_id);
 
 #endif //NESULATOR_PPU_UTILS_H

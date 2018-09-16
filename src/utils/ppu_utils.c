@@ -22,6 +22,11 @@ void encode_as_tiles(byte *mem_addr, byte number_tiles, struct tile *tiles) {
 	}
 }
 
-byte *tile_addr(byte tile_id) {
+struct tile nametable_tile(uint tile_id) {
+	uint base_tile_addr = bit_test(rmem_b(PPUCTRL), PPUCTRL_S) ? 0x0000 : 0x1000;
+	base_tile_addr += tile_id * 16;
 
+	struct tile tile;
+	encode_as_tiles(&vram_bank[base_tile_addr], 1, &tile);
+	return tile;
 }
