@@ -5,8 +5,8 @@
 #include "../memory.h"
 #include "../utils/ppu_utils.h"
 
-#define NAMETABLE_WINDOW_WIDTH 256
-#define NAMETABLE_WINDOW_HEIGHT 240
+#define NAMETABLE_WINDOW_WIDTH 512
+#define NAMETABLE_WINDOW_HEIGHT 480
 #define NAMETABLE_TEX_WIDTH 256
 #define NAMETABLE_TEX_HEIGHT 240
 #define NAMETABLE_ROWS_MAP 30
@@ -20,7 +20,14 @@ struct tile;
 struct nametable_viewer_window{
 	SDL_Window *window;
 	SDL_Renderer *renderer;
-	SDL_Texture *back_buffer_tex;
+	SDL_Texture *top_left;
+	SDL_Rect top_left_rect;
+	SDL_Texture *top_right;
+	SDL_Rect top_right_rect;
+	SDL_Texture *bottom_left;
+	SDL_Rect bottom_left_rect;
+	SDL_Texture *bottom_right;
+	SDL_Rect bottom_right_rect;
 	double refresh_time;//In ms
 };
 

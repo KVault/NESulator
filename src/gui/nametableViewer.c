@@ -1,6 +1,10 @@
 #include "nametableViewer.h"
 
 static struct nametable_viewer_window window;
+
+/**
+ * This back buffer is shared among all the textures.
+ */
 uint back_buffer[NAMETABLE_TEX_HEIGHT][NAMETABLE_TEX_WIDTH];
 
 int build_nametable_viewer(int refresh_rate) {
@@ -15,8 +19,38 @@ int build_nametable_viewer(int refresh_rate) {
 
 	window.renderer = SDL_CreateRenderer(window.window, -1, SDL_RENDERER_ACCELERATED);
 
-	window.back_buffer_tex = SDL_CreateTexture(window.renderer, SDL_PIXELFORMAT_RGB888,
+	window.top_left = SDL_CreateTexture(window.renderer, SDL_PIXELFORMAT_RGB888,
 			SDL_TEXTUREACCESS_STATIC, NAMETABLE_TEX_WIDTH, NAMETABLE_TEX_HEIGHT);
+
+	window.top_right = SDL_CreateTexture(window.renderer, SDL_PIXELFORMAT_RGB888,
+			SDL_TEXTUREACCESS_STATIC, NAMETABLE_TEX_WIDTH, NAMETABLE_TEX_HEIGHT);
+
+	window.bottom_left = SDL_CreateTexture(window.renderer, SDL_PIXELFORMAT_RGB888,
+	        SDL_TEXTUREACCESS_STATIC, NAMETABLE_TEX_WIDTH, NAMETABLE_TEX_HEIGHT);
+
+	window.bottom_right = SDL_CreateTexture(window.renderer, SDL_PIXELFORMAT_RGB888,
+			SDL_TEXTUREACCESS_STATIC, NAMETABLE_TEX_WIDTH, NAMETABLE_TEX_HEIGHT);
+
+	//Now fill in the rects to be filled in by the textures
+	window.top_left_rect.x = 0;
+	window.top_left_rect.y = 0;
+	window.top_left_rect.h = NAMETABLE_WINDOW_HEIGHT/2;
+	window.top_left_rect.w = NAMETABLE_WINDOW_WIDTH/2;
+
+	window.top_right_rect.x = NAMETABLE_WINDOW_WIDTH/2;
+	window.top_right_rect.y = 0;
+	window.top_right_rect.h = NAMETABLE_WINDOW_HEIGHT/2;
+	window.top_right_rect.w = NAMETABLE_WINDOW_WIDTH/2;
+
+	window.bottom_left_rect.x = 0;
+	window.bottom_left_rect.y = NAMETABLE_WINDOW_HEIGHT/2;
+	window.bottom_left_rect.h = NAMETABLE_WINDOW_HEIGHT/2;
+	window.bottom_left_rect.w = NAMETABLE_WINDOW_WIDTH/2;
+
+	window.bottom_right_rect.x = NAMETABLE_WINDOW_WIDTH/2;
+	window.bottom_right_rect.y = NAMETABLE_WINDOW_HEIGHT/2;
+	window.bottom_right_rect.h = NAMETABLE_WINDOW_HEIGHT/2;
+	window.bottom_right_rect.w = NAMETABLE_WINDOW_WIDTH/2;
 
 	register_window_cycle(&cycle_nametable_viewer);
 	sevent(SDL_WINDOWEVENT, SDL_WINDOWEVENT_CLOSE, &on_quit_nametable_viewer_window);
@@ -57,11 +91,24 @@ int cycle_nametable_viewer() {
 	if((time_aux = has_time_elapsed(last_check, window.refresh_time))){
 		last_check = time_aux;
 
-		render_nametable_map(0x2000);
-
-		SDL_UpdateTexture(window.back_buffer_tex, NULL, back_buffer,NAMETABLE_TEX_WIDTH * sizeof(uint));
 		SDL_RenderClear(window.renderer);
-		SDL_RenderCopy(window.renderer, window.back_buffer_tex, NULL, NULL);
+
+		render_nametable_map(0x2000);
+		SDL_UpdateTexture(window.top_left, NULL, back_buffer,NAMETABLE_TEX_WIDTH * sizeof(uint));
+		SDL_RenderCopy(window.renderer, window.top_left, NULL, &window.top_left_rect);
+
+		render_nametable_map(0x2400);
+		SDL_UpdateTexture(window.top_right, NULL, back_buffer,NAMETABLE_TEX_WIDTH * sizeof(uint));
+		SDL_RenderCopy(window.renderer, window.top_right, NULL, &window.top_right_rect);
+
+		render_nametable_map(0x2800);
+		SDL_UpdateTexture(window.bottom_left, NULL, back_buffer,NAMETABLE_TEX_WIDTH * sizeof(uint));
+		SDL_RenderCopy(window.renderer, window.bottom_left, NULL, &window.bottom_left_rect);
+
+		render_nametable_map(0x2C00);
+		SDL_UpdateTexture(window.bottom_right, NULL, back_buffer,NAMETABLE_TEX_WIDTH * sizeof(uint));
+		SDL_RenderCopy(window.renderer, window.bottom_right, NULL, &window.bottom_right_rect);
+
 		SDL_RenderPresent(window.renderer);
 
 		//Update the surfaces
