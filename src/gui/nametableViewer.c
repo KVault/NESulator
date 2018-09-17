@@ -49,6 +49,7 @@ void render_nametable_map(word start_addr){
 		for (uint j = 0; j < NAMETABLE_TILES_PER_ROW; ++j) {
 			byte tile_id = rmem_b_vram(start_addr + i);
 			struct tile tile = nametable_tile(tile_id);
+			//log_tile(&tile);
 			render_tile(&tile, i, j);
 		}
 	}
@@ -60,9 +61,9 @@ int cycle_nametable_viewer() {
 	if((time_aux = has_time_elapsed(last_check, window.refresh_time))){
 		last_check = time_aux;
 
-		render_nametable_map(0x2800);
+		render_nametable_map(0x2000);
 
-		SDL_UpdateTexture(window.back_buffer_tex, NULL, back_buffer,NAMETABLE_TEX_WIDTH);
+		SDL_UpdateTexture(window.back_buffer_tex, NULL, back_buffer,NAMETABLE_TEX_WIDTH * sizeof(uint));
 		SDL_RenderClear(window.renderer);
 		SDL_RenderCopy(window.renderer, window.back_buffer_tex, NULL, NULL);
 		SDL_RenderPresent(window.renderer);

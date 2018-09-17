@@ -14,6 +14,9 @@
 
 #define NAMETABLE_WINDOW_TITLE "Nametable Viewer"
 
+//TODO Is this really how we fix this?
+struct tile;
+
 struct nametable_viewer_window{
 	SDL_Window *window;
 	SDL_Renderer *renderer;

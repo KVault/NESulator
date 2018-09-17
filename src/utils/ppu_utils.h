@@ -28,4 +28,6 @@ void encode_as_tiles(byte *mem_addr, byte number_tiles, struct tile *tiles);
 
 struct tile nametable_tile(uint tile_id);
 
+void log_tile(struct tile *tile);
+
 #endif //NESULATOR_PPU_UTILS_H
