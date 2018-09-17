@@ -3,14 +3,16 @@
 
 #include "nes.h"
 
-#define MEM_SIZE 65536
+#define RAM_MEM_SIZE 65536
+#define VRAM_MEM_SIZE 16383 //The actual VRAM was 16Kb even if 64Kb were addreseable. So reserve less memory
 
-byte memoryBank[MEM_SIZE];
+byte ram_bank[RAM_MEM_SIZE];
+byte vram_bank[VRAM_MEM_SIZE];
 
 /**
  * Fills in the memory with zeroes. Just so we know what an empty memory looks like instead of garbage
  */
-void zeroMemory();
+void zero_ram();
 
 /**
  * Reads one byte from the specified memory position
@@ -31,6 +33,26 @@ void wmem_b(uint address, byte content);
  * Writes two bytes starting at the specified memory position
  */
 void wmem_w(uint address, word content);
+
+/**
+ * Reads one byte from the specified VRAM memory position
+ */
+byte rmem_b_vram(uint address);
+
+/**
+ * Reads two bytes from the specified VRAM memory position
+ */
+word rmem_w_vram(uint start_address);
+
+/**
+ * Writes one byte to the specified VRAM memory position
+ */
+void wmem_b_vram(uint address, byte content);
+
+/**
+ * Writes two bytes to the specified VRAM memory position
+ */
+void wmem_w_vram(uint start_address, word content);
 
 /**
  * Pops a byte from the stack
@@ -124,4 +146,3 @@ word absolutey_addr(word w);
 
 
 #endif //NESULATOR_MEMORY_H
-

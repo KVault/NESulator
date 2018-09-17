@@ -1,31 +1,35 @@
 #ifndef NESULATOR_MAINWINDOW_H
 #define NESULATOR_MAINWINDOW_H
 
-#include "../../lib/SDL2/include/SDL.h"
-#include "../log.h"
-#include "../Utils.h"
+#include "gui.h"
 
-#define SCREEN_WIDTH 256
-#define SCREEN_HEIGHT 240
-#define WINDOW_TITLE "NESulator"
+#define MAIN_WINDOW_WIDTH 256
+#define MAIN_WINDOW_HEIGHT 240
+#define MAIN_WINDOW_TITLE "NESulator"
+
+struct main_window{
+	SDL_Window *window;
+	SDL_Renderer *renderer;
+	SDL_Texture *back_buffer_tex;
+	int refresh_rate;//Normally the GUI refresh rate is measured in FPS, not Hz but we'll assume it's the same
+};
 
 /**
- * Function header for the callbacks. Every function has to match this header to be able to register itself
- * as a callback.
+ * Used to keep track of the FPS
  */
-typedef int (*sdl_event_func)(SDL_Event event);
+int gui_fps;
 
 /**
- * Builds and creates the SDL window what holds the emulator
+ * Builds and creates the main SDL window
  * @return 1 if succeeded, something else if didn't
  */
-int build_window();
+int build_main_window(int speed);
 
 /**
  * Called when the user clicks on the X, red button or whatever depending on your OS. Basically que user
  * wants to quit the app, so it does it.
  */
-int on_close_window(SDL_Event);
+int on_quit_main_window(SDL_Event);
 
 /**
  * Resize the background canvas to fill in the desired size of the window. It will also keep the NES's frame with
@@ -33,24 +37,11 @@ int on_close_window(SDL_Event);
  *
  * This function WILL scale up or down the image
  */
-int on_window_resized_event(SDL_Event);
+int on_main_window_resized(SDL_Event);
 
 /**
- * Handles any event, input or draw call from the gui. This "cycle" isn't dependant on the emulator
- * and it only shares its name for clarity.
+ * Called every gui cycle
  */
-void gui_cycle();
-
-/**
- * Subscribes to the given event with a function to be called when the event is raised
- * @return 1 if succeeded, something else if didn't
- */
-int sevent(SDL_EventType event,uint event_id, sdl_event_func func);
-
-/**
- * Unsubscribes from the given event
- * @return 1 if succeeded, something else if didn't
- */
-void uevent(SDL_EventType event,uint event_id, sdl_event_func func);
+int cycle_main_window();
 
 #endif //NESULATOR_MAINWINDOW_H

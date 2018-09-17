@@ -4,17 +4,86 @@
 ////// This functions are defined here so that when other file includes the .h, they won't be able to see this ones
 
 /**
- * Write from content in a specific memory address
- * It also deals with memory mirroring
+ * Generic function that deals with the actual writing to a memory bank. It'll be used to write both to RAM and VRAM
+ * by suplying a pointer to the bank.
  */
-void wmem(unsigned short amountBytes, uint initialPosition, byte *content);
+void wmem(byte *memory_bank, unsigned short amountBytes, uint initialPosition, byte *content);
 
 /**
+ * Generic function that deals with the action reading from a memory bank. It'll be used to read from RAM and VRAM
+ */
+void rmem(byte *memoryBank, unsigned short amountBytes, uint initialPosition, byte *destiny);
+
+/**
+ * Helper function used to deal with the mirroring. When a write to RAM happens, this function will also
+ * write to any mirrored address whenever necessary
+ */
+void ram_mirroring(unsigned short amountBytes, uint initialPosition, byte *content);
+
+/**
+ * Helper function used to deal with the mirroring. When a write to VRAM happens, this function will also
+ * write to any mirrored address whenever necessary
+ */
+void vram_mirroring(unsigned short amountBytes, uint initialPosition, byte *content);
+
+/**
+ * RAM function
+ * Write from content in a specific memory location
+ * It also deals with RAM mirroring
+ */
+void wmem_r(unsigned short amountBytes, uint initialPosition, byte *content);
+
+/**
+ * RAM function
  * Read content from a specific memory address and write to destiny
  */
-void rmem(unsigned short amountBytes, uint initialPosition, byte *destiny);
+void rmem_r(unsigned short amountBytes, uint initialPosition, byte *destiny);
 
-/*
+/**
+ * VRAM function
+ * Write from content to a specific memory location
+ * It also deals with the VRAM mirroring
+ */
+void wmem_vram(unsigned short amountBytes, uint initialPosition, byte *content);
+
+/**
+ * VRAM function
+ * Reads from VRAM from a specific memory address. Writes it to destiny
+ */
+void rmem_vram(unsigned short amountBytes, uint initialPosition, byte *destiny);
+
+void ram_mirroring(unsigned short amountBytes, uint initialPosition, byte *content){
+	int i = 0;
+	if (initialPosition >= 0x0000 && initialPosition <= 0x07FF) {
+		for (int k = 0; k < 4; k++) {
+			uint mirrored_position = initialPosition + (0x0800 * k);
+			for (int j = mirrored_position; i < amountBytes; j++, i++) {
+				ram_bank[j] = content[i];
+			}
+		}
+	}
+	//TODO mirroring $2008-$3FFF
+}
+
+void vram_mirroring(unsigned short amountBytes, uint initialPosition, byte *content) {
+	//TODO the actual mirroring. Nothing here for now
+}
+
+void rmem(byte *memoryBank, unsigned short amountBytes, uint initialPosition, byte *destiny){
+	int i = 0;
+	for (int j = initialPosition; i < amountBytes; i++, j++) {
+		destiny[i] = memoryBank[j];
+	}
+}
+
+void wmem(byte *memoryBank, unsigned short amountBytes, uint initialPosition, byte *content){
+	int i = 0;
+	for (int j = initialPosition; i < amountBytes; j++, i++) {
+		memoryBank[j] = content[i];
+	}
+}
+
+/* RAM MEMORY MAP
  * Address range  Size  Device
  * $0000-$07FF    $0800  2KB internal RAM
  * $0800-$0FFF    $0800  -----------------------
@@ -27,33 +96,32 @@ void rmem(unsigned short amountBytes, uint initialPosition, byte *destiny);
  * $4020-$FFFF    $BFE0  Cartridge space: PRG ROM, PRG RAM, and mapper registers
  */
 
-void wmem(unsigned short amountBytes, uint initialPosition, byte *content) {
-	int i = 0;
-	for (int j = initialPosition; i < amountBytes; j++, i++) {
-		memoryBank[j] = content[i];
-	}
-
-	if (initialPosition >= 0x0000 && initialPosition <= 0x07FF) {
-		for (int k = 0; k < 4; k++) {
-			uint mirrored_position = initialPosition + (0x0800 * k);
-			for (int j = mirrored_position; i < amountBytes; j++, i++) {
-				memoryBank[j] = content[i];
-			}
-		}
-	}
-	//TODO mirroring $2008-$3FFF
+void wmem_r(unsigned short amountBytes, uint initialPosition, byte *content) {
+	wmem(ram_bank, amountBytes, initialPosition, content);
+	ram_mirroring(amountBytes, initialPosition, content);
 }
 
-void rmem(unsigned short amountBytes, uint initialPosition, byte *destiny) {
-	int i = 0;
-	for (int j = initialPosition; i < amountBytes; i++, j++) {
-		destiny[i] = memoryBank[j];
-	}
+void rmem_r(unsigned short amountBytes, uint initialPosition, byte *destiny) {
+	rmem(ram_bank, amountBytes, initialPosition, destiny);
+}
+
+/**
+ *  Due  to  the  difference  between  physical  and  logical  address  spaces,
+ *  any  address  above  $3FFF  is  wrapped  around,  making  the  logical
+ *  memory locations $4000-$FFFF effectively a mirror of locations $0000-$3FFF.
+ */
+void wmem_vram(unsigned short amountBytes, uint initialPosition, byte *content) {
+	wmem(vram_bank, amountBytes, initialPosition, content);
+	vram_mirroring(amountBytes, initialPosition, content);
+}
+
+void rmem_vram(unsigned short amountBytes, uint initialPosition, byte *destiny) {
+	rmem(vram_bank, amountBytes, initialPosition, destiny);
 }
 
 byte rmem_b(uint address) {
 	byte destiny = 0;
-	rmem(BYTE, address, &destiny);
+	rmem_r(BYTE, address, &destiny);
 	return destiny;
 }
 
@@ -63,19 +131,42 @@ byte rmem_b(uint address) {
  */
 word rmem_w(uint address) {
 	byte destiny[2] = {0};
-	rmem(WORD, address, destiny);
+	rmem_r(WORD, address, destiny);
 	return to_mem_addr(destiny);
 }
 
 void wmem_b(uint address, byte content) {
-	wmem(BYTE, address, &content);
+	wmem_r(BYTE, address, &content);
 }
 
 void wmem_w(uint address, word content) {
 	byte wordVal[2] = {0};
 	to_mem_bytes(content, wordVal);
-	wmem(WORD, address, wordVal);
+	wmem_r(WORD, address, wordVal);
 }
+
+byte rmem_b_vram(uint address){
+	byte destiny = 0;
+	rmem_vram(BYTE, address, &destiny);
+	return destiny;
+}
+
+word rmem_w_vram(uint start_address){
+	byte destiny[2] = {0};
+	rmem_vram(WORD, start_address, destiny);
+	return to_mem_addr(destiny);
+}
+
+void wmem_b_vram(uint address, byte content){
+	wmem_vram(BYTE, address, &content);
+}
+
+void wmem_w_vram(uint start_address, word content){
+	byte wordVal[2] = {0};
+	to_mem_bytes(content, wordVal);
+	wmem_vram(WORD, start_address, wordVal);
+}
+
 
 byte pop_b() {
 	uint bankPointer = SP + 1 + 0x100; // The stack is between 0x100 and 0x1FF
@@ -119,8 +210,8 @@ void push_w(word content) {
 /**
  * Zeroes the memory, pum, bam, gone, stiff, cold, dead.
  */
-void zeroMemory() {
-	for (uint i = 0; i < MEM_SIZE; i++) {
+void zero_ram() {
+	for (uint i = 0; i < RAM_MEM_SIZE; i++) {
 		wmem_b(i, 0);
 	}
 }
@@ -137,7 +228,7 @@ word indirectx_addr(byte b) {
 		memContent[0] = rmem_b(b);
 		memContent[1] = rmem_b(0x00);
 	} else {
-		rmem(WORD, b, memContent);
+		rmem_r(WORD, b, memContent);
 	}
 
 	return to_mem_addr(memContent);
@@ -150,7 +241,7 @@ word indirecty_addr(byte b) {
 		memContent[0] = rmem_b(b);
 		memContent[1] = rmem_b(0x00);
 	} else {
-		rmem(WORD, b, memContent);
+		rmem_r(WORD, b, memContent);
 	}
 
 	word addr = to_mem_addr(memContent);

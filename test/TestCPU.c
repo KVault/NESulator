@@ -4,7 +4,7 @@
  * Simply calls each function to test. It's going to get messy but what the hell!....
  */
 void testOpcodes() {
-	power_up(0);
+	cpu_power_up(0);
 	//// We did something wrong with the BRK opcode function, need to be fixed
 	test_BRK();
 	test_ORA();
@@ -846,7 +846,7 @@ void test_NESTEST() {
 	set_clear_log_file();
 	set_log_path("../../logs/nesulator.log");
 
-	power_up(0);
+	cpu_power_up(0);
 	//If we need to initialize anything, it should go here
 
 	//Read the ROM, that we're going to execute and all that stuff

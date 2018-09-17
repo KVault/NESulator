@@ -2,7 +2,7 @@
 #define NESULATOR_TESTCPU_H
 
 #include "../src/rom.h"
-#include "../src/Utils.h"
+#include "../src/utils/Utils.h"
 #include "../src/cpu.h"
 #include "../src/memory.h"
 #include <assert.h>

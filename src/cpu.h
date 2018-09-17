@@ -2,8 +2,8 @@
 #define NESULATOR_CPU_H
 
 #include "nes.h"
-#include "Utils.h"
-#include "log.h"
+#include "utils/Utils.h"
+#include "utils/log.h"
 
 #define OPCODE_COUNT 256
 
@@ -40,7 +40,7 @@ byte currentOpcode; // The opcode of this cycle
  * Initializes a CPU with the specified clock speed. This will set every register and pointer
  * to the right value. Basically it simulates switching on the NES.
  */
-void power_up(int clockSpeed);
+void cpu_power_up(int clock_speed);
 
 /**
  * Resets the PC to the value held in the reset vector $FFFC and $FFFD
@@ -928,8 +928,11 @@ void lax_indirect_y();
 void axs(word addr, int cycles, int pcIncrease);
 
 void axs_indirect_x();
+
 void axs_zpage();
+
 void axs_zpage_y();
+
 void axs_absolute();
 
 
@@ -941,12 +944,19 @@ void axs_absolute();
  * This opcode DECs the contents of a memory location and then CMPs the result with the A register.
  */
 void dcm(word addr, int cycles, int pcIncrease);
+
 void dcm_absolute();
+
 void dcm_absolute_x();
+
 void dcm_absolute_y();
+
 void dcm_zpage();
+
 void dcm_zpage_x();
+
 void dcm_indirect_x();
+
 void dcm_indirect_y();
 
 
@@ -958,12 +968,19 @@ void dcm_indirect_y();
  * This opcode INCs the contents of a memory location and then SBCs the result from the A register.
  */
 void ins(word addr, int cycles, int pcIncrease);
+
 void ins_absolute();
+
 void ins_absolute_x();
+
 void ins_absolute_y();
+
 void ins_zpage();
+
 void ins_zpage_x();
+
 void ins_indirect_x();
+
 void ins_indirect_y();
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -974,12 +991,19 @@ void ins_indirect_y();
  * This opcode ASLs the contents of a memory location and then ORs the result with the accumulator.
  */
 void aso(word addr, int cycles, int pcIncrease);
+
 void aso_absolute();
+
 void aso_absolute_x();
+
 void aso_absolute_y();
+
 void aso_zpage();
+
 void aso_zpage_x();
+
 void aso_indirect_x();
+
 void aso_indirect_y();
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -990,12 +1014,19 @@ void aso_indirect_y();
  * RLA ROLs the contents of a memory location and then ANDs the result with the accumulator.
  */
 void rla(word addr, int cycles, int pcIncrease);
+
 void rla_absolute();
+
 void rla_absolute_x();
+
 void rla_absolute_y();
+
 void rla_zpage();
+
 void rla_zpage_x();
+
 void rla_indirect_x();
+
 void rla_indirect_y();
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1006,12 +1037,19 @@ void rla_indirect_y();
  * LSE LSRs the contents of a memory location and then EORs the result with the accumulator.
  */
 void lse(word addr, int cycles, int pcIncrease);
+
 void lse_absolute();
+
 void lse_absolute_x();
+
 void lse_absolute_y();
+
 void lse_zpage();
+
 void lse_zpage_x();
+
 void lse_indirect_x();
+
 void lse_indirect_y();
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1022,12 +1060,19 @@ void lse_indirect_y();
  * RRA RORs the contents of a memory location and then ADCs the result with the accumulator.
  */
 void rra(word addr, int cycles, int pcIncrease);
+
 void rra_absolute();
+
 void rra_absolute_x();
+
 void rra_absolute_y();
+
 void rra_zpage();
+
 void rra_zpage_x();
+
 void rra_indirect_x();
+
 void rra_indirect_y();
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1035,6 +1080,5 @@ void rra_indirect_y();
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void invalid();
-
 
 #endif //NESULATOR_CPU_H

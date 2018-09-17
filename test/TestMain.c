@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "../src/Utils.h"
+#include "../src/utils/Utils.h"
 #include "TestMemory.h"
 #include "TestCPU.h"
 

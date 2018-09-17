@@ -1,8 +1,8 @@
 #ifndef NESULATOR_NES_H
 #define NESULATOR_NES_H
 
-#include "gui/mainWindow.h"
-#include "log.h"
+#include "gui/gui.h"
+#include "utils/log.h"
 #include "cpu.h"
 #include "ppu.h"
 #include "rom.h"
