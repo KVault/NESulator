@@ -14,7 +14,7 @@
 
 #define NAMETABLE_WINDOW_TITLE "Nametable Viewer"
 
-//TODO Is this really how we fix this?
+//TODO Is this really how we fix the warning that would come up if this isn't here?
 struct tile;
 
 struct nametable_viewer_window{
@@ -35,10 +35,14 @@ int build_nametable_viewer(int refresh_rate);
 int on_quit_nametable_viewer_window(SDL_Event);
 
 /**
- * Renders the nametable sprites onto the back buffer
+ * Renders the nametable map onto the back buffer
  */
 void render_nametable_map(word start_addr);
 
+/**
+ * Renders the specified tile in the nametable's row and column. Basically a helper function to iterate over the
+ * sprite and draw it in the correct position
+ */
 void render_tile(struct tile *tile, uint row_id, uint column_id);
 
 int cycle_nametable_viewer();

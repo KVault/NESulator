@@ -35,11 +35,8 @@ int on_quit_nametable_viewer_window(SDL_Event e) {
 void render_tile(struct tile *tile, uint row_id, uint column_id) {
 	for (int i = 0; i < TILE_ROW_SIZE; ++i) {
 		for (int j = 0; j < TILE_COLUMN_SIZE; ++j) {
-			if(tile->pattern[i][j] != 0){
-				back_buffer[(row_id * TILE_ROW_SIZE) + i][(column_id *TILE_COLUMN_SIZE)+ j] = 255;
-			}else{
-				back_buffer[(row_id * TILE_ROW_SIZE) + i][(column_id *TILE_COLUMN_SIZE)+ j] = 0;
-			}
+			uint draw_color = tile->pattern[i][j] != 0 ? 255 : 0; //TODO remove magic numbers. For Debug only
+			back_buffer[(row_id * TILE_ROW_SIZE) + i][(column_id *TILE_COLUMN_SIZE)+ j] = draw_color;
 		}
 	}
 }
@@ -49,7 +46,6 @@ void render_nametable_map(word start_addr){
 		for (uint j = 0; j < NAMETABLE_TILES_PER_ROW; ++j) {
 			byte tile_id = rmem_b_vram(start_addr + i);
 			struct tile tile = nametable_tile(tile_id);
-			//log_tile(&tile);
 			render_tile(&tile, i, j);
 		}
 	}
