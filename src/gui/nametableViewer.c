@@ -31,7 +31,7 @@ int build_nametable_viewer(int refresh_rate) {
 	window.bottom_right = SDL_CreateTexture(window.renderer, SDL_PIXELFORMAT_RGB888,
 			SDL_TEXTUREACCESS_STATIC, NAMETABLE_TEX_WIDTH, NAMETABLE_TEX_HEIGHT);
 
-	//Now fill in the rects to be filled in by the textures
+	//Now fill in the rects to be used in by the textures. Each one of them in a corner
 	window.top_left_rect.x = 0;
 	window.top_left_rect.y = 0;
 	window.top_left_rect.h = NAMETABLE_WINDOW_HEIGHT/2;

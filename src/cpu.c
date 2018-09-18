@@ -1961,5 +1961,22 @@ void log_instruction(int num_params, const char *mnemonic, ...) {
 	vlog(mnemonic, ConsoleDebug, FileDebug, args);
 	va_end(args);
 	log_debug("\t\t\t");
-	log_debug("A:%02X X:%02X Y:%02X P:%02X SP:%02X CYC:%d \n", A, X, Y, P, SP, cyclesThisSec);
+	log_debug("A:%02X X:%02X Y:%02X ", A, X, Y);
+
+	//Now for the status register. A bit of dirty code but the logs will be much clearer
+	log_debug("P:");
+	log_debug(bit_test(P, flagN) ? "N" : "n");
+	log_debug(bit_test(P, flagV) ? "V" : "v");
+	log_debug(bit_test(P, flagUnused) ? "U" : "u");
+	log_debug(bit_test(P, flagB) ? "B" : "b");
+	log_debug(bit_test(P, flagD) ? "D" : "d");
+	log_debug(bit_test(P, flagI) ? "I" : "i");
+	log_debug(bit_test(P, flagZ) ? "Z" : "z");
+	log_debug(bit_test(P, flagC) ? "C" : "c");
+
+	log_debug(" ");
+
+	//And the rest of the registers
+	log_debug("SP:%02X CYC:%d", SP, cyclesThisSec);
+	log_debug("\n");
 }
