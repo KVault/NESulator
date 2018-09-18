@@ -17,6 +17,12 @@ static enum {
 	PPUCTRL_N = 0, PPUCTRL_I = 2, PPUCTRL_S = 3, PPUCTRL_B = 4, PPUCTRL_H = 5, PPUCTRL_P = 6, PPUCTRL_V = 7
 } PPUCTRL_FLAGS;
 
+word v; /** Current vram address */
+word t; /** Temporary vram address aka address of the top left onscreen tile */
+byte x; /** Find X scroll, 3 bits */
+byte w; /** Latch, 1 bit */
+
+
 //int speed = 0; // the speed of the PPU
 //int scanline_ptr = 0; // in which scanline the PPU is currently. From 0 to 261
 //int cycle_ptr = 0; // the cycle within the scanline. From 0 to 340
@@ -28,5 +34,9 @@ static enum {
 void ppu_cycle();
 
 void ppu_power_up(int clock_speed);
+
+void write_PPUADDR(byte value);
+
+void write_PPUDATA(byte value);
 
 #endif //NESULATOR_PPU_H
