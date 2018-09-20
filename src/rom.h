@@ -4,15 +4,11 @@
 #include "utils/Utils.h"
 #include <stdio.h>
 
-#include "mappers/NROM.h"
-#include "mappers/CNROM.h"
-
-
 #define PRG_PAGE_SIZE 16384
 #define CHR_PAGE_SIZE 8192
 #define TRAINER_SIZE 512
 
-struct ROM {
+typedef struct{
 	//Header
 	byte nesTitle[3]; //Bytes 0-3 of the ROM
 	byte fileFormat;// for iNES format it should always be 0xA1 (26)
@@ -45,18 +41,18 @@ struct ROM {
 
 	//CHR
 	byte *chrROM;
-};
+} ROM;
 
 /**
  * Loads a ROM from the specified filePath. It simulates what would happen when the cartridge is inserted by copying
  * it into memory. It won't, at this point, load anything into the console's memory
  */
-struct ROM *insertCartridge(char *filePath);
+ROM *insertCartridge(char *filePath);
 
 /**
  * Begins the copy process from the ROM to the RAM. It will also apply any mappings when necessary
  */
-void load_ROM(struct ROM *rom);
+void load_ROM(ROM *rom);
 
 /**
  * Cleans up the memory from the ROM. Basically it releases the mallocs

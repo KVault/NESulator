@@ -22,7 +22,7 @@ int main() {
 	//If we need to initialize anything, it should go here
 
 	//Read the ROM, that we're going to execute and all that stuff
-	struct ROM *rom = insertCartridge("../../rom/donkey_kong.nes");
+	ROM *rom = insertCartridge("../../rom/donkey_kong.nes");
 	load_ROM(rom);
 	reset_pc();
 

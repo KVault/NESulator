@@ -3,9 +3,9 @@
 
 //Create the struct outside so that when we fill it in and exit the function, we don't lose the reference
 //The emulator can run only one ROM at a time, so this also makes sense
-struct ROM rom = {};
+ROM rom = {};
 
-struct ROM *insertCartridge(char *filePath) {
+ROM *insertCartridge(char *filePath) {
 	FILE *file;
 	file = fopen(filePath, "rb");
 
@@ -40,7 +40,7 @@ struct ROM *insertCartridge(char *filePath) {
 	return &rom;
 }
 
-void load_ROM(struct ROM *rom){
+void load_ROM(ROM *rom){
 	//Apply the mapper
 	switch (rom->mapper){
 		case 0:
