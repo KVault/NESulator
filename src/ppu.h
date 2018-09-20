@@ -23,6 +23,7 @@ byte x; /** Find X scroll, 3 bits */
 byte w; /** Latch, 1 bit */
 
 
+
 //int speed = 0; // the speed of the PPU
 //int scanline_ptr = 0; // in which scanline the PPU is currently. From 0 to 261
 //int cycle_ptr = 0; // the cycle within the scanline. From 0 to 340
@@ -38,5 +39,7 @@ void ppu_power_up(int clock_speed);
 void write_PPUADDR(byte value);
 
 void write_PPUDATA(byte value);
+
+byte read_PPUDATA();
 
 #endif //NESULATOR_PPU_H

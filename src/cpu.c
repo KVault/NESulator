@@ -664,12 +664,12 @@ void delta_memory(word memAddr, int delta, int cycles, int pcIncrease) {
 }
 
 void inc_mem(word memAddr, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "INC #$%02X = %02X", memAddr, memAddr + 1);
+	log_instruction(pcIncrease - 1, "\tINC #$%02X = %02X", memAddr, memAddr + 1);
 	delta_memory(memAddr, 1, cycles, pcIncrease);
 }
 
 void dec_mem(word memAddr, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "INC #$%02X = %02X", memAddr, memAddr - 1);
+	log_instruction(pcIncrease - 1, "\tDEC #$%02X = %02X", memAddr, memAddr - 1);
 	delta_memory(memAddr, -1, cycles, pcIncrease);
 }
 
@@ -712,7 +712,6 @@ void dec_mem_absolute_x() {
 	word addr = absolutex_addr(rmem_w(PC + 1));
 	dec_mem(addr, 7, 3);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////LOAD REGISTERS INC/DEC REGION///////////////////////////////
@@ -806,7 +805,6 @@ void ldy_absolute_x() {
 	load_register(&Y, absolutex_param(), 4, 3, "\tLDY #$%02X\t");
 	// TODO +1 if page crossed
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////STORE REGISTERS REGION///////////////////////////////////////
@@ -1303,7 +1301,7 @@ void axs_absolute() {
  * It is the equivalent as to do a dec_mem and a cmp, so we'll just execute those two on order. It should be fine
  */
 void dcm(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tDCP $%04X", addr);
+	log_instruction(pcIncrease - 1, "\tDCP $%02X", addr);
 
 	delta_memory(addr, -1, 0, 0);
 
@@ -1357,7 +1355,7 @@ void dcm_indirect_y(){
  * Bear in mind, an sbc is the same as an asl with the parameter ~'ed
  */
 void ins(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tINS $%04X\t", addr);
+	log_instruction(pcIncrease - 1, "\tINS $%02X\t", addr);
 
 	delta_memory(addr, 1, 0, 0);
 
@@ -1402,7 +1400,7 @@ void ins_indirect_y(){
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void aso(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tASO $%04X", addr);
+	log_instruction(pcIncrease - 1, "\tASO $%02X", addr);
 
 	//ASL
 	byte value = rmem_b(addr);
@@ -1458,7 +1456,7 @@ void aso_indirect_y(){
  * RLA ROLs the contents of a memory location and then ANDs the result with the accumulator.
  */
 void rla(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tRLA $%04X\t", addr);
+	log_instruction(pcIncrease - 1, "\tRLA $%02X\t", addr);
 
 	byte value = rmem_b(addr);
 
@@ -1512,7 +1510,7 @@ void rla_indirect_y(){
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void lse(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tLSE $%04X\t", addr);
+	log_instruction(pcIncrease - 1, "\tLSE $%02X\t", addr);
 
 	byte data = rmem_b(addr);
 	lsr_internal(&data);
@@ -1560,7 +1558,7 @@ void lse_indirect_y(){
  * RRA RORs the contents of a memory location and then ADCs the result with the accumulator.
  */
 void rra(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tRRA $%04X\t", addr);
+	log_instruction(pcIncrease - 1, "\tRRA $%02X\t", addr);
 
 	byte value = rmem_b(addr);
 	ror_internal(&value);

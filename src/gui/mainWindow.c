@@ -32,13 +32,16 @@ int build_main_window(int speed) {
 	register_window_cycle(&cycle_main_window);
 	sevent(SDL_WINDOWEVENT, SDL_WINDOWEVENT_CLOSE, &on_quit_main_window);
 	sevent(SDL_WINDOWEVENT, SDL_WINDOWEVENT_RESIZED, &on_main_window_resized);
+	sevent(SDL_KEYUP, SDLK_ESCAPE, &on_quit_main_window);
 }
 
 int on_quit_main_window(SDL_Event e) {
-	if(e.window.windowID == SDL_GetWindowID(main_window.window)) {
+	if(e.window.windowID == SDL_GetWindowID(main_window.window) || e.key.keysym.sym == SDLK_ESCAPE) {
 		SDL_DestroyTexture(main_window.back_buffer_tex);
 		SDL_DestroyRenderer(main_window.renderer);
 		SDL_DestroyWindow(main_window.window);
+
+		//TODO call the quit for the rest of the windows. THis is a memory leak
 
 		//Manually raise a QUIT event
 		e.type = SDL_QUIT;

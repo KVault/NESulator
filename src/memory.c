@@ -49,7 +49,9 @@ void wmem_vram(unsigned short amountBytes, uint initialPosition, byte *content);
 /**
  * Handle the different operations with the PPU
  */
-void handle_ppu_registers(uint initialPosition, byte content);
+void ppu_reg_write(uint initialPosition, byte content);
+
+void ppu_reg_read(uint initialPosition);
 
 /**
  * VRAM function
@@ -102,16 +104,17 @@ void wmem(byte *memoryBank, unsigned short amountBytes, uint initialPosition, by
  */
 
 void wmem_ram(unsigned short amountBytes, uint initialPosition, byte *content) {
-	handle_ppu_registers(initialPosition, content[0]);
+	ppu_reg_write(initialPosition, content[0]);
 	wmem(ram_bank, amountBytes, initialPosition, content);
 	ram_mirroring(amountBytes, initialPosition, content);
 }
 
 void rmem_ram(unsigned short amountBytes, uint initialPosition, byte *destiny) {
+	ppu_reg_read(initialPosition);
 	rmem(ram_bank, amountBytes, initialPosition, destiny);
 }
 
-void handle_ppu_registers(uint initialPosition, byte content) {
+void ppu_reg_write(uint initialPosition, byte content) {
 	// TODO Check the mirroring
 	switch (initialPosition) {
 		case PPUADDR:
@@ -120,6 +123,17 @@ void handle_ppu_registers(uint initialPosition, byte content) {
 		case PPUDATA:
 			write_PPUDATA(content);
 			break;
+		default:break;
+	}
+}
+
+void ppu_reg_read(uint initialPosition) {
+	// TODO Check the mirroring
+	switch (initialPosition) {
+		case PPUDATA:
+			read_PPUDATA();
+			break;
+		default:break;
 	}
 }
 
