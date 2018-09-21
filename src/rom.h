@@ -33,8 +33,11 @@ typedef struct{
 
 	//MAPPER
 	int mapper;
-
 	byte *trainer;
+
+	//Only need one bit for the flags
+	uint mirroring:1;
+	uint four_screen:1;
 
 	//ROM
 	byte *prgROM;
@@ -58,5 +61,10 @@ void load_ROM(ROM *rom);
  * Cleans up the memory from the ROM. Basically it releases the mallocs
  */
 void ejectCartridge();
+
+/**
+ * Returns a pointer to the actual cartridge
+ */
+ROM *get_ROM();
 
 #endif //NESULATOR_ROM_H

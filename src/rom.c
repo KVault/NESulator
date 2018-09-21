@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include "rom.h"
+#include "mappers/NROM.h"
+#include "mappers/CNROM.h"
 
 //Create the struct outside so that when we fill it in and exit the function, we don't lose the reference
-//The emulator can run only one ROM at a time, so this also makes sense
+//The emulator can run only one ROM at a time, so this also makes sense (I think)
 ROM rom = {};
 
 ROM *insertCartridge(char *filePath) {
@@ -16,6 +18,9 @@ ROM *insertCartridge(char *filePath) {
 	fread(&rom.flags6, 1, 1, file);
 	fread(&rom.flags7, 1, 1, file);
 	fread(&rom.endOfHeader, 8, 1, file);
+
+	rom.mirroring = (uint)bit_test(rom.flags6, 0);
+	rom.four_screen = (uint)bit_test(rom.flags6, 3);
 
 	//Figure out the mapper number
 	int lowerBits = (rom.flags6 & 0b11110000) >> 4; // extract upper 4 bits of the flag6 and use them as lower bits
@@ -57,4 +62,8 @@ void ejectCartridge() {
 	free(rom.trainer);
 	free(rom.prgROM);
 	free(rom.chrROM);
+}
+
+ROM *get_ROM(){
+	return &rom;
 }

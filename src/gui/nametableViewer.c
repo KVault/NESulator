@@ -93,19 +93,19 @@ int cycle_nametable_viewer() {
 
 		SDL_RenderClear(window.renderer);
 
-		render_nametable_map(0x2000);
+		render_nametable_map(get_nt_start_addr(NT_TOP_LEFT));
 		SDL_UpdateTexture(window.top_left, NULL, back_buffer,NAMETABLE_TEX_WIDTH * sizeof(uint));
 		SDL_RenderCopy(window.renderer, window.top_left, NULL, &window.top_left_rect);
 
-		render_nametable_map(0x2400);
+		render_nametable_map(get_nt_start_addr(NT_TOP_RIGHT));
 		SDL_UpdateTexture(window.top_right, NULL, back_buffer,NAMETABLE_TEX_WIDTH * sizeof(uint));
 		SDL_RenderCopy(window.renderer, window.top_right, NULL, &window.top_right_rect);
 
-		render_nametable_map(0x2800);
+		render_nametable_map(get_nt_start_addr(NT_BOTTOM_LEFT));
 		SDL_UpdateTexture(window.bottom_left, NULL, back_buffer,NAMETABLE_TEX_WIDTH * sizeof(uint));
 		SDL_RenderCopy(window.renderer, window.bottom_left, NULL, &window.bottom_left_rect);
 
-		render_nametable_map(0x2C00);
+		render_nametable_map(get_nt_start_addr(NT_BOTTOM_RIGHT));
 		SDL_UpdateTexture(window.bottom_right, NULL, back_buffer,NAMETABLE_TEX_WIDTH * sizeof(uint));
 		SDL_RenderCopy(window.renderer, window.bottom_right, NULL, &window.bottom_right_rect);
 

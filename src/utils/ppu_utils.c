@@ -1,6 +1,4 @@
 #include "ppu_utils.h"
-#include "log.h"
-#include "math.h"
 
 void log_tile(struct tile *tile){
 	for (int i = 0; i < TILE_ROW_SIZE; ++i) {
@@ -34,4 +32,17 @@ struct tile nametable_tile(uint tile_id) {
 	struct tile tile;
 	encode_as_tiles(&vram_bank[base_tile_addr], 1, &tile);
 	return tile;
+}
+
+word get_nt_start_addr(NametableIndex nametableIndex){
+	switch (nametableIndex){
+		case NT_TOP_LEFT:
+			return 0x2000;
+		case NT_TOP_RIGHT:
+			return (word)(get_ROM()->mirroring ? 0x2400 : 0x2000);
+		case NT_BOTTOM_LEFT:
+			return (word)(get_ROM()->mirroring ? 0x2000 : 0x2800);
+		case NT_BOTTOM_RIGHT:
+			return (word)(get_ROM()->mirroring ? 0x2400 : 0x2800);
+	}
 }
