@@ -4,6 +4,8 @@
 #include "nes.h"
 #include "utils/Utils.h"
 #include "utils/log.h"
+#include "memory.h"
+#include "time.h"
 
 #define OPCODE_COUNT 256
 
@@ -32,9 +34,15 @@ byte SP;    // Stack Pointer, from 0x100 to 0x1FF address
  * C = carry flag (1 on unsigned overflow)
  */
 byte P;     // Status register, CPU flags
-int cyclesThisSec; //Counter of elapsed cycles (Hz) this current second.
-int speed;  //Speed of the CPU in Hz. Used to slow down the emulation to match the NES's clock speed
+int cpu_cyclesThisSec; //Counter of elapsed cycles (Hz) this current second.
+int cpu_speed;  //Speed of the CPU in Hz. Used to slow down the emulation to match the NES's clock speed
 byte currentOpcode; // The opcode of this cycle
+uint cpu_running;
+
+/**
+ * Main function for the CPU. It runs on a separate thread, and it takes care of keeping the right speed
+ */
+void *cpu_run(void *arg);
 
 /**
  * Initializes a CPU with the specified clock speed. This will set every register and pointer
@@ -117,12 +125,18 @@ void cpu_cycle();
 void log_instruction(int num_params, const char *mnemonic, ...);
 
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////INTERRUPTIONS REGION////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * BRK causes a non-maskable interrupt and increments the program counter by one.
  * Therefore an RTI will go to the address of the BRK +2 so that BRK may be used to replace a two-byte instruction
  * for debugging and the subsequent RTI will be correct.
  */
 void breakpoint();
+
+void nmi();
 
 
 //////////////////////////////////////////////////////////////////////////////////////////

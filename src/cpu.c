@@ -1,5 +1,38 @@
 #include "cpu.h"
-#include "memory.h"
+
+//TODO this has some dupplicated code. Can we fix this?
+void *cpu_run(void *arg){
+	cpu_running = 1;
+	static struct timespec this_second;
+	static struct timespec this_cycle;
+	long nano_per_cycle = (long)((1.0 / cpu_speed) * NANOSECOND);
+
+	long should_have_elapsed, have_elapsed, elapsed_delta = 0;
+	clock_gettime(CLOCK_REALTIME, &this_second);
+
+	while(cpu_running){
+		//Check if enough time has passed, and sleep the process otherwise
+		clock_gettime(CLOCK_REALTIME, &this_cycle);
+
+		//New second. Reset stuff
+		if(this_cycle.tv_sec > this_second.tv_sec){
+			this_second = this_cycle;
+			log_info("CPU cycles last second (%i): %d\n", this_cycle.tv_sec, cpu_cyclesThisSec);
+			cpu_cyclesThisSec = 0;
+		}
+
+		should_have_elapsed = nano_per_cycle * cpu_cyclesThisSec;
+		have_elapsed = this_cycle.tv_nsec - this_second.tv_nsec;
+		elapsed_delta = should_have_elapsed - have_elapsed;
+		if(elapsed_delta > 0){
+			this_cycle.tv_nsec = elapsed_delta;
+			this_cycle.tv_sec = 0;
+			nanosleep(&this_cycle, NULL);
+		}
+
+		cpu_cycle();
+	}
+}
 
 /**
  * More info here http://wiki.nesdev.com/w/index.php/CPU_power_up_state
@@ -13,7 +46,7 @@
  *  All 15 bits of noise channel LFSR = $0000.
  *  The first time the LFSR is clocked from the all-0s state, it will shift in a 1.
  */
-void cpu_power_up(int clock_speed) {
+void cpu_power_up(int clock_speed_hertzs) {
 	zero_ram();
 	A = X = Y = 0;
 	P = 0x24;
@@ -24,8 +57,8 @@ void cpu_power_up(int clock_speed) {
 		wmem_b(i, 0);
 	}
 
-	speed = clock_speed;
-	cyclesThisSec = 0;
+	cpu_speed = clock_speed_hertzs;
+	cpu_cyclesThisSec = 0;
 	//TODO IRQ stuff
 	//TODO LFSR stuff
 }
@@ -42,7 +75,7 @@ void nop(int cycles, int pcIncrease) {
 	log_instruction(0, "NOP\t\t\t");
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void nop1() {
@@ -60,9 +93,17 @@ void nop3() {
 void breakpoint() {
 	bit_set(&P, flagB);
 	bit_set(&P, 5);
-	cyclesThisSec += 7;
+	cpu_cyclesThisSec += 7;
 	PC++;
 	//log_instruction(0, "BRK");
+}
+
+void nmi(){
+	push_w(PC);
+	bit_clear(&P, flagB);
+	push_b(P);
+	word nmi_vector = rmem_w(0xFFFA);
+	PC = nmi_vector;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +124,7 @@ void ora(byte b, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(A, 7));
 
 	//Update cycles and pc
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
 
 }
@@ -141,7 +182,7 @@ void asl(byte *b, int cycles, int pcIncrease) {
 	*b = shifted;
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void asl_zpage() {
@@ -190,7 +231,7 @@ void jsr_absolute() {
 	push_w(cachedPC); // Stores the address of the next opcode minus one
 
 	PC = addr;
-	cyclesThisSec += 6;
+	cpu_cyclesThisSec += 6;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +243,7 @@ void php() {
 	push_b(P);
 
 	PC++;
-	cyclesThisSec += 3;
+	cpu_cyclesThisSec += 3;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -218,7 +259,7 @@ void plp() {
 	bit_clear(&P, flagB);
 
 	PC++;
-	cyclesThisSec += 4;
+	cpu_cyclesThisSec += 4;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +271,7 @@ void pha() {
 	push_b(A);
 
 	PC++;
-	cyclesThisSec += 3;
+	cpu_cyclesThisSec += 3;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -244,7 +285,7 @@ void pla() {
 	bit_val(&P, flagN, bit_test(A, 7));
 
 	PC++;
-	cyclesThisSec += 4;
+	cpu_cyclesThisSec += 4;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -264,7 +305,7 @@ void txs() {
 	log_instruction(0, "TXS\t\t\t");
 	SP = X;
 	PC++;
-	cyclesThisSec += 2;
+	cpu_cyclesThisSec += 2;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -278,7 +319,7 @@ void and(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagN, bit_test(A, 7));
 
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
 }
 
@@ -333,7 +374,7 @@ void bit(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagV, bit_test(value, 6));
 	bit_val(&P, flagN, bit_test(value, 7));
 
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
 }
 
@@ -360,7 +401,7 @@ void bit_absolute() {
  */
 void set_flag_value(byte flag, int isSet) {
 	bit_val(&P, flag, isSet);
-	cyclesThisSec += 2; //Constant. Always
+	cpu_cyclesThisSec += 2; //Constant. Always
 	PC++; //Constant. Always
 }
 
@@ -411,7 +452,7 @@ void transfer_reg(byte *from_reg, byte *to_reg) {
 	bit_val(&P, flagZ, *to_reg == 0);
 	bit_val(&P, flagN, bit_test(*to_reg, 7));
 	PC++;
-	cyclesThisSec += 2;
+	cpu_cyclesThisSec += 2;
 }
 
 /**
@@ -422,7 +463,7 @@ void dec_reg(byte *reg) {
 	bit_val(&P, flagZ, *reg == 0);
 	bit_val(&P, flagN, bit_test(*reg, 7));
 	PC++;
-	cyclesThisSec += 2;
+	cpu_cyclesThisSec += 2;
 }
 
 /**
@@ -433,7 +474,7 @@ void inc_reg(byte *reg) {
 	bit_val(&P, flagZ, *reg == 0);
 	bit_val(&P, flagN, bit_test(*reg, 7));
 	PC++;
-	cyclesThisSec += 2;
+	cpu_cyclesThisSec += 2;
 }
 
 void tax() {
@@ -504,7 +545,7 @@ void adc(byte value, int cycles, int pcIncrease) {
 	adc_internal(value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void adc_immediate() {
@@ -551,12 +592,12 @@ void adc_indirect_y() {
 void try_branch(byte flag, int req_flag_val, const char *mnemonic) {
 	signed char value = rmem_b(PC + 1); //byte is unsigned but we need a signed char
 	log_instruction(1, mnemonic, PC + 2 + value);
-	cyclesThisSec += 2;//This is always constant
+	cpu_cyclesThisSec += 2;//This is always constant
 
 	PC += 2;
 	if (bit_test(P, flag) == req_flag_val) {
 		PC += value;
-		cyclesThisSec++;
+		cpu_cyclesThisSec++;
 		//TODO +2 cycle if page crossed
 	}
 }
@@ -604,7 +645,7 @@ void sbc(byte value, int cycles, int pcIncrease) {
 	adc_internal(~value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void sbc_immediate() {
@@ -660,7 +701,7 @@ void delta_memory(word memAddr, int delta, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(value, 7));
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void inc_mem(word memAddr, int cycles, int pcIncrease) {
@@ -725,7 +766,7 @@ void load_register(byte *regPtr, byte value, int cycles, int pcIncrease, const c
 	bit_val(&P, flagN, bit_test(*regPtr, 7));
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void lda_inmediate() {
@@ -818,7 +859,7 @@ void store_register(byte reg, word memAddr, int cycles, int pcIncrease, const ch
 	wmem_b(memAddr, reg);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void sta_zpage() {
@@ -882,7 +923,7 @@ void rts() {
 	PC = pop_w();
 
 	PC++; // JSR pushes the address -1, so when we recover (here) we have to add 1 to make up for that "1" lost
-	cyclesThisSec += 6;
+	cpu_cyclesThisSec += 6;
 }
 
 void rti() {
@@ -890,7 +931,7 @@ void rti() {
 	P = pop_b();
 	bit_set(&P, flagUnused);//It has to be one. Always
 	PC = pop_w(); //Unlike RTS. RTI pulls the correct PC address. No need to increment
-	cyclesThisSec += 6;
+	cpu_cyclesThisSec += 6;
 }
 
 
@@ -910,7 +951,7 @@ void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease, cons
 	bit_val(&P, flagZ, *regPtr == value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void cmp_inmediate() {
@@ -997,7 +1038,7 @@ void lsr(byte *value, int cycles, int pcIncrease) {
 	lsr_internal(value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void lsr_zpage() {
@@ -1052,7 +1093,7 @@ void rol(byte *value, int cycles, int pcIncrease) {
 	*value = shifted;
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void rol_zpage() {
@@ -1108,7 +1149,7 @@ void ror(byte *value, int cycles, int pcIncrease) {
 	ror_internal(value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void ror_zpage() {
@@ -1162,7 +1203,7 @@ void eor(byte value, int cycles, int pcIncrease) {
 	eor_internal(value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void eor_immediate() {
@@ -1209,7 +1250,7 @@ void jmp(word addr, int cycles) {
 	log_instruction(2, "JMP $%02X\t", addr);
 
 	PC = addr;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void jmp_absolute() {
@@ -1234,7 +1275,7 @@ void lax(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(value, 7));
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void lax_absolute() {
@@ -1274,7 +1315,7 @@ void axs(word addr, int cycles, int pcIncrease) {
 	wmem_b(addr, value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void axs_indirect_x() {
@@ -1315,7 +1356,7 @@ void dcm(word addr, int cycles, int pcIncrease){
 	bit_val(&P, flagZ, A == value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void dcm_absolute(){
@@ -1364,7 +1405,7 @@ void ins(word addr, int cycles, int pcIncrease){
 	adc_internal(~value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void ins_absolute(){
@@ -1416,7 +1457,7 @@ void aso(word addr, int cycles, int pcIncrease){
 	bit_val(&P, flagN, bit_test(A, 7));
 
 	//Update cycles and pc
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
 }
 
@@ -1473,7 +1514,7 @@ void rla(word addr, int cycles, int pcIncrease){
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagN, bit_test(A, 7));
 
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
 }
 
@@ -1519,7 +1560,7 @@ void lse(word addr, int cycles, int pcIncrease){
 	eor_internal(data);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void lse_absolute(){
@@ -1567,7 +1608,7 @@ void rra(word addr, int cycles, int pcIncrease){
 	adc_internal(value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void rra_absolute(){
@@ -1975,6 +2016,6 @@ void log_instruction(int num_params, const char *mnemonic, ...) {
 	log_debug(" ");
 
 	//And the rest of the registers
-	log_debug("SP:%02X CYC:%d", SP, cyclesThisSec);
+	log_debug("SP:%02X CYC:%d", SP, cpu_cyclesThisSec);
 	log_debug("\n");
 }

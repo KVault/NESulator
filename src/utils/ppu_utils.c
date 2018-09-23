@@ -34,6 +34,11 @@ struct tile nametable_tile(uint tile_id) {
 	return tile;
 }
 
+/**
+ * This "Magic numbers" are actually the memory addresses. They have to be somewhere and this place
+ * looks as good as any other. We don't want #defines or global variables since we don't want to be
+ * touching them from outside
+ */
 word get_nt_start_addr(NametableIndex nametableIndex){
 	switch (nametableIndex){
 		case NT_TOP_LEFT:

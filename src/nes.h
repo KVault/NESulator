@@ -9,6 +9,7 @@
 #include "apu.h"
 #include "stdlib.h"
 #include "stdio.h"
+#include "pthread.h"
 
 int stop_emulation(SDL_Event);
 

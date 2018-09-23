@@ -69,6 +69,13 @@ void ram_mirroring(unsigned short amountBytes, uint initialPosition, byte *conte
 			}
 		}
 	}
+	if(initialPosition >= 0x2000 && initialPosition <= 0x3FFF){
+		for (int k = initialPosition; k < 0x3FFF; k+=8) {
+			for (int j = k; i < amountBytes; j++, i++) {
+				ram_bank[j] = content[i];
+			}
+		}
+	}
 	//TODO mirroring $2008-$3FFF
 }
 

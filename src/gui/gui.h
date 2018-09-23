@@ -11,8 +11,6 @@
 #include "patterntableViewer.h"
 #include "../utils/colour_palette.h"
 
-#define MILLISECOND 1000.0
-
 /**
  * Function header for the callbacks. Every function has to match this header to be able to register itself
  * as a callback.

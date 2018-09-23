@@ -8,6 +8,9 @@ typedef unsigned int uint;
 #define BYTE 1
 #define WORD 2
 
+#define MILLISECOND 1000.0
+#define NANOSECOND  1000000000.0
+
 /**
  * Return the bitPos'th value of b
  */
