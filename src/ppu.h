@@ -13,6 +13,7 @@
 #define PPUDATA 0x2007
 #define OAMDMA 0x4014
 #define PPU_SCANLINES 261
+#define PPU_VISIBLE_SCANLINES 240
 #define PPU_POINT_PER_SCANLINE 340
 
 static enum {
@@ -28,6 +29,7 @@ int ppu_points_per_cpu_cycle;  //Speed of the PPU in Hz. Used to slow down the e
 static int ppu_cycles_this_sec;
 static int current_scanline;
 static int current_cycle_scanline;
+static int in_vblank;
 
 
 

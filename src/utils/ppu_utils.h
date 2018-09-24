@@ -31,7 +31,7 @@ struct tile {
  */
 void encode_as_tiles(byte *mem_addr, byte number_tiles, struct tile *tiles);
 
-struct tile nametable_tile(uint tile_id);
+struct tile nametable_tile(byte tile_id);
 
 /**
  * Uses the current mirroring to return the start address of the nametable index

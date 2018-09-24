@@ -78,7 +78,7 @@ void render_tile(struct tile *tile, uint row_id, uint column_id) {
 void render_nametable_map(word start_addr){
 	for (uint i = 0; i < NAMETABLE_ROWS_MAP; ++i) {
 		for (uint j = 0; j < NAMETABLE_TILES_PER_ROW; ++j) {
-			byte tile_id = rmem_b_vram(start_addr + i);
+			byte tile_id = rmem_b_vram(start_addr + ((i * NAMETABLE_TILES_PER_ROW)  + j));
 			struct tile tile = nametable_tile(tile_id);
 			render_tile(&tile, i, j);
 		}

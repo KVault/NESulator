@@ -95,7 +95,6 @@ void breakpoint() {
 	bit_set(&P, 5);
 	cpu_cyclesThisSec += 7;
 	PC++;
-	//log_instruction(0, "BRK");
 }
 
 void nmi(){
@@ -173,7 +172,7 @@ void ora_absolute_y() {
  * if the number is negative AFTER the shifting the we set the negative flag.
  */
 void asl(byte *b, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "ASL #$%02X", b);
+	log_instruction(pcIncrease - 1, "\tASL #$%02X", b);
 	bit_val(&P, flagC, bit_test(*b, flagN));
 
 	byte shifted = *b << 1;
@@ -774,15 +773,15 @@ void lda_inmediate() {
 }
 
 void lda_zpage() {
-	load_register(&A, zpage_param(), 3, 2, "LDA #$%02X\t");
+	load_register(&A, zpage_param(), 3, 2, "\tLDA #$%02X\t");
 }
 
 void lda_zpage_x() {
-	load_register(&A, zpagex_param(), 4, 2, "LDA #$%02X\t");
+	load_register(&A, zpagex_param(), 4, 2, "\tLDA #$%02X\t");
 }
 
 void lda_absolute() {
-	load_register(&A, absolute_param(), 4, 3, "LDA #$%02X\t");
+	load_register(&A, absolute_param(), 4, 3, "\tLDA #$%02X\t");
 }
 
 void lda_absolute_x() {
@@ -792,16 +791,16 @@ void lda_absolute_x() {
 }
 
 void lda_absolute_y() {
-	load_register(&A, absolutey_param(), 4, 3, "LDA #$%02X\t");
+	load_register(&A, absolutey_param(), 4, 3, "\tLDA #$%02X\t");
 	// TODO +1 if page crossed
 }
 
 void lda_indirect_x() {
-	load_register(&A, indirectx_param(), 6, 2, "LDA #$%02X\t");
+	load_register(&A, indirectx_param(), 6, 2, "\tLDA #$%02X\t");
 }
 
 void lda_indirect_y() {
-	load_register(&A, indirecty_param(), 5, 2, "LDA #$%02X\t");
+	load_register(&A, indirecty_param(), 5, 2, "\tLDA #$%02X\t");
 	// TODO +1 if page crossed
 }
 
@@ -863,11 +862,11 @@ void store_register(byte reg, word memAddr, int cycles, int pcIncrease, const ch
 }
 
 void sta_zpage() {
-	store_register(A, zpage_addr(rmem_b(PC + 1)), 3, 2, "STA $%02X = %02X");
+	store_register(A, zpage_addr(rmem_b(PC + 1)), 3, 2, "\tSTA $%02X = %02X");
 }
 
 void sta_zpage_x() {
-	store_register(A, zpagex_addr(rmem_b(PC + 1)), 4, 2, "STA $%02X = %02X");
+	store_register(A, zpagex_addr(rmem_b(PC + 1)), 4, 2, "\tSTA $%02X = %02X");
 }
 
 void sta_absolute() {
@@ -883,7 +882,7 @@ void sta_absolute_y() {
 }
 
 void sta_indirect_x() {
-	store_register(A, indirectx_addr(rmem_b(PC + 1)), 6, 2, "STA $%02X = %02X");
+	store_register(A, indirectx_addr(rmem_b(PC + 1)), 6, 2, "\tSTA $%02X = %02X");
 }
 
 void sta_indirect_y() {
@@ -1144,7 +1143,7 @@ void ror_internal(byte *value){
 }
 
 void ror(byte *value, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "ROR $%02X", value);
+	log_instruction(pcIncrease - 1, "\tROR $%02X\t", value);
 
 	ror_internal(value);
 

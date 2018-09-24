@@ -35,16 +35,23 @@ void *ppu_run(void *arg){
 }
 
 void ppu_cycle() {
-
 	//h-blank
+	//TODO how long does it take to reset to 0? Take that time into account
 	if(current_cycle_scanline > PPU_POINT_PER_SCANLINE){
 		current_cycle_scanline = 0;
 		++current_scanline;
 	}
 
 	//v-blank
-	if(current_scanline > PPU_SCANLINES){
+	if(current_scanline > PPU_VISIBLE_SCANLINES && !in_vblank){
 		start_vblank();
+	}
+
+	//Finish the v-blank!
+	if(current_scanline > PPU_SCANLINES){
+		//finish_vblank();
+		current_scanline = 0;
+		in_vblank = 0;
 	}
 
 	++current_cycle_scanline;
@@ -76,15 +83,15 @@ void write_PPUADDR(byte value) {
 
 void write_PPUDATA(byte value) {
 	wmem_b_vram(v, value);
-	v += bit_test(rmem_b(PPUCTRL), 2) ? 32 : 1;
+	v += bit_test(rmem_b(PPUCTRL), 3) ? 32 : 1;
 }
 
 byte read_PPUDATA(){
-	v += bit_test(rmem_b(PPUCTRL), 2) ? 32 : 1;
+	v += bit_test(rmem_b(PPUCTRL), 3) ? 32 : 1;
 	return rmem_b_vram(v);
 }
 
 void start_vblank(){
-	current_scanline = 0;
+	in_vblank = 1;
 	nmi();
 }
