@@ -18,7 +18,7 @@ int stop_emulation(SDL_Event e) {
 
 int main() {
 	//LOGS
-	set_console_log_level(ConsoleError);
+	set_console_log_level(ConsoleInfo);
 	set_file_log_level(FileDebug);
 	set_clear_log_file();
 	set_log_path("../../logs/donkey_kong.log");
@@ -44,14 +44,29 @@ int main() {
 	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
 	//control this with a debugger, or an UI. But for now, it simply runs forever
 	while (is_running) {
-		//SDL stuff. Not related with the actual emulator
 		cpu_cycle();
-		gui_cycle();
 		ppu_cycle();
+		gui_cycle();
+		every_second();
 	}
 
 
 	return 0;
+}
+
+void every_second() {
+	static long last_second = 0;
+	static long ctime = 0;
+	ctime = time(NULL);
+
+	//More than one second elapsed
+	if (ctime - last_second > 1) {
+		last_second = time(NULL);
+		log_info("Processor speed: %iHz\n", cpu_cyclesThisSec);
+		cpu_cyclesThisSec = 0;
+	}
+
+
 }
 
 void register_events() {

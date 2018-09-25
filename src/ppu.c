@@ -1,5 +1,18 @@
 #include "ppu.h"
 
+
+void ppu_power_up(int clock_speed) {
+	wmem_b(PPUCTRL, 0);
+	wmem_b(PPUMASK, 0);
+	wmem_b(PPUSTATUS, 0xA0);
+	wmem_b(OAMADDR, 0);
+	wmem_b(PPUSCROLL, 0);
+	wmem_b(PPUADDR, 0);
+	wmem_b(PPUDATA, 0);
+	wmem_b(OAMDATA, 0); // Undefined default value
+	wmem_b(OAMDMA, 0); // Undefined default value
+}
+
 //TODO this has some dupplicated code. Can we fix this?
 void *ppu_run(void *arg){
 	ppu_running = 1;
@@ -49,27 +62,18 @@ void ppu_cycle() {
 
 	//Finish the v-blank!
 	if(current_scanline > PPU_SCANLINES){
-		//finish_vblank();
-		current_scanline = 0;
-		in_vblank = 0;
+		finish_vblank();
 	}
+
+	try_trigger_nmi();
 
 	++current_cycle_scanline;
 	++ppu_cycles_this_sec;
 }
 
-void ppu_power_up(int clock_speed) {
-	wmem_b(PPUCTRL, 0);
-	wmem_b(PPUMASK, 0);
-	wmem_b(PPUSTATUS, 0xA0);
-	wmem_b(OAMADDR, 0);
-	wmem_b(PPUSCROLL, 0);
-	wmem_b(PPUADDR, 0);
-	wmem_b(PPUDATA, 0);
-	wmem_b(OAMDATA, 0); // Undefined default value
-	wmem_b(OAMDMA, 0); // Undefined default value
-}
-
+///////////////////////////////////////////////////////////////////////////
+/////////////////////////////REGISTERS/////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 void write_PPUADDR(byte value) {
 	if (w == 0) {
 		t = value << 8;
@@ -91,7 +95,29 @@ byte read_PPUDATA(){
 	return rmem_b_vram(v);
 }
 
+void write_PPUCTRL(byte value){
+	nmi_output = bit_test(value, 7);
+}
+///////////////////////////////////////////////////////////////////////////
+////////////////////////END OF REGISTERS///////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+
 void start_vblank(){
-	in_vblank = 1;
-	nmi();
+	in_vblank = TRUE;
+	nmi_occurred = TRUE;
+}
+
+void finish_vblank(){
+	in_vblank = FALSE;
+	nmi_occurred = FALSE;
+	current_scanline = 0;
+}
+
+void try_trigger_nmi(){
+	//TODO Docs also say that nmi_output == TRUE? but if I do that, nothing comes up
+	if(nmi_occurred == TRUE){
+		nmi();
+		nmi_occurred = FALSE;
+	}
 }

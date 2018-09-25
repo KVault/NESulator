@@ -30,6 +30,8 @@ static int ppu_cycles_this_sec;
 static int current_scanline;
 static int current_cycle_scanline;
 static int in_vblank;
+static int nmi_occurred;
+static int nmi_output;
 
 
 
@@ -54,8 +56,17 @@ void write_PPUADDR(byte value);
 
 void write_PPUDATA(byte value);
 
+void write_PPUCTRL(byte value);
+
 byte read_PPUDATA();
 
 void start_vblank();
+
+void finish_vblank();
+
+/**
+ * Checks for the correct conditions to trigger an nmi. If they are met, then it triggers it
+ */
+void try_trigger_nmi();
 
 #endif //NESULATOR_PPU_H

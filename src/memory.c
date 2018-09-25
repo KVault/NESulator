@@ -130,6 +130,9 @@ void ppu_reg_write(uint initialPosition, byte content) {
 		case PPUDATA:
 			write_PPUDATA(content);
 			break;
+		case PPUCTRL:
+			write_PPUCTRL(content);
+			break;
 		default:break;
 	}
 }

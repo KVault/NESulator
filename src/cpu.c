@@ -102,6 +102,7 @@ void nmi(){
 	bit_clear(&P, flagB);
 	push_b(P);
 	word nmi_vector = rmem_w(0xFFFA);
+	bit_set(&P, flagI);
 	PC = nmi_vector;
 }
 
