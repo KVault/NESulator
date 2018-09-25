@@ -1,5 +1,38 @@
 #include "cpu.h"
-#include "memory.h"
+
+//TODO this has some dupplicated code. Can we fix this?
+void *cpu_run(void *arg) {
+	cpu_running = 1;
+	static struct timespec this_second;
+	static struct timespec this_cycle;
+	long nano_per_cycle = (long) ((1.0 / cpu_speed) * NANOSECOND);
+
+	long should_have_elapsed, have_elapsed, elapsed_delta = 0;
+	clock_gettime(CLOCK_REALTIME, &this_second);
+
+	while (cpu_running) {
+		//Check if enough time has passed, and sleep the process otherwise
+		clock_gettime(CLOCK_REALTIME, &this_cycle);
+
+		//New second. Reset stuff
+		if (this_cycle.tv_sec > this_second.tv_sec) {
+			this_second = this_cycle;
+			log_info("CPU cycles last second (%i): %d\n", this_cycle.tv_sec, cpu_cyclesThisSec);
+			cpu_cyclesThisSec = 0;
+		}
+
+		should_have_elapsed = nano_per_cycle * cpu_cyclesThisSec;
+		have_elapsed = this_cycle.tv_nsec - this_second.tv_nsec;
+		elapsed_delta = should_have_elapsed - have_elapsed;
+		if (elapsed_delta > 0) {
+			this_cycle.tv_nsec = elapsed_delta;
+			this_cycle.tv_sec = 0;
+			nanosleep(&this_cycle, NULL);
+		}
+
+		cpu_instruction();
+	}
+}
 
 /**
  * More info here http://wiki.nesdev.com/w/index.php/CPU_power_up_state
@@ -13,7 +46,7 @@
  *  All 15 bits of noise channel LFSR = $0000.
  *  The first time the LFSR is clocked from the all-0s state, it will shift in a 1.
  */
-void cpu_power_up(int clock_speed) {
+void cpu_power_up(int clock_speed_hertzs) {
 	zero_ram();
 	A = X = Y = 0;
 	P = 0x24;
@@ -24,8 +57,8 @@ void cpu_power_up(int clock_speed) {
 		wmem_b(i, 0);
 	}
 
-	speed = clock_speed;
-	cyclesThisSec = 0;
+	cpu_speed = clock_speed_hertzs;
+	cpu_cyclesThisSec = 0;
 	//TODO IRQ stuff
 	//TODO LFSR stuff
 }
@@ -42,7 +75,7 @@ void nop(int cycles, int pcIncrease) {
 	log_instruction(0, "NOP\t\t\t");
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void nop1() {
@@ -60,9 +93,17 @@ void nop3() {
 void breakpoint() {
 	bit_set(&P, flagB);
 	bit_set(&P, 5);
-	cyclesThisSec += 7;
+	cpu_cyclesThisSec += 7;
 	PC++;
-	//log_instruction(0, "BRK");
+}
+
+void nmi() {
+	push_w(PC);
+	bit_clear(&P, flagB);
+	push_b(P);
+	word nmi_vector = rmem_w(0xFFFA);
+	bit_set(&P, flagI);
+	PC = nmi_vector;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +124,7 @@ void ora(byte b, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(A, 7));
 
 	//Update cycles and pc
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
 
 }
@@ -132,7 +173,7 @@ void ora_absolute_y() {
  * if the number is negative AFTER the shifting the we set the negative flag.
  */
 void asl(byte *b, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "ASL #$%02X", b);
+	log_instruction(pcIncrease - 1, "\tASL #$%02X", b);
 	bit_val(&P, flagC, bit_test(*b, flagN));
 
 	byte shifted = *b << 1;
@@ -141,7 +182,7 @@ void asl(byte *b, int cycles, int pcIncrease) {
 	*b = shifted;
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void asl_zpage() {
@@ -190,7 +231,7 @@ void jsr_absolute() {
 	push_w(cachedPC); // Stores the address of the next opcode minus one
 
 	PC = addr;
-	cyclesThisSec += 6;
+	cpu_cyclesThisSec += 6;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +243,7 @@ void php() {
 	push_b(P);
 
 	PC++;
-	cyclesThisSec += 3;
+	cpu_cyclesThisSec += 3;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -218,7 +259,7 @@ void plp() {
 	bit_clear(&P, flagB);
 
 	PC++;
-	cyclesThisSec += 4;
+	cpu_cyclesThisSec += 4;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +271,7 @@ void pha() {
 	push_b(A);
 
 	PC++;
-	cyclesThisSec += 3;
+	cpu_cyclesThisSec += 3;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -244,7 +285,7 @@ void pla() {
 	bit_val(&P, flagN, bit_test(A, 7));
 
 	PC++;
-	cyclesThisSec += 4;
+	cpu_cyclesThisSec += 4;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -264,7 +305,7 @@ void txs() {
 	log_instruction(0, "TXS\t\t\t");
 	SP = X;
 	PC++;
-	cyclesThisSec += 2;
+	cpu_cyclesThisSec += 2;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -278,7 +319,7 @@ void and(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagN, bit_test(A, 7));
 
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
 }
 
@@ -333,7 +374,7 @@ void bit(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagV, bit_test(value, 6));
 	bit_val(&P, flagN, bit_test(value, 7));
 
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
 }
 
@@ -360,7 +401,7 @@ void bit_absolute() {
  */
 void set_flag_value(byte flag, int isSet) {
 	bit_val(&P, flag, isSet);
-	cyclesThisSec += 2; //Constant. Always
+	cpu_cyclesThisSec += 2; //Constant. Always
 	PC++; //Constant. Always
 }
 
@@ -411,7 +452,7 @@ void transfer_reg(byte *from_reg, byte *to_reg) {
 	bit_val(&P, flagZ, *to_reg == 0);
 	bit_val(&P, flagN, bit_test(*to_reg, 7));
 	PC++;
-	cyclesThisSec += 2;
+	cpu_cyclesThisSec += 2;
 }
 
 /**
@@ -422,7 +463,7 @@ void dec_reg(byte *reg) {
 	bit_val(&P, flagZ, *reg == 0);
 	bit_val(&P, flagN, bit_test(*reg, 7));
 	PC++;
-	cyclesThisSec += 2;
+	cpu_cyclesThisSec += 2;
 }
 
 /**
@@ -433,7 +474,7 @@ void inc_reg(byte *reg) {
 	bit_val(&P, flagZ, *reg == 0);
 	bit_val(&P, flagN, bit_test(*reg, 7));
 	PC++;
-	cyclesThisSec += 2;
+	cpu_cyclesThisSec += 2;
 }
 
 void tax() {
@@ -504,7 +545,7 @@ void adc(byte value, int cycles, int pcIncrease) {
 	adc_internal(value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void adc_immediate() {
@@ -551,12 +592,12 @@ void adc_indirect_y() {
 void try_branch(byte flag, int req_flag_val, const char *mnemonic) {
 	signed char value = rmem_b(PC + 1); //byte is unsigned but we need a signed char
 	log_instruction(1, mnemonic, PC + 2 + value);
-	cyclesThisSec += 2;//This is always constant
+	cpu_cyclesThisSec += 2;//This is always constant
 
 	PC += 2;
 	if (bit_test(P, flag) == req_flag_val) {
 		PC += value;
-		cyclesThisSec++;
+		cpu_cyclesThisSec++;
 		//TODO +2 cycle if page crossed
 	}
 }
@@ -604,7 +645,7 @@ void sbc(byte value, int cycles, int pcIncrease) {
 	adc_internal(~value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void sbc_immediate() {
@@ -660,16 +701,16 @@ void delta_memory(word memAddr, int delta, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(value, 7));
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void inc_mem(word memAddr, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "INC #$%02X = %02X", memAddr, memAddr + 1);
+	log_instruction(pcIncrease - 1, "\tINC #$%02X = %02X", memAddr, memAddr + 1);
 	delta_memory(memAddr, 1, cycles, pcIncrease);
 }
 
 void dec_mem(word memAddr, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "INC #$%02X = %02X", memAddr, memAddr - 1);
+	log_instruction(pcIncrease - 1, "\tDEC #$%02X = %02X", memAddr, memAddr - 1);
 	delta_memory(memAddr, -1, cycles, pcIncrease);
 }
 
@@ -713,7 +754,6 @@ void dec_mem_absolute_x() {
 	dec_mem(addr, 7, 3);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////LOAD REGISTERS INC/DEC REGION///////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -726,7 +766,7 @@ void load_register(byte *regPtr, byte value, int cycles, int pcIncrease, const c
 	bit_val(&P, flagN, bit_test(*regPtr, 7));
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void lda_inmediate() {
@@ -734,15 +774,15 @@ void lda_inmediate() {
 }
 
 void lda_zpage() {
-	load_register(&A, zpage_param(), 3, 2, "LDA #$%02X\t");
+	load_register(&A, zpage_param(), 3, 2, "\tLDA #$%02X\t");
 }
 
 void lda_zpage_x() {
-	load_register(&A, zpagex_param(), 4, 2, "LDA #$%02X\t");
+	load_register(&A, zpagex_param(), 4, 2, "\tLDA #$%02X\t");
 }
 
 void lda_absolute() {
-	load_register(&A, absolute_param(), 4, 3, "LDA #$%02X\t");
+	load_register(&A, absolute_param(), 4, 3, "\tLDA #$%02X\t");
 }
 
 void lda_absolute_x() {
@@ -752,16 +792,16 @@ void lda_absolute_x() {
 }
 
 void lda_absolute_y() {
-	load_register(&A, absolutey_param(), 4, 3, "LDA #$%02X\t");
+	load_register(&A, absolutey_param(), 4, 3, "\tLDA #$%02X\t");
 	// TODO +1 if page crossed
 }
 
 void lda_indirect_x() {
-	load_register(&A, indirectx_param(), 6, 2, "LDA #$%02X\t");
+	load_register(&A, indirectx_param(), 6, 2, "\tLDA #$%02X\t");
 }
 
 void lda_indirect_y() {
-	load_register(&A, indirecty_param(), 5, 2, "LDA #$%02X\t");
+	load_register(&A, indirecty_param(), 5, 2, "\tLDA #$%02X\t");
 	// TODO +1 if page crossed
 }
 
@@ -807,7 +847,6 @@ void ldy_absolute_x() {
 	// TODO +1 if page crossed
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////STORE REGISTERS REGION///////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -820,15 +859,15 @@ void store_register(byte reg, word memAddr, int cycles, int pcIncrease, const ch
 	wmem_b(memAddr, reg);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void sta_zpage() {
-	store_register(A, zpage_addr(rmem_b(PC + 1)), 3, 2, "STA $%02X = %02X");
+	store_register(A, zpage_addr(rmem_b(PC + 1)), 3, 2, "\tSTA $%02X = %02X");
 }
 
 void sta_zpage_x() {
-	store_register(A, zpagex_addr(rmem_b(PC + 1)), 4, 2, "STA $%02X = %02X");
+	store_register(A, zpagex_addr(rmem_b(PC + 1)), 4, 2, "\tSTA $%02X = %02X");
 }
 
 void sta_absolute() {
@@ -844,7 +883,7 @@ void sta_absolute_y() {
 }
 
 void sta_indirect_x() {
-	store_register(A, indirectx_addr(rmem_b(PC + 1)), 6, 2, "STA $%02X = %02X");
+	store_register(A, indirectx_addr(rmem_b(PC + 1)), 6, 2, "\tSTA $%02X = %02X");
 }
 
 void sta_indirect_y() {
@@ -884,7 +923,7 @@ void rts() {
 	PC = pop_w();
 
 	PC++; // JSR pushes the address -1, so when we recover (here) we have to add 1 to make up for that "1" lost
-	cyclesThisSec += 6;
+	cpu_cyclesThisSec += 6;
 }
 
 void rti() {
@@ -892,7 +931,7 @@ void rti() {
 	P = pop_b();
 	bit_set(&P, flagUnused);//It has to be one. Always
 	PC = pop_w(); //Unlike RTS. RTI pulls the correct PC address. No need to increment
-	cyclesThisSec += 6;
+	cpu_cyclesThisSec += 6;
 }
 
 
@@ -912,7 +951,7 @@ void compare_register(byte *regPtr, byte value, int cycles, int pcIncrease, cons
 	bit_val(&P, flagZ, *regPtr == value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void cmp_inmediate() {
@@ -982,7 +1021,7 @@ void cpy_absolute() {
 
 void lsr_internal(byte *value);
 
-void lsr_internal(byte *value){
+void lsr_internal(byte *value) {
 	bit_val(&P, flagC, bit_test(*value, 0));
 
 	byte shifted = *value >> 1;
@@ -999,7 +1038,7 @@ void lsr(byte *value, int cycles, int pcIncrease) {
 	lsr_internal(value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void lsr_zpage() {
@@ -1054,7 +1093,7 @@ void rol(byte *value, int cycles, int pcIncrease) {
 	*value = shifted;
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void rol_zpage() {
@@ -1091,7 +1130,7 @@ void rol_absolute_x() {
 
 void ror_internal(byte *value);
 
-void ror_internal(byte *value){
+void ror_internal(byte *value) {
 	byte cachedFlagC = (byte) bit_test(P, flagC);
 	byte cached0 = (byte) bit_test(*value, 0);
 
@@ -1105,12 +1144,12 @@ void ror_internal(byte *value){
 }
 
 void ror(byte *value, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "ROR $%02X", value);
+	log_instruction(pcIncrease - 1, "\tROR $%02X\t", value);
 
 	ror_internal(value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void ror_zpage() {
@@ -1151,7 +1190,7 @@ void ror_absolute_x() {
 //////////////////////////////////////////////////////////////////////////////////////////
 void eor_internal(byte value);
 
-void eor_internal(byte value){
+void eor_internal(byte value) {
 	A ^= value;
 
 	bit_val(&P, flagN, bit_test(A, 7));
@@ -1164,7 +1203,7 @@ void eor(byte value, int cycles, int pcIncrease) {
 	eor_internal(value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void eor_immediate() {
@@ -1211,7 +1250,7 @@ void jmp(word addr, int cycles) {
 	log_instruction(2, "JMP $%02X\t", addr);
 
 	PC = addr;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void jmp_absolute() {
@@ -1236,7 +1275,7 @@ void lax(byte value, int cycles, int pcIncrease) {
 	bit_val(&P, flagN, bit_test(value, 7));
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void lax_absolute() {
@@ -1276,7 +1315,7 @@ void axs(word addr, int cycles, int pcIncrease) {
 	wmem_b(addr, value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
 void axs_indirect_x() {
@@ -1302,8 +1341,8 @@ void axs_absolute() {
 /**
  * It is the equivalent as to do a dec_mem and a cmp, so we'll just execute those two on order. It should be fine
  */
-void dcm(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tDCP $%04X", addr);
+void dcm(word addr, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tDCP $%02X", addr);
 
 	delta_memory(addr, -1, 0, 0);
 
@@ -1317,34 +1356,34 @@ void dcm(word addr, int cycles, int pcIncrease){
 	bit_val(&P, flagZ, A == value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
-void dcm_absolute(){
+void dcm_absolute() {
 	dcm(absolute_addr(rmem_w(PC + 1)), 6, 3);
 }
 
-void dcm_absolute_x(){
+void dcm_absolute_x() {
 	dcm(absolutex_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void dcm_absolute_y(){
+void dcm_absolute_y() {
 	dcm(absolutey_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void dcm_zpage(){
+void dcm_zpage() {
 	dcm(zpage_addr(rmem_b(PC + 1)), 5, 2);
 }
 
-void dcm_zpage_x(){
+void dcm_zpage_x() {
 	dcm(zpagex_addr(rmem_b(PC + 1)), 6, 2);
 }
 
-void dcm_indirect_x(){
+void dcm_indirect_x() {
 	dcm(indirectx_addr(rmem_b(PC + 1)), 8, 2);
 }
 
-void dcm_indirect_y(){
+void dcm_indirect_y() {
 	dcm(indirecty_addr(rmem_b(PC + 1)), 8, 2);
 }
 
@@ -1356,8 +1395,8 @@ void dcm_indirect_y(){
  * It is the equivalent as to do a dec_mem and a cmp, so we'll just execute those two on order. It should be fine
  * Bear in mind, an sbc is the same as an asl with the parameter ~'ed
  */
-void ins(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tINS $%04X\t", addr);
+void ins(word addr, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tINS $%02X\t", addr);
 
 	delta_memory(addr, 1, 0, 0);
 
@@ -1366,34 +1405,34 @@ void ins(word addr, int cycles, int pcIncrease){
 	adc_internal(~value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
-void ins_absolute(){
+void ins_absolute() {
 	ins(absolute_addr(rmem_w(PC + 1)), 6, 3);
 }
 
-void ins_absolute_x(){
+void ins_absolute_x() {
 	ins(absolutex_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void ins_absolute_y(){
+void ins_absolute_y() {
 	ins(absolutey_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void ins_zpage(){
+void ins_zpage() {
 	ins(zpage_addr(rmem_b(PC + 1)), 5, 2);
 }
 
-void ins_zpage_x(){
+void ins_zpage_x() {
 	ins(zpagex_addr(rmem_b(PC + 1)), 6, 2);
 }
 
-void ins_indirect_x(){
+void ins_indirect_x() {
 	ins(indirectx_addr(rmem_b(PC + 1)), 8, 2);
 }
 
-void ins_indirect_y(){
+void ins_indirect_y() {
 	ins(indirecty_addr(rmem_b(PC + 1)), 8, 2);
 }
 
@@ -1401,8 +1440,8 @@ void ins_indirect_y(){
 ///////////////////////////ASO (SLO) REGION///////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void aso(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tASO $%04X", addr);
+void aso(word addr, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tASO $%02X", addr);
 
 	//ASL
 	byte value = rmem_b(addr);
@@ -1418,35 +1457,35 @@ void aso(word addr, int cycles, int pcIncrease){
 	bit_val(&P, flagN, bit_test(A, 7));
 
 	//Update cycles and pc
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
 }
 
-void aso_absolute(){
+void aso_absolute() {
 	aso(absolute_addr(rmem_w(PC + 1)), 6, 3);
 }
 
-void aso_absolute_x(){
+void aso_absolute_x() {
 	aso(absolutex_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void aso_absolute_y(){
+void aso_absolute_y() {
 	aso(absolutey_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void aso_zpage(){
+void aso_zpage() {
 	aso(zpage_addr(rmem_b(PC + 1)), 5, 2);
 }
 
-void aso_zpage_x(){
+void aso_zpage_x() {
 	aso(zpagex_addr(rmem_b(PC + 1)), 6, 2);
 }
 
-void aso_indirect_x(){
+void aso_indirect_x() {
 	aso(indirectx_addr(rmem_b(PC + 1)), 8, 2);
 }
 
-void aso_indirect_y(){
+void aso_indirect_y() {
 	aso(indirecty_addr(rmem_b(PC + 1)), 8, 2);
 }
 
@@ -1457,8 +1496,8 @@ void aso_indirect_y(){
 /**
  * RLA ROLs the contents of a memory location and then ANDs the result with the accumulator.
  */
-void rla(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tRLA $%04X\t", addr);
+void rla(word addr, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tRLA $%02X\t", addr);
 
 	byte value = rmem_b(addr);
 
@@ -1469,41 +1508,41 @@ void rla(word addr, int cycles, int pcIncrease){
 	byte shifted = value << 1;
 
 	bit_val(&shifted, 0, cachedFlagC);
-	wmem_b(addr,shifted);
+	wmem_b(addr, shifted);
 
 	A &= shifted;
 	bit_val(&P, flagZ, A == 0);
 	bit_val(&P, flagN, bit_test(A, 7));
 
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
 }
 
-void rla_absolute(){
+void rla_absolute() {
 	rla(absolute_addr(rmem_w(PC + 1)), 6, 3);
 }
 
-void rla_absolute_x(){
+void rla_absolute_x() {
 	rla(absolutex_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void rla_absolute_y(){
+void rla_absolute_y() {
 	rla(absolutey_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void rla_zpage(){
+void rla_zpage() {
 	rla(zpage_addr(rmem_b(PC + 1)), 5, 2);
 }
 
-void rla_zpage_x(){
+void rla_zpage_x() {
 	rla(zpagex_addr(rmem_b(PC + 1)), 6, 2);
 }
 
-void rla_indirect_x(){
+void rla_indirect_x() {
 	rla(indirectx_addr(rmem_b(PC + 1)), 8, 2);
 }
 
-void rla_indirect_y(){
+void rla_indirect_y() {
 	rla(indirecty_addr(rmem_b(PC + 1)), 8, 2);
 }
 
@@ -1511,8 +1550,8 @@ void rla_indirect_y(){
 ///////////////////////////LSE REGION/////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void lse(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tLSE $%04X\t", addr);
+void lse(word addr, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tLSE $%02X\t", addr);
 
 	byte data = rmem_b(addr);
 	lsr_internal(&data);
@@ -1521,34 +1560,34 @@ void lse(word addr, int cycles, int pcIncrease){
 	eor_internal(data);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
-void lse_absolute(){
+void lse_absolute() {
 	lse(absolute_addr(rmem_w(PC + 1)), 6, 3);
 }
 
-void lse_absolute_x(){
+void lse_absolute_x() {
 	lse(absolutex_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void lse_absolute_y(){
+void lse_absolute_y() {
 	lse(absolutey_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void lse_zpage(){
+void lse_zpage() {
 	lse(zpage_addr(rmem_b(PC + 1)), 5, 2);
 }
 
-void lse_zpage_x(){
+void lse_zpage_x() {
 	lse(zpagex_addr(rmem_b(PC + 1)), 6, 2);
 }
 
-void lse_indirect_x(){
+void lse_indirect_x() {
 	lse(indirectx_addr(rmem_b(PC + 1)), 8, 2);
 }
 
-void lse_indirect_y(){
+void lse_indirect_y() {
 	lse(indirecty_addr(rmem_b(PC + 1)), 8, 2);
 }
 
@@ -1559,8 +1598,8 @@ void lse_indirect_y(){
 /**
  * RRA RORs the contents of a memory location and then ADCs the result with the accumulator.
  */
-void rra(word addr, int cycles, int pcIncrease){
-	log_instruction(pcIncrease - 1, "\tRRA $%04X\t", addr);
+void rra(word addr, int cycles, int pcIncrease) {
+	log_instruction(pcIncrease - 1, "\tRRA $%02X\t", addr);
 
 	byte value = rmem_b(addr);
 	ror_internal(&value);
@@ -1569,34 +1608,34 @@ void rra(word addr, int cycles, int pcIncrease){
 	adc_internal(value);
 
 	PC += pcIncrease;
-	cyclesThisSec += cycles;
+	cpu_cyclesThisSec += cycles;
 }
 
-void rra_absolute(){
+void rra_absolute() {
 	rra(absolute_addr(rmem_w(PC + 1)), 6, 3);
 }
 
-void rra_absolute_x(){
+void rra_absolute_x() {
 	rra(absolutex_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void rra_absolute_y(){
+void rra_absolute_y() {
 	rra(absolutey_addr(rmem_w(PC + 1)), 7, 3);
 }
 
-void rra_zpage(){
+void rra_zpage() {
 	rra(zpage_addr(rmem_b(PC + 1)), 5, 2);
 }
 
-void rra_zpage_x(){
+void rra_zpage_x() {
 	rra(zpagex_addr(rmem_b(PC + 1)), 6, 2);
 }
 
-void rra_indirect_x(){
+void rra_indirect_x() {
 	rra(indirectx_addr(rmem_b(PC + 1)), 8, 2);
 }
 
-void rra_indirect_y(){
+void rra_indirect_y() {
 	rra(indirecty_addr(rmem_b(PC + 1)), 8, 2);
 }
 
@@ -1879,9 +1918,12 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ins_absolute_x,//$EF      INS
 };
 
-void cpu_cycle() {
+byte cpu_instruction() {
+	static int cycle_before = 0;
+	cycle_before = cpu_cyclesThisSec;
 	decOpcode();
 	exeOpcode();
+	return (byte) (cpu_cyclesThisSec - cycle_before);
 }
 
 void decOpcode() {
@@ -1961,5 +2003,22 @@ void log_instruction(int num_params, const char *mnemonic, ...) {
 	vlog(mnemonic, ConsoleDebug, FileDebug, args);
 	va_end(args);
 	log_debug("\t\t\t");
-	log_debug("A:%02X X:%02X Y:%02X P:%02X SP:%02X CYC:%d \n", A, X, Y, P, SP, cyclesThisSec);
+	log_debug("A:%02X X:%02X Y:%02X ", A, X, Y);
+
+	//Now for the status register. A bit of dirty code but the logs will be much clearer
+	log_debug("P:");
+	log_debug(bit_test(P, flagN) ? "N" : "n");
+	log_debug(bit_test(P, flagV) ? "V" : "v");
+	log_debug(bit_test(P, flagUnused) ? "U" : "u");
+	log_debug(bit_test(P, flagB) ? "B" : "b");
+	log_debug(bit_test(P, flagD) ? "D" : "d");
+	log_debug(bit_test(P, flagI) ? "I" : "i");
+	log_debug(bit_test(P, flagZ) ? "Z" : "z");
+	log_debug(bit_test(P, flagC) ? "C" : "c");
+
+	log_debug(" ");
+
+	//And the rest of the registers
+	log_debug("SP:%02X CYC:%d", SP, cpu_cyclesThisSec);
+	log_debug("\n");
 }

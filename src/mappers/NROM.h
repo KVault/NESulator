@@ -2,8 +2,8 @@
 #define NESULATOR_NROM_H
 
 #include "../rom.h"
+#include "../memory.h"
 
-struct ROM;
-void mapper0(struct ROM *rom);
+void mapper0(ROM *rom);
 
 #endif //NESULATOR_NROM_H

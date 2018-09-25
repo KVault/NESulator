@@ -1,2 +1,2 @@
-add_executable(TEStulator ../src/utils/log.c ../src/utils/log.h ../src/utils/Utils.c ../src/memory.c ../src/cpu.c ../src/rom.c
+add_executable(TEStulator ../src/utils/log.c ../src/utils/log.h ../src/utils/Utils.c ../src/ppu.c ../src/memory.c ../src/cpu.c ../src/rom.c
         ../src/mappers/CNROM.c ../src/mappers/NROM.c TestMemory.c TestCPU.c TestCPU.h TestMain.c )

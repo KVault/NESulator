@@ -4,7 +4,6 @@
 #include "../rom.h"
 #include "../memory.h"
 
-struct ROM;
-void mapper3(struct ROM *rom);
+void mapper3(ROM *rom);
 
 #endif //NESULATOR_CNROM_H
