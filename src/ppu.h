@@ -25,7 +25,7 @@ word t; /** Temporary vram address aka address of the top left onscreen tile */
 byte x; /** Find X scroll, 3 bits */
 byte w; /** Latch, 1 bit */
 uint ppu_running;
-int ppu_points_per_cpu_cycle;  //Speed of the PPU in Hz. Used to slow down the emulation to match the NES's clock speed
+int ppu_cycle_per_cpu_cycle;  //Speed of the PPU in Hz. Used to slow down the emulation to match the NES's clock speed
 static int ppu_cycles_this_sec;
 static int current_scanline;
 static int current_cycle_scanline;

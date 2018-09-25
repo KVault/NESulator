@@ -117,7 +117,7 @@ word indirect_param();
  * Executes an instruction on the cpu. Internally it would decode the opcode and execute it (for now)
  * In  the future it would also have to call some routine to match the original cpu speed
  */
-void cpu_cycle();
+byte cpu_instruction();
 
 /**
  * Log an instruction with all the CPU information at that point: PC and registers.

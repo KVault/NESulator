@@ -44,8 +44,10 @@ int main() {
 	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
 	//control this with a debugger, or an UI. But for now, it simply runs forever
 	while (is_running) {
-		cpu_cycle();
-		ppu_cycle();
+		byte num_cycle = cpu_instruction();
+		for (int i = 0; i < ppu_cycle_per_cpu_cycle * num_cycle; ++i) {
+			ppu_cycle();
+		}
 		gui_cycle();
 		every_second();
 	}
