@@ -11,11 +11,16 @@
 #define TILE_ROW_SIZE 8
 #define TILE_COLUMN_SIZE 8
 #define TILES_PER_TABLE 0xFF
-#define TILE_SIZE 64
 #define PPU_PATTERN_LEFT vram_bank[0x0000]
 #define PPU_PATTERN_RIGHT vram_bank[0x1000]
 
-typedef enum {NT_TOP_LEFT, NT_TOP_RIGHT, NT_BOTTOM_LEFT, NT_BOTTOM_RIGHT} NametableIndex;
+typedef enum {
+	NT_TOP_LEFT, NT_TOP_RIGHT, NT_BOTTOM_LEFT, NT_BOTTOM_RIGHT
+} NametableIndex;
+
+typedef enum {
+	AT_TOP_LEFT, AT_TOP_RIGHT, AT_BOTTOM_LEFT, AT_BOTTOM_RIGHT
+} AttributeTableIndex;
 
 struct tile {
 	/**
@@ -39,6 +44,12 @@ struct tile nametable_tile(byte tile_id);
  */
 word get_nt_start_addr(NametableIndex nametableIndex);
 
+word get_at_start_addr(AttributeTableIndex attributeTableIndex);
+
 void log_tile(struct tile *tile);
+
+byte get_attribute(int row_id, int column_id);
+
+struct pixel get_background_palette(byte attribute);
 
 #endif //NESULATOR_PPU_UTILS_H
