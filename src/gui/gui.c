@@ -128,9 +128,9 @@ int gui_init() {
 	}
 
 	//Now Build all the windows
-	build_main_window(20);
+	build_main_window(60);
 	build_patterntable_viewer(5);
-	build_nametable_viewer(20);
+	build_nametable_viewer(5);
 }
 
 double has_time_elapsed(double last_refresh, double time) {
@@ -168,7 +168,10 @@ void gui_cycle() {
 
 Uint32 set_pixel(SDL_Window *window, const struct pixel pixel) {
 	if(window != NULL){
-		return SDL_MapRGB(SDL_GetWindowSurface(window)->format, pixel.R,pixel.G,pixel.B);
+		SDL_Surface *surface = SDL_GetWindowSurface(window);
+		if(surface != NULL){
+			return SDL_MapRGB(surface->format, pixel.R,pixel.G,pixel.B);
+		}
 	}
 	return 0;
 }

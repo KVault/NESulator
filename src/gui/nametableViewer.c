@@ -69,7 +69,7 @@ int on_quit_nametable_viewer_window(SDL_Event e) {
 void render_tile(struct tile *tile, uint row_id, uint column_id) {
 	for (int i = 0; i < TILE_ROW_SIZE; ++i) {
 		for (int j = 0; j < TILE_COLUMN_SIZE; ++j) {
-			uint draw_color = tile->pattern[i][j] != 0 ? 255 : 0; //TODO remove magic numbers. For Debug only
+			uint draw_color = set_pixel(window.window, COLOUR_PALETTE[tile->pattern[i][j] + 15]);
 			back_buffer[(row_id * TILE_ROW_SIZE) + i][(column_id *TILE_COLUMN_SIZE)+ j] = draw_color;
 		}
 	}
@@ -110,9 +110,6 @@ int cycle_nametable_viewer() {
 		SDL_RenderCopy(window.renderer, window.bottom_right, NULL, &window.bottom_right_rect);
 
 		SDL_RenderPresent(window.renderer);
-
-		//Update the surfaces
-		SDL_UpdateWindowSurface(window.window);
 	}
 	return 0;
 }
