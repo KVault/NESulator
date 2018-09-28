@@ -166,11 +166,11 @@ void gui_cycle() {
 
 }
 
-Uint32 set_pixel(SDL_Window *window, const struct pixel pixel) {
+Uint32 set_pixel(SDL_Window *window, const colour colour) {
 	if(window != NULL){
 		SDL_Surface *surface = SDL_GetWindowSurface(window);
 		if(surface != NULL){
-			return SDL_MapRGB(surface->format, pixel.R,pixel.G,pixel.B);
+			return SDL_MapRGB(surface->format, colour.R,colour.G,colour.B);
 		}
 	}
 	return 0;

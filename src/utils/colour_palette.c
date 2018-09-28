@@ -1,6 +1,6 @@
 #include "colour_palette.h"
 
-const pixel COLOUR_PALETTE[] = {
+const colour COLOUR_PALETTE[] = {
 		{0x75, 0x75, 0x75}, //00
 		{0x27, 0x1B, 0x8F}, //01
 		{0x00, 0x00, 0xAB}, //02

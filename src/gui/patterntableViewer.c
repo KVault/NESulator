@@ -48,7 +48,7 @@ int on_quit_patterntable_viewer_window(SDL_Event e) {
 	return 0;
 }
 
-void render_tiles(struct tile *tiles, uint *back_buffer) {
+void render_tiles(tile *tiles, uint *back_buffer) {
 	for (byte i = 0; i < TILES_PER_TABLE; ++i) {
 		for (int j = 0; j < TILE_ROW_SIZE; ++j) {
 			for (int k = 0; k < TILE_COLUMN_SIZE; ++k) {
@@ -67,16 +67,16 @@ void render_tiles(struct tile *tiles, uint *back_buffer) {
 
 int cycle_patterntable_viewer() {
 	static double last_check;
-	static struct tile *left_tiles;
-	static struct tile *right_tiles;
+	static tile *left_tiles;
+	static tile *right_tiles;
 	double time_aux = 0;
 
 	//Only allocate it the first time
 	if (left_tiles == NULL) {
-		left_tiles = calloc(TILES_PER_TABLE + 1, sizeof(struct tile));
+		left_tiles = calloc(TILES_PER_TABLE + 1, sizeof(tile));
 	}
 	if (right_tiles == NULL) {
-		right_tiles = calloc(TILES_PER_TABLE + 1, sizeof(struct tile));
+		right_tiles = calloc(TILES_PER_TABLE + 1, sizeof(tile));
 	}
 
 	if ((time_aux = has_time_elapsed(last_check, window.refresh_time))) {

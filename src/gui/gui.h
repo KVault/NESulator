@@ -10,6 +10,7 @@
 #include "nametableViewer.h"
 #include "patterntableViewer.h"
 #include "../utils/colour_palette.h"
+#include "../utils/ppu_utils.h"
 
 /**
  * Function header for the callbacks. Every function has to match this header to be able to register itself
@@ -74,6 +75,6 @@ double has_time_elapsed(double last_check, double time);
  */
 int gui_init();
 
-Uint32 set_pixel(SDL_Window *window, const struct pixel pixel);
+Uint32 set_pixel(SDL_Window *window, const colour colour);
 
 #endif //NESULATOR_GUI_H

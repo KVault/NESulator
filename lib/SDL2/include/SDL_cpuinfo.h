@@ -53,7 +53,7 @@
 #ifdef __ALTIVEC__
 #if defined(HAVE_ALTIVEC_H) && !defined(__APPLE_ALTIVEC__) && !defined(SDL_DISABLE_ALTIVEC_H)
 #include <altivec.h>
-#undef pixel
+#undef colour
 #undef bool
 #endif
 #endif

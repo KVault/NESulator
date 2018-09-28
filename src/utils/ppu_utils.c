@@ -1,6 +1,6 @@
 #include "ppu_utils.h"
 
-void log_tile(struct tile *tile) {
+void log_tile(tile *tile) {
 	for (int i = 0; i < TILE_ROW_SIZE; ++i) {
 		for (int j = 0; j < TILE_ROW_SIZE; ++j) {
 			tile->pattern[i][j] ? log_info("%i", tile->pattern[i][j]) : log_info(".");
@@ -9,7 +9,7 @@ void log_tile(struct tile *tile) {
 	}
 }
 
-void encode_as_tiles(byte *mem_addr, byte number_tiles, struct tile *tiles) {
+void encode_as_tiles(byte *mem_addr, byte number_tiles, tile *tiles) {
 	for (int i, tile_count = i = 0;
 	     tile_count < number_tiles; i += 16, ++tile_count) { //Each tile is defined by 16 bytes
 		for (int j = 0; j < TILE_ROW_SIZE; ++j) { //And each byte defines a row of pixels with a value from 0 to 3
@@ -26,11 +26,11 @@ void encode_as_tiles(byte *mem_addr, byte number_tiles, struct tile *tiles) {
 	}
 }
 
-struct tile nametable_tile(byte tile_id) {
+tile nametable_tile(byte tile_id) {
 	uint base_tile_addr = bit_test(rmem_b(PPUCTRL), PPUCTRL_S) ? 0x0000 : 0x1000;
 	base_tile_addr += tile_id * 16;
 
-	struct tile tile;
+	tile tile;
 	encode_as_tiles(&vram_bank[base_tile_addr], 1, &tile);
 	return tile;
 }
@@ -67,8 +67,9 @@ word get_at_start_addr(AttributeTableIndex attributeTableIndex) {
 }
 
 byte get_attribute(int row_id, int column_id) {
-	int is_bottom = row_id / 240;
-	int is_right = column_id / 256;
+	//Use this two booleans to create a number that will match the AttributeTableIndex enums
+	int is_bottom = row_id / 240;//240 is the vertical half of the nametable
+	int is_right = column_id / 256;//256  is the horizontal half of the nametable
 
 	AttributeTableIndex index = (is_bottom << 1) + is_right;
 	word addr = get_at_start_addr(index);
@@ -80,6 +81,8 @@ byte get_attribute(int row_id, int column_id) {
 	// We've reach the block.
 	byte meta_tile = rmem_b_vram(addr);
 
+	//In here, again look within the block if the tile is in the upper cells or right/left. Use the same principle
+	//as above and once we know the cell we're in simply get two bits and generate the attribute
 	if ((row_id % 2 == 0) && (column_id % 2 == 0)) { // top_left
 		return (byte) ((bit_test(meta_tile, 1) << 1) + (bit_test(meta_tile, 0)));
 	} else if ((row_id % 2 == 0) && (column_id % 2 == 1)) { // top_right
@@ -91,31 +94,26 @@ byte get_attribute(int row_id, int column_id) {
 	}
 }
 
-struct pixel get_background_palette(byte attribute) {
-	struct pixel palette;
+colour *fill_palette_colours(word palette_addr){
+	static colour palette[3];
+	for (uint i = 0; i < 3; ++i) {
+		palette[i] = COLOUR_PALETTE[rmem_b_vram(palette_addr + i)];
+	}
+
+	return palette;
+}
+
+colour *get_background_palette(byte attribute) {
 	switch (attribute) {
 		case 0:
-			palette.R = rmem_b_vram(0x3F01);
-			palette.G = rmem_b_vram(0x3F02);
-			palette.B = rmem_b_vram(0x3F03);
-			break;
+			return fill_palette_colours(BACKGROUND_PALETTE_0);
 		case 1:
-			palette.R = rmem_b_vram(0x3F05);
-			palette.G = rmem_b_vram(0x3F06);
-			palette.B = rmem_b_vram(0x3F07);
-			break;
+			return fill_palette_colours(BACKGROUND_PALETTE_1);
 		case 2:
-			palette.R = rmem_b_vram(0x3F09);
-			palette.G = rmem_b_vram(0x3F0A);
-			palette.B = rmem_b_vram(0x3F0B);
-			break;
+			return fill_palette_colours(BACKGROUND_PALETTE_2);
 		case 3:
-			palette.R = rmem_b_vram(0x3F0D);
-			palette.G = rmem_b_vram(0x3F0E);
-			palette.B = rmem_b_vram(0x3F0F);
-			break;
+			return fill_palette_colours(BACKGROUND_PALETTE_3);
 		default:
 			break;
 	}
-	return palette;
 }

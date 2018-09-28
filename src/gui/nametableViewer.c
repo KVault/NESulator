@@ -67,13 +67,14 @@ int on_quit_nametable_viewer_window(SDL_Event e) {
 	return 0;
 }
 
-void render_tile(struct tile *tile, uint row_id, uint column_id) {
+void render_tile(tile *tile, uint row_id, uint column_id) {
 	for (int i = 0; i < TILE_ROW_SIZE; ++i) {
 		for (int j = 0; j < TILE_COLUMN_SIZE; ++j) {
 			uint  draw_color = 0;
 			if (tile->pattern[i][j] != 0) {
 				byte attribute = get_attribute(row_id, column_id);
-				draw_color = set_pixel(window.window, get_background_palette(attribute));
+				colour *palette = get_background_palette(attribute);
+				draw_color = set_pixel(window.window, palette[tile->pattern[i][j]]);
 			}
 			back_buffer[(row_id * TILE_ROW_SIZE) + i][(column_id * TILE_COLUMN_SIZE) + j] = draw_color;
 		}
@@ -84,7 +85,7 @@ void render_nametable_map(word start_addr) {
 	for (uint i = 0; i < NAMETABLE_ROWS_MAP; ++i) {
 		for (uint j = 0; j < NAMETABLE_TILES_PER_ROW; ++j) {
 			byte tile_id = rmem_b_vram(start_addr + (i * NAMETABLE_TILES_PER_ROW + j));
-			struct tile tile = nametable_tile(tile_id);
+			tile tile = nametable_tile(tile_id);
 			render_tile(&tile, i, j);
 		}
 	}

@@ -1,9 +1,9 @@
 #ifndef NESULATOR_NAMETABLEVIEWER_H
 #define NESULATOR_NAMETABLEVIEWER_H
 
-#include "gui.h"
 #include "../memory.h"
 #include "../utils/ppu_utils.h"
+#include "gui.h"
 
 #define NAMETABLE_WINDOW_WIDTH 512
 #define NAMETABLE_WINDOW_HEIGHT 480
@@ -13,9 +13,6 @@
 #define NAMETABLE_TILES_PER_ROW 32
 
 #define NAMETABLE_WINDOW_TITLE "Nametable Viewer"
-
-//TODO Is this really how we fix the warning that would come up if this isn't here?
-struct tile;
 
 struct nametable_viewer_window{
 	SDL_Window *window;
@@ -45,12 +42,6 @@ int on_quit_nametable_viewer_window(SDL_Event);
  * Renders the nametable map onto the back buffer
  */
 void render_nametable_map(word start_addr);
-
-/**
- * Renders the specified tile in the nametable's row and column. Basically a helper function to iterate over the
- * sprite and draw it in the correct position
- */
-void render_tile(struct tile *tile, uint row_id, uint column_id);
 
 int cycle_nametable_viewer();
 
