@@ -1,8 +1,6 @@
 #ifndef NESULATOR_NAMETABLEVIEWER_H
 #define NESULATOR_NAMETABLEVIEWER_H
 
-#include "../memory.h"
-#include "../utils/ppu_utils.h"
 #include "gui.h"
 
 #define NAMETABLE_WINDOW_WIDTH 512
@@ -41,7 +39,7 @@ int on_quit_nametable_viewer_window(SDL_Event);
 /**
  * Renders the nametable map onto the back buffer
  */
-void render_nametable_map(word start_addr);
+void render_nametable_map(NametableIndex nametableIndex);
 
 int cycle_nametable_viewer();
 

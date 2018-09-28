@@ -7,10 +7,8 @@
 #include "../utils/log.h"
 #include "../utils/Utils.h"
 #include "mainWindow.h"
-#include "nametableViewer.h"
-#include "patterntableViewer.h"
-#include "../utils/colour_palette.h"
 #include "../utils/ppu_utils.h"
+#include "../utils/colour_palette.h"
 
 /**
  * Function header for the callbacks. Every function has to match this header to be able to register itself

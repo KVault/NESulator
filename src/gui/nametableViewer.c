@@ -67,12 +67,12 @@ int on_quit_nametable_viewer_window(SDL_Event e) {
 	return 0;
 }
 
-void render_tile(tile *tile, uint row_id, uint column_id) {
+void render_tile(NametableIndex nametableIndex, tile *tile, uint row_id, uint column_id) {
 	for (int i = 0; i < TILE_ROW_SIZE; ++i) {
 		for (int j = 0; j < TILE_COLUMN_SIZE; ++j) {
 			uint  draw_color = 0;
 			if (tile->pattern[i][j] != 0) {
-				byte attribute = get_attribute(row_id, column_id);
+				byte attribute = get_attribute(nametableIndex, row_id, column_id);
 				colour *palette = get_background_palette(attribute);
 				draw_color = set_pixel(window.window, palette[tile->pattern[i][j]]);
 			}
@@ -81,12 +81,13 @@ void render_tile(tile *tile, uint row_id, uint column_id) {
 	}
 }
 
-void render_nametable_map(word start_addr) {
+void render_nametable_map(NametableIndex nametableIndex) {
+	word start_addr = get_nt_start_addr(nametableIndex);
 	for (uint i = 0; i < NAMETABLE_ROWS_MAP; ++i) {
 		for (uint j = 0; j < NAMETABLE_TILES_PER_ROW; ++j) {
 			byte tile_id = rmem_b_vram(start_addr + (i * NAMETABLE_TILES_PER_ROW + j));
 			tile tile = nametable_tile(tile_id);
-			render_tile(&tile, i, j);
+			render_tile(nametableIndex, &tile, i, j);
 		}
 	}
 }
@@ -99,19 +100,19 @@ int cycle_nametable_viewer() {
 
 		SDL_RenderClear(window.renderer);
 
-		render_nametable_map(get_nt_start_addr(NT_TOP_LEFT));
+		render_nametable_map(NT_TOP_LEFT);
 		SDL_UpdateTexture(window.top_left, NULL, back_buffer, NAMETABLE_TEX_WIDTH * sizeof(uint));
 		SDL_RenderCopy(window.renderer, window.top_left, NULL, &window.top_left_rect);
 
-		render_nametable_map(get_nt_start_addr(NT_TOP_RIGHT));
+		render_nametable_map(NT_TOP_RIGHT);
 		SDL_UpdateTexture(window.top_right, NULL, back_buffer, NAMETABLE_TEX_WIDTH * sizeof(uint));
 		SDL_RenderCopy(window.renderer, window.top_right, NULL, &window.top_right_rect);
 
-		render_nametable_map(get_nt_start_addr(NT_BOTTOM_LEFT));
+		render_nametable_map(NT_BOTTOM_LEFT);
 		SDL_UpdateTexture(window.bottom_left, NULL, back_buffer, NAMETABLE_TEX_WIDTH * sizeof(uint));
 		SDL_RenderCopy(window.renderer, window.bottom_left, NULL, &window.bottom_left_rect);
 
-		render_nametable_map(get_nt_start_addr(NT_BOTTOM_RIGHT));
+		render_nametable_map(NT_BOTTOM_RIGHT);
 		SDL_UpdateTexture(window.bottom_right, NULL, back_buffer, NAMETABLE_TEX_WIDTH * sizeof(uint));
 		SDL_RenderCopy(window.renderer, window.bottom_right, NULL, &window.bottom_right_rect);
 

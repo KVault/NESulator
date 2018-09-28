@@ -54,7 +54,7 @@ word get_at_start_addr(AttributeTableIndex attributeTableIndex);
 
 void log_tile(tile *tile);
 
-byte get_attribute(int row_id, int column_id);
+byte get_attribute(NametableIndex nametableIndex, int row_id, int column_id);
 
 colour *get_background_palette(byte attribute);
 

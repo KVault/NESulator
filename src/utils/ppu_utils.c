@@ -60,19 +60,15 @@ word get_at_start_addr(AttributeTableIndex attributeTableIndex) {
 		case AT_TOP_RIGHT:
 			return (word) (get_ROM()->mirroring ? 0x27C0 : 0x23C0);
 		case AT_BOTTOM_LEFT:
-			return (word) (get_ROM()->mirroring ? 0x23C00 : 0x2BC0);
+			return (word) (get_ROM()->mirroring ? 0x23C0 : 0x2BC0);
 		case AT_BOTTOM_RIGHT:
 			return (word) (get_ROM()->mirroring ? 0x27C0 : 0x2FC0);
 	}
 }
 
-byte get_attribute(int row_id, int column_id) {
-	//Use this two booleans to create a number that will match the AttributeTableIndex enums
-	int is_bottom = row_id / 240;//240 is the vertical half of the nametable
-	int is_right = column_id / 256;//256  is the horizontal half of the nametable
-
-	AttributeTableIndex index = (is_bottom << 1) + is_right;
-	word addr = get_at_start_addr(index);
+byte get_attribute(NametableIndex nametableIndex, int row_id, int column_id) {
+	//We can use the same index, they have the same value
+	word addr = get_at_start_addr((AttributeTableIndex)nametableIndex);
 
 	// This is only for move in blocks of 32x32, we still need to find the actual attribute within that block
 	addr += 8 * (row_id / 4); // move down

@@ -1,4 +1,6 @@
 #include "gui.h"
+#include "patterntableViewer.h"
+#include "nametableViewer.h"
 
 /**
  * Size of event_callbacks array. This can be incremented if needed, but for now this number will do
