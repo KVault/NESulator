@@ -2,7 +2,7 @@
 
 int is_running;
 
-int run() {
+static PyObject *run(PyObject *self, PyObject *args) {
 	//LOGS
 	set_console_log_level(ConsoleInfo);
 	set_file_log_level(FileDebug);

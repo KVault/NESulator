@@ -5,7 +5,7 @@
 #include "cpu.h"
 #include "rom.h"
 
-int run();
+static PyObject *run(PyObject *self, PyObject *args);
 
 void every_second();
 
