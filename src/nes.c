@@ -2,17 +2,6 @@
 
 int is_running;
 
-/**
- * Simply stops the emulation.
- */
-int stop_emulation() {
-	is_running = 0;
-	cpu_running = 0;
-	ppu_running = 0;
-	ejectCartridge();
-	return 0;
-}
-
 int main() {
 	//LOGS
 	set_console_log_level(ConsoleInfo);
