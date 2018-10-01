@@ -1,5 +1,7 @@
 #include "ppu_utils.h"
 
+word BACKGROUND_PALETTES[4] = {0x3F01, 0x3F05, 0x3F09, 0x3F0D};
+
 void log_tile(tile *tile) {
 	for (int i = 0; i < TILE_ROW_SIZE; ++i) {
 		for (int j = 0; j < TILE_ROW_SIZE; ++j) {
@@ -71,7 +73,7 @@ byte get_attribute(NametableIndex nametableIndex, int row_id, int column_id) {
 	word addr = get_at_start_addr((AttributeTableIndex)nametableIndex);
 
 	// This is only for move in blocks of 32x32, we still need to find the actual attribute within that block
-	addr += 8 * (row_id / 4); // move down
+	addr += 8 * (row_id / 4); // move "down" that is move X times 8 bits in the array
 	addr += column_id / 4; // move right
 
 	// We've reach the block.
@@ -90,26 +92,20 @@ byte get_attribute(NametableIndex nametableIndex, int row_id, int column_id) {
 	}
 }
 
-colour *fill_palette_colours(word palette_addr){
-	static colour palette[3];
-	for (uint i = 0; i < 3; ++i) {
+/**
+ * With the attribute, get the correct palette memory address (for the background) and fill in an array
+ * with the colours
+ */
+colour *get_background_palette(byte attribute) {
+	static colour palette[4];
+	static colour universal_background;
+	universal_background = COLOUR_PALETTE[rmem_b_vram(0x3F00)];
+	word palette_addr = BACKGROUND_PALETTES[attribute];
+
+	for (uint i = 0; i < 4; ++i) {
 		palette[i] = COLOUR_PALETTE[rmem_b_vram(palette_addr + i)];
 	}
 
+	palette[0] = universal_background;
 	return palette;
-}
-
-colour *get_background_palette(byte attribute) {
-	switch (attribute) {
-		case 0:
-			return fill_palette_colours(BACKGROUND_PALETTE_0);
-		case 1:
-			return fill_palette_colours(BACKGROUND_PALETTE_1);
-		case 2:
-			return fill_palette_colours(BACKGROUND_PALETTE_2);
-		case 3:
-			return fill_palette_colours(BACKGROUND_PALETTE_3);
-		default:
-			break;
-	}
 }

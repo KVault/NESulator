@@ -1,4 +1,5 @@
 #include "gui.h"
+#include "mainWindow.h"
 #include "patterntableViewer.h"
 #include "nametableViewer.h"
 

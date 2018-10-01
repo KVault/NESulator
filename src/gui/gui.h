@@ -6,7 +6,6 @@
 #include "../../lib/SDL2/include/SDL.h"
 #include "../utils/log.h"
 #include "../utils/Utils.h"
-#include "mainWindow.h"
 #include "../utils/ppu_utils.h"
 #include "../utils/colour_palette.h"
 

@@ -13,6 +13,7 @@ static double refresh_time;
  * Creates an empty SDL window. It'll log any errors that may happen (Log level dependant)
  */
 int build_main_window(int speed) {
+
 	main_window.refresh_rate = speed;
 	refresh_time = (1.0/speed) * MILLISECOND;
 

@@ -71,11 +71,9 @@ void render_tile(NametableIndex nametableIndex, tile *tile, uint row_id, uint co
 	for (int i = 0; i < TILE_ROW_SIZE; ++i) {
 		for (int j = 0; j < TILE_COLUMN_SIZE; ++j) {
 			uint  draw_color = 0;
-			if (tile->pattern[i][j] != 0) {
-				byte attribute = get_attribute(nametableIndex, row_id, column_id);
-				colour *palette = get_background_palette(attribute);
-				draw_color = set_pixel(window.window, palette[tile->pattern[i][j]]);
-			}
+			byte attribute = get_attribute(nametableIndex, row_id, column_id);
+			colour *palette = get_background_palette(attribute);
+			draw_color = set_pixel(window.window, palette[tile->pattern[i][j]]);
 			back_buffer[(row_id * TILE_ROW_SIZE) + i][(column_id * TILE_COLUMN_SIZE) + j] = draw_color;
 		}
 	}

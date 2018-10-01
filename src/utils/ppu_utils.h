@@ -14,12 +14,6 @@
 #define PPU_PATTERN_LEFT vram_bank[0x0000]
 #define PPU_PATTERN_RIGHT vram_bank[0x1000]
 
-#define BACKGROUND_PALETTE_0 0x3F01
-#define BACKGROUND_PALETTE_1 0x3F05
-#define BACKGROUND_PALETTE_2 0x3F09
-#define BACKGROUND_PALETTE_3 0x3F0D
-
-
 typedef enum {
 	NT_TOP_LEFT, NT_TOP_RIGHT, NT_BOTTOM_LEFT, NT_BOTTOM_RIGHT
 } NametableIndex;
@@ -27,6 +21,11 @@ typedef enum {
 typedef enum {
 	AT_TOP_LEFT, AT_TOP_RIGHT, AT_BOTTOM_LEFT, AT_BOTTOM_RIGHT
 } AttributeTableIndex;
+
+/**
+ * Memory addresses for the Background palettes. These are the entry points and each palette holds 3 colours
+ */
+extern word BACKGROUND_PALETTES[4];
 
 typedef struct{
 	/**
