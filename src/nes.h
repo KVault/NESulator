@@ -1,10 +1,11 @@
 #ifndef NESULATOR_NES_H
 #define NESULATOR_NES_H
 
+#include <Python.h>
 #include "cpu.h"
 #include "rom.h"
 
-int main();
+int run();
 
 void every_second();
 
