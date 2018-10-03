@@ -1,2 +1,1 @@
-def hello_world():
-    print("Hello world mother fucker")
+print("HELLO FROM PYTHON")
