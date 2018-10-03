@@ -2,12 +2,24 @@
 
 int is_running;
 
-static PyObject *run(PyObject *self, PyObject *args) {
+/**
+ * Simply stops the emulation.
+ */
+int stop_emulation() {
+	is_running = 0;
+	cpu_running = 0;
+	ppu_running = 0;
+	ejectCartridge();
+	return 0;
+}
+
+int main() {
 	//LOGS
 	set_console_log_level(ConsoleInfo);
 	set_file_log_level(FileDebug);
 	set_clear_log_file();
 	set_log_path("../../logs/donkey_kong.log");
+	hello_world();
 
 	cpu_power_up(1789773);
 	ppu_power_up(3);//TODO this powerup has to wait about 20k cycles. PPU stuff
@@ -43,6 +55,4 @@ void every_second() {
 		log_info("Processor speed: %iHz\n", cpu_cyclesThisSec);
 		cpu_cyclesThisSec = 0;
 	}
-
-
 }
