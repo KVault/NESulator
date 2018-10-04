@@ -13,13 +13,17 @@ int stop_emulation() {
 	return 0;
 }
 
+pthread_t gui_thread;
+
 int main() {
 	//LOGS
 	set_console_log_level(ConsoleInfo);
 	set_file_log_level(FileDebug);
 	set_clear_log_file();
 	set_log_path("../../logs/donkey_kong.log");
-	hello_world();
+
+	//Startup the GUI. In a thread, #yolo
+	pthread_create(&gui_thread, NULL, start_gui, NULL);
 
 	cpu_power_up(1789773);
 	ppu_power_up(3);//TODO this powerup has to wait about 20k cycles. PPU stuff
