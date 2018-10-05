@@ -8,4 +8,4 @@ add_executable(NESulator nes.c utils/log.c utils/log.h nes.h mappers/NROM.c mapp
 
 target_link_libraries(NESulator ${PYTHON_LIBRARIES})
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gui/hello_world.py ${CMAKE_CURRENT_BINARY_DIR}/)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gui/GUIStartup.py ${CMAKE_CURRENT_BINARY_DIR}/)

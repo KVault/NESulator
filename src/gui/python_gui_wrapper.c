@@ -10,12 +10,22 @@ void *start_gui(void *arg){
 }
 
 PyObject *hello_world() {
+
+	//TODO Turn this into a reusable function. I would hate to be doing this every single time 
 	Py_Initialize();
-	Py_SetProgramName(L"Hello_world.py");
-	PyObject *obj = Py_BuildValue("s", "hello_world.py");
-	FILE *file = _Py_fopen_obj(obj, "r+");
-	if(file != NULL) {
-		PyRun_SimpleFileEx(file, "hello_world.py", 0);
-	}
+	PyObject *module, *function, *dictionary, *result;
+
+	PyObject *sys = PyImport_ImportModule("sys");
+	PyObject *path = PyObject_GetAttrString(sys, "path");
+	PyList_Append(path, PyUnicode_FromString("."));
+	module = PyImport_ImportModule("GUIStartup");
+	dictionary = PyModule_GetDict(module);
+	function = PyDict_GetItemString(dictionary, "greet");
+
+	result = PyObject_CallObject(function, NULL);
+	long c_result = PyLong_AsLong(result);
+	log_info("The result from the method call is %i:\n",c_result);
+
 	Py_Finalize();
+	return Py_None;
 }
