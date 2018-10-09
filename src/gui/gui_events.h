@@ -1,0 +1,10 @@
+#ifndef NESULATOR_GUI_EVENTS_H
+#define NESULATOR_GUI_EVENTS_H
+
+#endif //NESULATOR_GUI_EVENTS_H
+
+typedef enum {
+	ROM_OPEN = 1,
+	KEY_PRESSED = 2,
+	APP_QUIT = 3
+} GUI_Event;

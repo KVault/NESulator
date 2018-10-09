@@ -2,11 +2,6 @@ from tkinter import *
 from tkinter import filedialog
 
 
-def greet(callback_memoryview : memoryview):
-    print("At least I got here")
-    print(callback_memoryview[0])
-
-
 class MainWindow:
     def __init__(self, master):
         self.master = master

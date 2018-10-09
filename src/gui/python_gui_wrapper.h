@@ -1,12 +1,14 @@
 #ifndef NESULATOR_PYTHON_GUI_WRAPPER_H
 #define NESULATOR_PYTHON_GUI_WRAPPER_H
 
-#include <Python.h>
+#include <Python.h> //This header MUST be the first one.
 #include <limits.h>
 #include <stdio.h>
 #include "../utils/log.h"
 
 extern int callback_buffer[];
+
+PyObject *create_memoryview(PyObject *memoryview,void *buffer, long size, long item_size);
 
 void *start_gui(void *arg);
 
