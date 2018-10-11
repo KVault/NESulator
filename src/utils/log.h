@@ -2,7 +2,6 @@
 #define NESULATOR_LOG_H
 
 #include <stdio.h>
-#include <zconf.h>
 
 enum ConsoleLogLevelEnum {
 	ConsoleDisabled = -1, ConsoleError = 1, ConsoleInfo = 2, ConsoleDebug = 3

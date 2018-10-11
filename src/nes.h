@@ -10,7 +10,7 @@ int stop_emulation();
 //So that SDL stops complaining
 #undef main
 
-int main();
+int run();
 
 void every_second();
 

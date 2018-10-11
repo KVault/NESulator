@@ -1,11 +1,10 @@
-import sys
 import importlib
 
 from src.gui import MainWindow
+from src.gui import NESulator
 
 importlib.import_module("MainWindow")
-
-sys.argv = ['']  # Apparently if being called from C, we need to do this
+importlib.import_module("NESulator")
 
 
 def main():

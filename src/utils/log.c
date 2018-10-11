@@ -1,4 +1,4 @@
-
+#include <stdarg.h>
 #include "log.h"
 
 enum ConsoleLogLevelEnum console_log_level = ConsoleDisabled;

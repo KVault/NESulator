@@ -2,7 +2,6 @@
 #define NESULATOR_ROM_H
 
 #include "utils/Utils.h"
-#include <stdio.h>
 
 #define PRG_PAGE_SIZE 16384
 #define CHR_PAGE_SIZE 8192

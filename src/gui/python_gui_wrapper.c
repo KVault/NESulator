@@ -1,20 +1,36 @@
 #include "python_gui_wrapper.h"
-#include "../utils/Utils.h"
+#include "../cpu.h"
 
-int callback_buffer[10];
-PyObject *callback_buffer_obj;
+static PyMethodDef NESulator_methods[] = {
+		{"cycle_count",  get_cycle_count, METH_NOARGS, "Retrieves the current cycle count"},
+		{NULL, NULL, 0, NULL}        /* Sentinel */
+};
 
-void *start_gui(void *arg){
-	hello_world();
-	expose_buffers();
+static struct PyModuleDef NESulator_module = {
+		PyModuleDef_HEAD_INIT,
+		"NESulator",    /* name of module */
+		NULL,           /* module documentation, may be NULL */
+		1,             /* size of per-interpreter state of the module,
+                           or -1 if the module keeps state in global variables. */
+		NESulator_methods
+};
 
-	return NULL;
+
+PyMODINIT_FUNC PyInit_NESulator(void)
+{
+	printf("Hey");
+	return PyModule_Create(&NESulator_module);
+}
+
+
+static PyObject *get_cycle_count(PyObject *self, PyObject *args) {
+	return PyLong_FromLong(cpu_cyclesThisSec);
 }
 
 void expose_buffers(){
-	callback_buffer_obj = create_memoryview(callback_buffer_obj, callback_buffer, 10 * sizeof(int), sizeof(int));
+	//callback_buffer_obj = create_memoryview(callback_buffer_obj, callback_buffer, 10 * sizeof(int), sizeof(int));
 }
-
+/*
 PyObject *create_memoryview(PyObject *memoryview,void *buffer, long size, long item_size){
 	Py_buffer py_buffer = {};
 	py_buffer.len = size;
@@ -27,33 +43,5 @@ PyObject *create_memoryview(PyObject *memoryview,void *buffer, long size, long i
 
 	memoryview = PyMemoryView_FromBuffer(&py_buffer);
 	return memoryview;
-}
+}*/
 
-PyObject *hello_world() {
-	//TODO Turn this into a reusable function. I would hate to be doing this every single time
-	Py_Initialize();
-	expose_buffers();
-
-	//Get the test data in there
-	callback_buffer[0] = 23;
-
-	PyObject *module, *function, *dictionary, *result, *args;
-
-	module = PyImport_ImportModule("MainWindow");
-	if(module == NULL){
-		log_error("Module not found:");
-	}
-	dictionary = PyModule_GetDict(module);
-	function = PyDict_GetItemString(dictionary, "greet");
-	args = PyTuple_New(1);
-	PyTuple_SetItem(args, 0, callback_buffer_obj);
-
-	if(!PyCallable_Check(function)){
-		log_error("Function not callable:");
-	}
-
-	result = PyObject_CallObject(function, args);
-
-	Py_Finalize();
-	return Py_None;
-}
