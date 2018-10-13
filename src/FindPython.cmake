@@ -5,7 +5,7 @@
 # FindPythonLibs
 # --------------
 #
-# Find python libraries
+# Find impl libraries
 #
 # .. deprecated:: 3.12
 #
@@ -18,7 +18,7 @@
 # ::
 #
 #   PYTHONLIBS_FOUND           - have the Python libs been found
-#   PYTHON_LIBRARIES           - path to the python library
+#   PYTHON_LIBRARIES           - path to the impl library
 #   PYTHON_INCLUDE_PATH        - path to where Python.h is found (deprecated)
 #   PYTHON_INCLUDE_DIRS        - path to where Python.h is found
 #   PYTHON_DEBUG_LIBRARIES     - path to the debug library (deprecated)
@@ -36,7 +36,7 @@
 #
 # ::
 #
-#   PYTHON_LIBRARY             - path to the python library
+#   PYTHON_LIBRARY             - path to the impl library
 #   PYTHON_INCLUDE_DIR         - path to where Python.h is found
 #
 # If calling both ``find_package(PythonInterp)`` and
@@ -64,7 +64,7 @@ if(IS_ABSOLUTE "${PYTHON_EXECUTABLE}")
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/CMakeFindFrameworks.cmake)
-# Search for the python framework on Apple.
+# Search for the impl framework on Apple.
 CMAKE_FIND_FRAMEWORKS(Python)
 
 # Save CMAKE_FIND_FRAMEWORK
@@ -266,9 +266,9 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(PythonLibs
         REQUIRED_VARS PYTHON_LIBRARIES PYTHON_INCLUDE_DIRS
         VERSION_VAR PYTHONLIBS_VERSION_STRING)
 
-# PYTHON_ADD_MODULE(<name> src1 src2 ... srcN) is used to build modules for python.
+# PYTHON_ADD_MODULE(<name> src1 src2 ... srcN) is used to build modules for impl.
 # PYTHON_WRITE_MODULES_HEADER(<filename>) writes a header file you can include
-# in your sources to initialize the static python modules
+# in your sources to initialize the static impl modules
 function(PYTHON_ADD_MODULE _NAME )
     get_property(_TARGET_SUPPORTS_SHARED_LIBS
             GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS)

@@ -3,7 +3,6 @@
 
 #include "cpu.h"
 #include "rom.h"
-#include "gui/python_gui_wrapper.h"
 
 int stop_emulation();
 
