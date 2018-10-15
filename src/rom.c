@@ -1,10 +1,13 @@
 #include "rom.h"
+#include "mappers/NROM.h"
+#include "mappers/CNROM.h"
 #include <stdio.h>
 #include <stdlib.h>
+
 //Create the struct outside so that when we fill it in and exit the function, we don't lose the reference
 //The emulator can run only one ROM at a time, so this also makes sense (I think)
 
-ROM rom = {NULL};
+ROM rom = {};
 
 ROM *insertCartridge(char *filePath) {
 	FILE *file;

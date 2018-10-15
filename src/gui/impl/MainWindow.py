@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import filedialog
+from src.gui.guicython import py_cycles
+import threading
 
 
 class MainWindow:
@@ -15,9 +17,22 @@ class MainWindow:
 
         master.config(menu=self.menu)
 
+        # CLock label
+        self.clock_speed = Label()
+
     def open_rom(self):
-        self.master.rom_dialog = filedialog.askopenfilename(initialdir="/", title="Select file", filetypes=(
+        self.master.rom_filename = filedialog.askopenfilename(initialdir="/", title="Select file", filetypes=(
             ("NES files", "*.nes"), ("all files", "*.*")))
+
+        # Now with the filename, start the emulator!!!
+        # self.master.rom_filename
+
+    def update_clock_speeds(self):
+        # Use this to schedule another run in 60 seconds
+        threading.Timer(60.0, self.update_clock_speeds).start()
+        speed = py_cycles()
+        self.clock_speed.text = "CPU Speed: " + format(speed/1000000)
+
 
 
 def run_main_window():
