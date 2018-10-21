@@ -4,7 +4,6 @@
 #include <lauxlib.h>
 
 int main(){
-	printf("yolo");
 	lua_State *L;
 	L = luaL_newstate();
 	luaL_openlibs(L);
@@ -22,5 +21,6 @@ int main(){
 	}
 
 	lua_close(L);	//Cya, lua
+
 	return 0;
 }

@@ -1,6 +1,6 @@
 require("wx")
 require("libGUItulator")
-utils = require("Utils")
+utils = require("impl\\Utils")
 
 main_window = nil --The top level window
 cpu_speed_label = nil

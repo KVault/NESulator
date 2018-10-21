@@ -59,6 +59,10 @@ void *run(void *args) {
 	return 0;
 }
 
+void main(){
+	printf("HEEE");
+}
+
 /**
  * Ticks every second. It's used to keep track of the clock speeds and whatnot
  */
