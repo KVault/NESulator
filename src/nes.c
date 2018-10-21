@@ -1,4 +1,7 @@
 #include "nes.h"
+
+// So that MSVC is happy
+#define HAVE_STRUCT_TIMESPEC
 #include "pthread.h"
 
 int is_running;
@@ -22,7 +25,6 @@ int start_emulation(){
 	}
 
 	is_running = 1;
-	configure();
 	reset_pc();
 	pthread_create(&nes, NULL, &run, NULL);
 	return 0;
@@ -68,6 +70,7 @@ void every_second() {
 	//More than one second elapsed
 	if (ctime - last_second > 1) {
 		last_second = time(NULL);
+		cpu_cyclesLastSec = cpu_cyclesThisSec;
 		cpu_cyclesThisSec = 0;
 	}
 }
