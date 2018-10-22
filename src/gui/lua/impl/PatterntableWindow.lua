@@ -1,11 +1,7 @@
---
--- Created by IntelliJ IDEA.
--- User: jossanta
--- Date: 21/10/2018
--- Time: 21:55
--- To change this template use File | Settings | File Templates.
---
+require("wx")
+Utils = require("impl\\Utils")
 
+local PatterntableWindow = {}
 window = nil
 xml = nil
 
@@ -20,12 +16,14 @@ function LoadFrame()
     window:Connect(wx.wxEVT_CLOSE_WINDOW, OnClose)
 end
 
-
-function TryOpen(xml_resource)
+function TryOpen()
     if window == nil then
-        xml = xml_resource
+        xml = Utils.GetXRCForFile("PatterntableWindow")
         LoadFrame()
     end
 
     window:Show(true)
 end
+
+PatterntableWindow.TryOpen = TryOpen
+return PatterntableWindow

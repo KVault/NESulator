@@ -48,7 +48,7 @@ void *run(void *args) {
 	//control this with a debugger, or an UI. But for now, it simply runs forever
 	byte num_cycle;
 	while (is_running) {
-		num_cycle = cpu_instruction();
+		num_cycle =cpu_instruction();
 		for (int i = 0; i < ppu_cycle_per_cpu_cycle * num_cycle; ++i) {
 			ppu_cycle();
 		}

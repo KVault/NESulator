@@ -35,6 +35,20 @@ function GetExePath()
     return filePath
 end
 
+--Returns the XMLResource that holds the current XRC
+function GetXRCForFile(xrcFileName)
+    local xmlResource = wx.wxXmlResource()
+    xmlResource:InitAllHandlers()
+    local xrcFileName = utils.GetExePath() .. "/" .. xrcFileName .. ".xrc"
+
+    if not xmlResource:Load(xrcFileName) then
+        return nil
+    else
+        return xmlResource
+    end
+end
+
 Utils.GetExePath = GetExePath
+Utils.GetXRCForFile = GetXRCForFile
 
 return Utils

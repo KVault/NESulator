@@ -1,7 +1,7 @@
 require("wx")
 require("libGUItulator")
 utils = require("impl\\Utils")
-patterntable = require("impl\\PatterntableWindow")
+PatterntableWindow = require("impl\\PatterntableWindow")
 
 main_window = nil --The top level window
 cpu_speed_label = nil
@@ -19,26 +19,12 @@ function OnQuit()
     main_window:Destroy()
 end
 
---Returns the XMLResource that holds the current XRC
-function LoadXRC()
-    local xmlResource = wx.wxXmlResource()
-    xmlResource:InitAllHandlers()
-    local xrcFileName = utils.GetExePath() .. "/MainWindow.xrc"
-
-    if not xmlResource:Load(xrcFileName) then
-        return nil
-    else
-        return xmlResource
-    end
-end
-
 function OnOpenPatterntableWindow()
-    print("OnClick")
-    PatterntableWindow:TryOpen(xml)
+    PatterntableWindow.TryOpen()
 end
 
 function main()
-    xml = LoadXRC()
+    local xml = Utils.GetXRCForFile("MainWindow")
     -- create the wxFrame window
     main_window = wx.wxFrame()
     xml:LoadFrame(main_window, wx.NULL, "MainWindow")
@@ -51,8 +37,8 @@ function main()
     main_window:Connect(wx.wxEVT_UPDATE_UI, RefreshCPUSpeed)
     main_window:Connect(wx.wxEVT_CLOSE_WINDOW, OnQuit)
 
-    local patterntable_menuitem = main_window:FindWindow(xml.GetXRCID("PatternTableMenuItem"))
-    patterntable_menwuitem:Connect(wx.wxEVT_CLICK, OnOpenPatterntableWindow)
+    local pattertable_menuItem= xml.GetXRCID("PatternTableMenuItem")
+    main_window:Connect(pattertable_menuItem, wx.wxEVT_COMMAND_MENU_SELECTED, OnOpenPatterntableWindow)
 
     main_window:Centre()
     main_window:Show(true)
