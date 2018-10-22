@@ -1,9 +1,11 @@
 require("wx")
 require("libGUItulator")
 utils = require("impl\\Utils")
+patterntable = require("impl\\PatterntableWindow")
 
 main_window = nil --The top level window
 cpu_speed_label = nil
+xml = nil
 
 function RefreshCPUSpeed()
     local MHz = libGUItulator.get_cycle_count() / 1000000
@@ -30,8 +32,13 @@ function LoadXRC()
     end
 end
 
+function OnOpenPatterntableWindow()
+    print("OnClick")
+    PatterntableWindow:TryOpen(xml)
+end
+
 function main()
-    local xml = LoadXRC()
+    xml = LoadXRC()
     -- create the wxFrame window
     main_window = wx.wxFrame()
     xml:LoadFrame(main_window, wx.NULL, "MainWindow")
@@ -43,6 +50,9 @@ function main()
     --Just for testing TODO REMOVE THIS ONE
     main_window:Connect(wx.wxEVT_UPDATE_UI, RefreshCPUSpeed)
     main_window:Connect(wx.wxEVT_CLOSE_WINDOW, OnQuit)
+
+    local patterntable_menuitem = main_window:FindWindow(xml.GetXRCID("PatternTableMenuItem"))
+    patterntable_menwuitem:Connect(wx.wxEVT_CLICK, OnOpenPatterntableWindow)
 
     main_window:Centre()
     main_window:Show(true)

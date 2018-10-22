@@ -3,7 +3,7 @@
     <object class="wxFrame" name="MainWindow">
         <style>wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL</style>
         <size>256,360</size>
-        <title></title>
+        <title>NESulator</title>
         <centered>1</centered>
         <aui_managed>0</aui_managed>
         <object class="wxMenuBar" name="MainMenu">
@@ -12,18 +12,15 @@
                 <label>File</label>
                 <object class="wxMenuItem" name="FileMenu_Open">
                     <label>Open\tCtrl+O</label>
-                    <help></help>
                 </object>
             </object>
             <object class="wxMenu" name="DebugMenu">
                 <label>Debug</label>
                 <object class="wxMenuItem" name="PatternTableMenuItem">
                     <label>Patterntable viewer\tCtrl + P</label>
-                    <help></help>
                 </object>
                 <object class="wxMenuItem" name="NameTableMenuItem">
                     <label>Nametable viewer\tCtrl + N</label>
-                    <help></help>
                 </object>
             </object>
         </object>
