@@ -2,6 +2,7 @@ require("wx")
 require("libGUItulator")
 utils = require("impl\\Utils")
 PatterntableWindow = require("impl\\PatterntableWindow")
+NametableWindow = require("impl\\NametableWindow")
 
 main_window = nil --The top level window
 cpu_speed_label = nil
@@ -15,12 +16,18 @@ end
 
 function OnQuit()
     libGUItulator.stop_emulation()
+    PatterntableWindow:OnClose()
+    NametableWindow:OnClose()
     main_window:Show(false)
     main_window:Destroy()
 end
 
 function OnOpenPatterntableWindow()
-    PatterntableWindow.TryOpen()
+    PatterntableWindow:TryOpen("PatterntableWindow")
+end
+
+function OnOpenNametableWindow()
+    NametableWindow:TryOpen("NametableWindow")
 end
 
 function main()
@@ -37,8 +44,11 @@ function main()
     main_window:Connect(wx.wxEVT_UPDATE_UI, RefreshCPUSpeed)
     main_window:Connect(wx.wxEVT_CLOSE_WINDOW, OnQuit)
 
-    local pattertable_menuItem= xml.GetXRCID("PatternTableMenuItem")
+    local pattertable_menuItem = xml.GetXRCID("PatternTableMenuItem")
     main_window:Connect(pattertable_menuItem, wx.wxEVT_COMMAND_MENU_SELECTED, OnOpenPatterntableWindow)
+
+    local nametable_menuItem = xml.GetXRCID("NametableMenuItem")
+    main_window:Connect(nametable_menuItem, wx.wxEVT_COMMAND_MENU_SELECTED, OnOpenPatterntableWindow)
 
     main_window:Centre()
     main_window:Show(true)

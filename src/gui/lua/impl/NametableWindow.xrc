@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+    <object class="wxFrame" name="NametableWindow">
+        <style>wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL</style>
+        <size>512,480</size>
+        <title>Nametable Viewer</title>
+        <centered>1</centered>
+        <aui_managed>0</aui_managed>
+        <object class="wxStaticBitmap" name="NameTable">
+            <size>512,480</size>
+            <bitmap />
+        </object>
+    </object>
+</resource>
