@@ -45,10 +45,12 @@ function main()
     main_window:Connect(wx.wxEVT_CLOSE_WINDOW, OnQuit)
 
     local pattertable_menuItem = xml.GetXRCID("PatternTableMenuItem")
-    main_window:Connect(pattertable_menuItem, wx.wxEVT_COMMAND_MENU_SELECTED, OnOpenPatterntableWindow)
+    main_window:Connect(pattertable_menuItem,
+        wx.wxEVT_COMMAND_MENU_SELECTED, OnOpenPatterntableWindow)
 
-    local nametable_menuItem = xml.GetXRCID("NametableMenuItem")
-    main_window:Connect(nametable_menuItem, wx.wxEVT_COMMAND_MENU_SELECTED, OnOpenPatterntableWindow)
+    local nametable_menuItem = xml.GetXRCID("NameTableMenuItem")
+    main_window:Connect(nametable_menuItem,
+        wx.wxEVT_COMMAND_MENU_SELECTED, OnOpenNametableWindow)
 
     main_window:Centre()
     main_window:Show(true)

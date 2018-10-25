@@ -39,7 +39,7 @@ end
 function BaseWindow:LoadFrame()
     self.window = wx.wxFrame()
     self.xml:LoadFrame(self.window, wx.NULL, "PatterntableWindow")
-    self.window:Connect(wx.wxEVT_CLOSE_WINDOW, self.OnClose)
+    self.window:Connect(wx.wxEVT_CLOSE_WINDOW, function() self:OnClose() end )
 end
 
 -- Base implementation to be called every frame. It looks a bit like a game
