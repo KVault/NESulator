@@ -1,5 +1,6 @@
 require("wx")
 Utils = require("impl\\Utils")
+GUItulator = require("libGUItulator")
 
 local BaseWindow = {
     window = nil,
@@ -34,12 +35,17 @@ function BaseWindow:TryOpen(windowXRCID)
     end
 
     self.window:Show(true)
+    self:RegisterOnFrame()
 end
 
 function BaseWindow:LoadFrame()
     self.window = wx.wxFrame()
     self.xml:LoadFrame(self.window, wx.NULL, "PatterntableWindow")
     self.window:Connect(wx.wxEVT_CLOSE_WINDOW, function() self:OnClose() end )
+end
+
+function BaseWindow:RegisterOnFrame()
+    self.window:Connect(wx.wxEVT_UPDATE_UI, function() self:OnFrame() end)
 end
 
 -- Base implementation to be called every frame. It looks a bit like a game

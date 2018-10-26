@@ -1,4 +1,4 @@
-#include "gui.h"
+#include "lua_gui.h"
 
 ROM rom;
 
@@ -7,6 +7,7 @@ static const struct luaL_Reg GUIulator[] = {
 		{"get_cycle_count", get_cycle_count},
 		{"stop_emulation", stop_emulation},
 		{"open_rom", open_rom},
+		{"get_patterntable", get_patterntable},
 		{NULL, NULL}  /* sentinel */
 };
 
@@ -35,6 +36,22 @@ static int open_rom(lua_State *state){
 
 	return 0;
 }
+
+static int get_patterntable(lua_State *state){
+	static patterntable table;
+	table = *fill_patterntable();
+
+
+	lua_pushnumber(state, table.size);
+	byte *backBuffer = (byte *)lua_newuserdata(state, table.size); //Allocate the buffer un Lua's stack
+
+	for(int i = 0; i < table.size; i++){
+		backBuffer[i] = table.buffer[i];
+	}
+
+	return 1;  /* new userdatum is already on the stack */
+}
+
 
 static int stop_backgroumd_emulation(lua_State *state){
 	stop_emulation();

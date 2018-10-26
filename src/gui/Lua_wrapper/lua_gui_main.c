@@ -1,4 +1,4 @@
-#include "../utils/log.h"
+#include "../../utils/log.h"
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
