@@ -20,4 +20,6 @@ static int stop_backgroumd_emulation(lua_State *state);
 
 static int get_patterntable(lua_State *state);
 
+static int get_patterntable_pixel(lua_State *state);
+
 #endif //NESULATOR_GUI

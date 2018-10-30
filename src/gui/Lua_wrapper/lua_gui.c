@@ -1,6 +1,7 @@
 #include "lua_gui.h"
 
 ROM rom;
+patterntable patterntable_backbuffer;
 
 //library to be registered
 static const struct luaL_Reg GUIulator[] = {
@@ -38,18 +39,25 @@ static int open_rom(lua_State *state){
 }
 
 static int get_patterntable(lua_State *state){
-	static patterntable table;
-	table = *fill_patterntable();
+	patterntable_backbuffer = *fill_patterntable();
+	return 0;
+}
 
-
-	lua_pushnumber(state, table.size);
-	byte *backBuffer = (byte *)lua_newuserdata(state, table.size); //Allocate the buffer un Lua's stack
-
-	for(int i = 0; i < table.size; i++){
-		backBuffer[i] = table.buffer[i];
+/**
+ * This is a ver y bad way of doing it. But we just need to get something showing up in Lua.
+ *
+ * TODO refactor this so that is uses userdata and metatables. Ideallu just one call to the C backend
+ */
+static int get_patterntable_pixel(lua_State *state){
+	//The parameter is at the top of the stack
+	int pos = (int) lua_tonumber(state, 1);
+	/* This is pushed in order BGR, so it can be read as RGB, making it easier to read */
+	for(int i = 2; i >= 0; --i){
+		byte pixel_colour = patterntable_backbuffer.buffer[pos + i];
+		lua_pushnumber(state, pixel_colour);
 	}
 
-	return 1;  /* new userdatum is already on the stack */
+	return 3;// amount of values in the stack. (in RGB order, ready to read)
 }
 
 
