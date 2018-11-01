@@ -1,21 +1,13 @@
 #ifndef NESULATOR_GUI_H
 #define NESULATOR_GUI_H
 
-#include "../utils/Utils.h"
-#include "../utils/ppu_utils.h"
+#include "imgui/imgui.h"
+#include "SDL2/SDL.h"
+#include "imgui/imgui_impl_sdl.h"
+#include "imgui/imgui_impl_opengl2.h"
+#include "SDL2/SDL_opengl.h"
+#include "GL/glu.h"
 
-#define PATTERNTABLE_HEIGHT 240
-#define PATTERNTABLE_WIDTH 512
-
-enum PatterntableSide {LeftPatterntable, RightPatterntable};
-
-typedef struct{
-	uint size; //In bytes
-	byte *buffer;
-}patterntable;
-
-void render_tiles(tile *tiles, patterntable *patterntable, enum PatterntableSide side);
-
-patterntable *fill_patterntable();
+int main();
 
 #endif //NESULATOR_GUI_H
