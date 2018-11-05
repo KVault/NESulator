@@ -9,7 +9,7 @@
 
 ROM rom = {};
 
-ROM *insertCartridge(char *filePath) {
+void insertCartridge(char *filePath) {
 	FILE *file;
 	file = fopen(filePath, "rb");
 
@@ -44,7 +44,6 @@ ROM *insertCartridge(char *filePath) {
 
 	fflush(file);
 	fclose(file);
-	return &rom;
 }
 
 void load_ROM(ROM *rom){

@@ -1,13 +1,8 @@
 #include "nes.h"
 
-// So that MSVC is happy
-#define HAVE_STRUCT_TIMESPEC
-#include "pthread.h"
-
 int is_running;
-pthread_t nes;
 
-void *run(void *args);
+void run();
 
 /**
  * Simply stops the emulation.
@@ -26,7 +21,7 @@ int start_emulation(){
 
 	is_running = 1;
 	reset_pc();
-	pthread_create(&nes, NULL, &run, NULL);
+	run();
 	return 0;
 }
 
@@ -41,7 +36,7 @@ void configure(){
 	ppu_power_up(3);//TODO this powerup has to wait about 20k cycles. PPU stuff
 }
 
-void *run(void *args) {
+void run() {
 	is_running = 1;
 
 	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
@@ -54,13 +49,10 @@ void *run(void *args) {
 		}
 		every_second();
 	}
-
-	pthread_join(nes, NULL);
-	return 0;
 }
 
 void main(){
-	printf("HEEE");
+	printf("HEEE MAN");
 }
 
 /**

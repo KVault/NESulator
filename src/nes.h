@@ -3,6 +3,8 @@
 
 #include "cpu.h"
 #include "rom.h"
+#include "utils/Utils.h"
+#include "utils/log.h"
 
 /**
  * Of course, only one ROM can be in the console at the same time. This is the one
