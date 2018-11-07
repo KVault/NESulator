@@ -51,10 +51,6 @@ void run() {
 	}
 }
 
-void main(){
-	printf("HEEE MAN");
-}
-
 /**
  * Ticks every second. It's used to keep track of the clock speeds and whatnot
  */

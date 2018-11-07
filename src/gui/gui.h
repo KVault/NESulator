@@ -18,4 +18,9 @@ EXPORT int last_cpu_speed();
  */
 EXPORT void gui_start_emulation(char *rom_path);
 
+/**
+ * Stop the emulation
+ */
+EXPORT void gui_stop_emulation();
+
 #endif //NESULATOR_GUI_H

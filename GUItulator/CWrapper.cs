@@ -10,5 +10,8 @@ namespace GUItulator
         [DllImport("libNESulator.dll", EntryPoint = "gui_start_emulation")]
         public static extern int StartEmulation(string romPath);
 
+        [DllImport("libNESulator.dll", EntryPoint = "gui_stop_emulation")]
+        public static extern int StopEmulation();
+
     }
 }

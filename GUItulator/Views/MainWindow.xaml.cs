@@ -22,6 +22,7 @@ namespace GUItulator.Views
         {
             AvaloniaXamlLoader.Load(this);
             this.Activated += OnInitialized;
+            this.Closed += (sender, args) => CWrapper.StopEmulation();
         }
 
         private void OnInitialized(object sender, EventArgs args)
@@ -29,7 +30,7 @@ namespace GUItulator.Views
             viewModel = DataContext as MainWindowViewModel;
             viewModel.StartPollCPUSpeed();
 
-            new Thread(() => CWrapper.StartEmulation(@"C:\dev\NESulator\NESulator\rom\donkey_kong.nes")).Start();
+            new Thread(() => CWrapper.StartEmulation(@"C:\\Users\\Alex\\Developer\\src\\github.com\\kvault\\nesulator\\rom")).Start();
         }
     }
 }
