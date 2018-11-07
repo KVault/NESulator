@@ -1,4 +1,13 @@
+#include <stdlib.h>
+#include "pthread.h"
 #include <stdio.h>
+
+pthread_t gui_thread;
+
+void *startup_gui(void *arg){
+	system("dotnet GUItulator.dll");
+	return NULL;
+}
 
 /**
  * This code should quite simple to "understand" all we're doing here is starting up the whole thing but in a not so
@@ -12,5 +21,6 @@
  * yada yada yada..... we do it because we can.
  */
 int main() {
-	printf("yolo");
+	pthread_create(&gui_thread, NULL, startup_gui, NULL);
+	pthread_join(gui_thread, NULL);
 }
