@@ -8,7 +8,7 @@ namespace GUItulator
         public static extern int CPUSpeed();
 
         [DllImport("libNESulator.dll", EntryPoint = "gui_start_emulation")]
-        public static extern int StartEmulation(string romPath);
+        public static extern void StartEmulation(object o);
 
         [DllImport("libNESulator.dll", EntryPoint = "gui_stop_emulation")]
         public static extern int StopEmulation();

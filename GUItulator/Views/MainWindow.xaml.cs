@@ -10,6 +10,7 @@ namespace GUItulator.Views
     public class MainWindow : Window
     {
         private MainWindowViewModel viewModel;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -21,16 +22,20 @@ namespace GUItulator.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            this.Activated += OnInitialized;
-            this.Closed += (sender, args) => CWrapper.StopEmulation();
+            Activated += OnInitialized;
+        }
+
+        protected override void HandleClosed()
+        {
+            base.HandleClosed();
+            viewModel.StopPollCPUSpeed();
+            viewModel.StopEmulation();
         }
 
         private void OnInitialized(object sender, EventArgs args)
         {
             viewModel = DataContext as MainWindowViewModel;
-            viewModel.StartPollCPUSpeed();
-
-            new Thread(() => CWrapper.StartEmulation(@"C:\\Users\\Alex\\Developer\\src\\github.com\\kvault\\nesulator\\rom")).Start();
+            viewModel?.StartPollCPUSpeed();
         }
     }
 }
