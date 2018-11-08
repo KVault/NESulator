@@ -29,10 +29,13 @@ namespace GUItulator.ViewModels
                 AllowMultiple = false,
                 Filters = new List<FileDialogFilter>()
                 {
-                    new FileDialogFilter() {Extensions = {".nes"}}
+                    new FileDialogFilter() {Extensions = {"nes"}}
                 }
             }.ShowAsync();
-            StartEmulation(romFile[0]);
+            if (romFile != null && romFile.Length > 0)
+            {
+                StartEmulation(romFile[0]);
+            }
         }
 
         /// <summary>
@@ -65,12 +68,12 @@ namespace GUItulator.ViewModels
         public void StartEmulation(string fileName)
         {
             emulatorThread = new Thread(() => CWrapper.StartEmulation(fileName));
-            emulatorThread.Start(fileName);
+            emulatorThread.Start();
         }
 
         public void StopEmulation()
         {
-            //CWrapper.StopEmulation();
+            CWrapper.StopEmulation();
         }
     }
 }

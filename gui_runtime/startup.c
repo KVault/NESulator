@@ -2,14 +2,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-//pthread_t gui_thread;
-
-void *startup_gui(void *arg) {
-	system("dotnet GUItulator.dll");
-	exit(0);
-	return NULL;
-}
-
 /**
  * This code should quite simple to "understand" all we're doing here is starting up the whole thing but in a not so
  * usual way. Because we want to keep debugging and making this essentially a C application, the entry point must
@@ -22,8 +14,5 @@ void *startup_gui(void *arg) {
  * yada yada yada..... we do it because we can.
  */
 int main() {
-	int pid = system("dotnet GUItulator.dll");
-	printf("%d\n",pid);
-	//pthread_create(&gui_thread, NULL, startup_gui, NULL);
-	//pthread_join(gui_thread, NULL);
+	system("dotnet GUItulator.dll");
 }
