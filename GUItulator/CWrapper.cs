@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 
 namespace GUItulator
@@ -8,10 +9,12 @@ namespace GUItulator
         public static extern int CPUSpeed();
 
         [DllImport("libNESulator.dll", EntryPoint = "gui_start_emulation")]
-        public static extern void StartEmulation(object o);
+        public static extern void StartEmulation(string o);
 
         [DllImport("libNESulator.dll", EntryPoint = "gui_stop_emulation")]
         public static extern int StopEmulation();
 
+        [DllImport("libNESulator.dll", EntryPoint = "gui_patterntable_frame")]
+        public static extern int PatterntableFrame(out IntPtr buffer);
     }
 }

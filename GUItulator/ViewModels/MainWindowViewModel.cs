@@ -5,8 +5,11 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using GUItulator.Views;
 using ReactiveUI;
+using Serilog;
 
 namespace GUItulator.ViewModels
 {
@@ -36,6 +39,18 @@ namespace GUItulator.ViewModels
             {
                 StartEmulation(romFile[0]);
             }
+        }
+
+        public void HardcodedRun()
+        {
+            StartEmulation(@"C:\dev\NESulator\NESulator\rom\donkey_kong.nes");
+        }
+
+        public void OpenPatterntable() => new PatterntableWindow().Show();
+
+        public void OpenNametable()
+        {
+
         }
 
         /// <summary>
@@ -73,7 +88,15 @@ namespace GUItulator.ViewModels
 
         public void StopEmulation()
         {
-            CWrapper.StopEmulation();
+            try
+            {
+                CWrapper.StopEmulation();
+            }
+            catch (Exception e)
+            {
+                Log.Error(e, e.Message);
+            }
+
         }
     }
 }

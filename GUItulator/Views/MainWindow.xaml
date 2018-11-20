@@ -13,6 +13,11 @@
       <Menu DockPanel.Dock="Top">
           <MenuItem Header="File">
               <MenuItem Header="Open" Command="{Binding OpenROM}"></MenuItem>
+              <MenuItem Header="Hardcoded run" Command="{Binding HardcodedRun}"></MenuItem>
+          </MenuItem>
+          <MenuItem Header="Debug">
+              <MenuItem Header="Pattern table" Command="{Binding OpenPatterntable}"></MenuItem>
+              <MenuItem Header="Nametable" Command="{Binding OpenNametable}"></MenuItem>
           </MenuItem>
       </Menu>
 

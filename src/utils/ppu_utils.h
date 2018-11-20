@@ -11,6 +11,7 @@
 #define TILE_ROW_SIZE 8
 #define TILE_COLUMN_SIZE 8
 #define TILES_PER_TABLE 0xFF
+#define TILES_TOTAL 0x1FE //Basically 0xFF * 2
 #define PPU_PATTERN_LEFT vram_bank[0x0000]
 #define PPU_PATTERN_RIGHT vram_bank[0x1000]
 
@@ -39,7 +40,7 @@ typedef struct{
  *
  * That is in blocks of 16 bytes and performing the left + right sum to obtain numbers from 0 to 3.
  */
-void encode_as_tiles(byte *mem_addr, byte number_tiles, tile *tiles);
+void encode_as_tiles(byte *mem_addr, uint number_tiles, tile *tiles);
 
 tile nametable_tile(byte tile_id);
 

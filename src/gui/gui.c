@@ -13,3 +13,7 @@ EXPORT void gui_start_emulation(char *rom_path) {
 EXPORT void gui_stop_emulation() {
 	stop_emulation();
 }
+
+EXPORT int *gui_patterntable_frame(byte *back_buffer){
+	return patterntable_frame(back_buffer);
+}
