@@ -14,6 +14,6 @@ EXPORT void gui_stop_emulation() {
 	stop_emulation();
 }
 
-EXPORT int *gui_patterntable_frame(byte *back_buffer){
+EXPORT FrameInfo gui_patterntable_frame(byte *back_buffer){
 	return patterntable_frame(back_buffer);
 }

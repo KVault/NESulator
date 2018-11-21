@@ -15,6 +15,12 @@
 #define PPU_PATTERN_LEFT vram_bank[0x0000]
 #define PPU_PATTERN_RIGHT vram_bank[0x1000]
 
+typedef struct {
+	int size;
+	byte *buffer;
+
+} FrameInfo;
+
 typedef enum {
 	NT_TOP_LEFT, NT_TOP_RIGHT, NT_BOTTOM_LEFT, NT_BOTTOM_RIGHT
 } NametableIndex;

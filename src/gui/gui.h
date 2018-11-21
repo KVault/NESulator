@@ -30,6 +30,6 @@ EXPORT void gui_stop_emulation();
  *
  * TODO Maybe change that? I just want to get this working right now
  */
-EXPORT int *gui_patterntable_frame();
+EXPORT FrameInfo gui_patterntable_frame();
 
 #endif //NESULATOR_GUI_H

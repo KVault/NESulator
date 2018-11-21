@@ -16,15 +16,14 @@ namespace GUItulator.ViewModels
             get {return patterntable;}
             set {this.RaiseAndSetIfChanged(ref patterntable, value);}
         }
-        private string catPath = @"C:\Users\jossanta\Desktop\Cat.jpg";
 
         public void DrawDummyBitmap(object sender, RoutedEventArgs args)
         {
             try
             {
-                var size = CWrapper.PatterntableFrame(out var buffer);
-                var backBuffer = new byte[size];
-                Marshal.Copy(buffer, backBuffer, 0, size);
+                var frameInfo = CWrapper.PatterntableFrame();
+                var backBuffer = new byte[frameInfo.size];
+                Marshal.Copy(frameInfo.buffer, backBuffer, 0, frameInfo.size);
             }
             catch (Exception e)
             {

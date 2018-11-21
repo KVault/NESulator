@@ -1,4 +1,5 @@
 #include "gui_patterntable.h"
+#include "gui.h"
 
 byte back_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT * 3];//The 3 is the RGB
 
@@ -23,8 +24,9 @@ void render_tiles(tile *tiles, byte *back_buffer) {
 	}
 }
 
-int patterntable_frame(byte *buffer){
+FrameInfo patterntable_frame(){
 	static tile *tiles;
+	static FrameInfo frameInfo = {};
 
 	if (tiles == NULL) {
 		tiles = calloc(TILES_TOTAL + 1, sizeof(tile));
@@ -33,6 +35,8 @@ int patterntable_frame(byte *buffer){
 	encode_as_tiles(&PPU_PATTERN_LEFT, TILES_TOTAL, tiles);
 	render_tiles(tiles, back_buffer);
 
-	buffer = back_buffer;
-	return (PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT * 3);
-}
+	frameInfo.buffer = back_buffer;
+	frameInfo.size = PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT * 3;
+
+	return frameInfo;
+}  

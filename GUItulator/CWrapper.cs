@@ -15,6 +15,13 @@ namespace GUItulator
         public static extern int StopEmulation();
 
         [DllImport("libNESulator.dll", EntryPoint = "gui_patterntable_frame")]
-        public static extern int PatterntableFrame(out IntPtr buffer);
+        public static extern FrameInfo PatterntableFrame();
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public unsafe struct FrameInfo
+        {
+            public int size;
+            public IntPtr buffer;
+        }
     }
 }

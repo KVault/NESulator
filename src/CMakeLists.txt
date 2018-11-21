@@ -5,9 +5,7 @@ file(GLOB_RECURSE SRC_FILES "*.h" "*.c")
 add_library(NESulator SHARED ${SRC_FILES})
 
 # Run this script that calls the dotnet compiler to build the GUItulator
-add_custom_command(TARGET NESulator PRE_BUILD
-        COMMAND powershell ../../scripts/build_guitulator.ps1
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+# add_custom_command(TARGET NESulator PRE_BUILD COMMAND cmd //C ../../scripts/build_guitulator.bat WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 # Copy the contents of GUItulator to the bin directory
 add_custom_command(TARGET NESulator PRE_BUILD
