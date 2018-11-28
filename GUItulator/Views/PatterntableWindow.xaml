@@ -6,9 +6,5 @@
         Width="512"
         Height="240">
 
-        <Design.DataContext>
-                <vm:PatterntableWindowViewModel/>
-        </Design.DataContext>
-
         <Image Source="{Binding Patterntable}" Width="512" Height="240"></Image>
 </Window>

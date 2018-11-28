@@ -1,7 +1,7 @@
 #include "gui_patterntable.h"
 #include "gui.h"
 
-byte back_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT * 3];//The 3 is the RGB
+byte back_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT * 3];//The 4 is the RGBA
 
 
 void render_tiles(tile *tiles, byte *back_buffer) {
@@ -39,4 +39,4 @@ FrameInfo patterntable_frame(){
 	frameInfo.size = PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT * 3;
 
 	return frameInfo;
-}  
+}
