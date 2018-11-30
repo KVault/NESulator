@@ -1,39 +1,5 @@
 #include "cpu.h"
 
-//TODO this has some dupplicated code. Can we fix this?
-void *cpu_run(void *arg) {
-	cpu_running = 1;
-	static struct timespec this_second;
-	static struct timespec this_cycle;
-	long nano_per_cycle = (long) ((1.0 / cpu_speed) * NANOSECOND);
-
-	long should_have_elapsed, have_elapsed, elapsed_delta = 0;
-	clock_gettime(CLOCK_REALTIME, &this_second);
-
-	while (cpu_running) {
-		//Check if enough time has passed, and sleep the process otherwise
-		clock_gettime(CLOCK_REALTIME, &this_cycle);
-
-		//New second. Reset stuff
-		if (this_cycle.tv_sec > this_second.tv_sec) {
-			this_second = this_cycle;
-			log_info("CPU cycles last second (%i): %d\n", this_cycle.tv_sec, cpu_cyclesThisSec);
-			cpu_cyclesThisSec = 0;
-		}
-
-		should_have_elapsed = nano_per_cycle * cpu_cyclesThisSec;
-		have_elapsed = this_cycle.tv_nsec - this_second.tv_nsec;
-		elapsed_delta = should_have_elapsed - have_elapsed;
-		if (elapsed_delta > 0) {
-			this_cycle.tv_nsec = elapsed_delta;
-			this_cycle.tv_sec = 0;
-			nanosleep(&this_cycle, NULL);
-		}
-
-		cpu_instruction();
-	}
-}
-
 /**
  * More info here http://wiki.nesdev.com/w/index.php/CPU_power_up_state
  *
@@ -1711,7 +1677,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&bmi,           //$30       BPL           Branch if minus                 2       2(+2)
 		&and_indirect_y,//$31       AND ($44), Y  bitwise AND with accumulator    2       5+
 		&invalid,
-		&rla_indirect_y,//$33      RLA
+		&rla_indirect_y,//$33       RLA
 		&nop2,          //$34       NOP
 		&and_zpage_x,   //$35       AND $44, X    bitwise AND with accumulator    2       4
 		&rol_zpage_x,   //$36       ROL $44       Rotate Left                     2       6
@@ -1733,8 +1699,8 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&lsr_zpage,     //$46       LSR           Logical Shift Right              2       5
 		&lse_zpage,     //$47       LSE
 		&pha,           //$48       PHA           PusH Acumulator                  1       3
-		&eor_immediate,  //$49       EOR          Exclusive OR                     2       2
-		&lsr_accumulator,//$4A       LSR          Logical Shift Right              1       2
+		&eor_immediate,  //$49      EOR          Exclusive OR                     2       2
+		&lsr_accumulator,//$4A      LSR          Logical Shift Right              1       2
 		&invalid,
 		&jmp_absolute,  //$4C       JMP           JuMP                              3       3
 		&eor_absolute,  //$4D       EOR           Exclusive OR                      3       4
@@ -1753,9 +1719,9 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&nop1,          //$5A       NOP
 		&lse_absolute_y,//$5B       LSE
 		&nop3,          //$5C       NOP
-		&eor_absolute_x, //$5D       EOR           Exclusive OR                    3       4
-		&lsr_absolute_x, //$5E       LSR           Logical Shift Right             3       7
-		&lse_absolute_x,  //$5F       LSE
+		&eor_absolute_x, //$5D      EOR           Exclusive OR                    3       4
+		&lsr_absolute_x, //$5E      LSR           Logical Shift Right             3       7
+		&lse_absolute_x,  //$5F     LSE
 		&rts,            //$60      RTS          Returns from Subroutine           1       6
 		&adc_indirect_x, //$61      ADC ($44, X) ADd with Carry                    2       6
 		&invalid,
@@ -1771,9 +1737,9 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&jmp_indirect,  //$6C       JMP          JuMP                              3       5
 		&adc_absolute,  //$6D       ADC $4400    ADd with Carry                    3       4
 		&ror_absolute,  //$6E       ROR $44      Rotate Right                      3       6
-		&rra_absolute,  //$6F      RRA
-		&bvs,           //$70      BVS           Branch if plus                    2       2(+2)
-		&adc_indirect_y,//$71      ADC ($44), X   ADd with Carry                   2       5+
+		&rra_absolute,  //$6F       RRA
+		&bvs,           //$70       BVS           Branch if plus                    2       2(+2)
+		&adc_indirect_y,//$71       ADC ($44), X   ADd with Carry                   2       5+
 		&invalid,
 		&rra_indirect_y,//$73       RRA
 		&nop2,          //$74       NOP
@@ -1789,13 +1755,13 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&ror_absolute_x,//$7E       ROR $44      Rotate Right                       3       7
 		&rra_absolute_x,//$7F       RRA
 		&nop2,          //$80       NOP
-		&sta_indirect_x,//$81      STA ($44,X)    STore Accumulator                 2       6
+		&sta_indirect_x,//$81       STA ($44,X)    STore Accumulator                 2       6
 		&nop2,          //$82       NOP
-		&axs_indirect_x,//$83      AXS                                              2       2
-		&sty_zpage,     //$84      STX $44       STore Y Register                   2       3
-		&sta_zpage,     //$85      STA $44       STore Accumulator                  2       2
-		&stx_zpage,     //$86      STX $44       STore X Register                   2       2
-		&axs_zpage,     //$87      AXS
+		&axs_indirect_x,//$83       AXS                                              2       2
+		&sty_zpage,     //$84       STX $44       STore Y Register                   2       3
+		&sta_zpage,     //$85       STA $44       STore Accumulator                  2       2
+		&stx_zpage,     //$86       STX $44       STore X Register                   2       2
+		&axs_zpage,     //$87       AXS
 		&dey,           //$88       DEY           Decrements Y                      1       2
 		&nop2,          //$89       NOP
 		&txa,           //$8A       TXA           Transfer X to A                   1       2
@@ -1805,24 +1771,24 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&stx_absolute,  //$8E       STX $4400     STore X Register                  3       4
 		&axs_absolute,  //$8F       AXS
 		&bcc,           //$90       BCC           Branch if carry clear             2       2(+2)
-		&sta_indirect_y,//$91      STA ($44),Y    STore Accumulator                 2       6
+		&sta_indirect_y,//$91       STA ($44),Y    STore Accumulator                 2       6
 		&invalid,
 		&invalid,
-		&sty_zpage_x,   //$94      STX $44,Y      STore Y Register                  2       4
-		&sta_zpage_x,   //$95      STA $44,X      STore Accumulator                 2       4
-		&stx_zpage_y,   //96       STX $44, Y     STore X Register                  2       4
-		&axs_zpage_y,   //$97      AXS
-		&tya,           //$98      TYA           Transfer Y to A                    1       2
-		&sta_absolute_y,//$99      STA $440&invalidY    STore Accumulator           3       5
+		&sty_zpage_x,   //$94       STX $44,Y      STore Y Register                  2       4
+		&sta_zpage_x,   //$95       STA $44,X      STore Accumulator                 2       4
+		&stx_zpage_y,   //96        STX $44, Y     STore X Register                  2       4
+		&axs_zpage_y,   //$97       AXS
+		&tya,           //$98       TYA           Transfer Y to A                    1       2
+		&sta_absolute_y,//$99       STA $440&invalidY    STore Accumulator           3       5
 		&txs,           //9A
 		&invalid,
 		&invalid,
-		&sta_absolute_x,//$9D      STA $440&invalidX    STore Accumulator                 3       5
+		&sta_absolute_x,//$9D       STA $440&invalidX    STore Accumulator                 3       5
 		&invalid,
 		&invalid,
-		&ldy_immediate, //A0       LDA #$44       LoaD Accumulator                  2       2
-		&lda_indirect_x,//A1       LDA ($44,X)    LoaD Accumulator                  2       6
-		&ldx_immediate, //A2       LDA #$44       LoaD Accumulator                  2       2
+		&ldy_immediate, //A0        LDA #$44       LoaD Accumulator                  2       2
+		&lda_indirect_x,//A1        LDA ($44,X)    LoaD Accumulator                  2       6
+		&ldx_immediate, //A2        LDA #$44       LoaD Accumulator                  2       2
 		&lax_indirect_x,//$A3       LAX $4400     Load Accumulator and X            2       6
 		&ldy_zpage,     //$A4       LDA $44       LoaD Accumulator                  2       3
 		&lda_zpage,     //$A5       LDA $44       LoaD Accumulator                  2       3
@@ -1832,10 +1798,10 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&lda_inmediate, //$A9       LDA #$44      LoaD Accumulator                  2       2
 		&tax,           //$AA       TAX           Transfer A to X                   1       2
 		&invalid,
-		&ldy_absolute,  //$AC      LDY $4400     LoaD Y Register                    3       4
-		&lda_absolute,  //AD       LDA $4400     LoaD Accumulator                   3       4
-		&ldx_absolute,  //AE       LDA $4400     LoaD Accumulator                   3       4
-		&lax_absolute,  //$AF      LAX $4400     Load Accumulator and X             3       4
+		&ldy_absolute,  //$AC       LDY $4400     LoaD Y Register                    3       4
+		&lda_absolute,  //AD        LDA $4400     LoaD Accumulator                   3       4
+		&ldx_absolute,  //AE        LDA $4400     LoaD Accumulator                   3       4
+		&lax_absolute,  //$AF       LAX $4400     Load Accumulator and X             3       4
 		&bcs,           //$B0       BCS           Branch id carry set               2       2(+2)
 		&lda_indirect_y,//B1        LDA ($44),Y   LoaD Accumulator                  2       5+
 		&invalid,
@@ -1848,10 +1814,10 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&lda_absolute_y,//$B9       LDA $440&invalidY   LoaD Accumulator                   3       4+
 		&tsx,           //BA
 		&invalid,
-		&ldy_absolute_x,//$BC      LDY $440&invalidY    LoaD Y Register                    3       4+
-		&lda_absolute_x,//BD       LDA $440&invalidX    LoaD Accumulator                   3       4+
-		&ldx_absolute_y,//BE       LDA $440&invalidY    LoaD Accumulator                   3       4+
-		&lax_absolute_y,  //$BF    LAX $4400,Y          Load Accumulator and X             3       4+
+		&ldy_absolute_x,//$BC       LDY $440&invalidY    LoaD Y Register                    3       4+
+		&lda_absolute_x,//BD        LDA $440&invalidX    LoaD Accumulator                   3       4+
+		&ldx_absolute_y,//BE        LDA $440&invalidY    LoaD Accumulator                   3       4+
+		&lax_absolute_y,  //$BF     LAX $4400,Y          Load Accumulator and X             3       4+
 		&cpy_immediate,     //$C0   CPX #$44      Compare                           2       2
 		&cmp_indirect_x,    //$C1   CMP ($44,X)   Compare                           2       6
 		&nop2,          //$C2       NOP
@@ -1871,13 +1837,13 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&bne,           //$D0       BNE           Branch now equals                 2       2(+2)
 		&cmp_indirect_y,    //$D1   CMP ($44),X   Compare                           2       5+
 		&invalid,
-		&dcm_indirect_y,//$Dqa:::qqa::3       DCM $44       Decrement and CoMpare
+		&dcm_indirect_y,//$D3       DCM $44       Decrement and CoMpare
 		&nop2,          //$D4       NOP
-		&cmp_zpage_x,       //$D5      CMP $44,X     Compare                           2       4
-		&dec_mem_zpage_x,   //$D6      DEC $44,X     DEcrement Memory                  2       6
-		&dcm_zpage_x,       //$D7      DCM $44       Decrement and CoMpare
-		&cld,               //$D8      CLD           CLear Decimal flag                1       2
-		&cmp_absolute_y,    //$D9      CMP $440&invalidY   Compare                          3       4+
+		&cmp_zpage_x,       //$D5   CMP $44,X     Compare                           2       4
+		&dec_mem_zpage_x,   //$D6   DEC $44,X     DEcrement Memory                  2       6
+		&dcm_zpage_x,       //$D7   DCM $44       Decrement and CoMpare
+		&cld,               //$D8   CLD           CLear Decimal flag                1       2
+		&cmp_absolute_y,    //$D9   CMP $440&invalidY   Compare                          3       4+
 		&nop1,          //$DA       NOP
 		&dcm_absolute_y,//$DF       DCM $4400     Decrement and CoMpare
 		&nop3,          //$DC       NOP
@@ -1887,35 +1853,35 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&cpx_immediate,    //$E0    CPX #$44      Compare                          2       2
 		&sbc_indirect_x,//$E1       SBC ($44,X)   SuBstract with Carry             2       6
 		&nop2,          //$E2       NOP
-		&ins_indirect_x,//$E3      INS
+		&ins_indirect_x,//$E3       INS
 		&cpx_zpage,    //$E4        CPX $44       Compare                          2       3
 		&sbc_zpage,     //$E5       SBC $44       SuBstract with Carry             2       3
 		&inc_mem_zpage, //$E6       INC $44       INcrement Memory                 2       5
-		&ins_zpage,     //$E7      INS
+		&ins_zpage,     //$E7       INS
 		&inx,           //$E8       INX           Increments X register            1       7
 		&sbc_immediate, //$E9       SBC #$44      SuBstract with Carry             2       2
 		&nop1,          //$EA       NOP           No OPeration                     1       2
-		&sbc_immediate, //$EB      SBC #$44       Invalid opcode. works like sbc
-		&cpx_absolute,  //$EC      CPX $4400       Compare                         3       4
-		&sbc_absolute, //$ED       SBC $4400       SuBstract with Carry            3       4
-		&inc_mem_absolute,//$EE    INC $4400       INcrement Memory                3       6
-		&ins_absolute,  //$EF      INS
+		&sbc_immediate, //$EB       SBC #$44       Invalid opcode. works like sbc
+		&cpx_absolute,  //$EC       CPX $4400       Compare                         3       4
+		&sbc_absolute, //$ED        SBC $4400       SuBstract with Carry            3       4
+		&inc_mem_absolute,//$EE     INC $4400       INcrement Memory                3       6
+		&ins_absolute,  //$EF       INS
 		&beq,           //$F0       BEQ           Branch if equals                 2       2(+2)
 		&sbc_indirect_y,//$F1       SBC ($44),Y   SuBstract with Carry             2       5+
 		&invalid,
-		&ins_indirect_y,//$F3      INS
+		&ins_indirect_y,//$F3       INS
 		&nop2,          //$F4       NOP
 		&sbc_zpage_x,   //$F5       SBC $44,X     SuBstract with Carry             2       4
 		&inc_mem_zpage_x,//$F6      INC $44, X    INcrement Memory                 2       6
-		&ins_zpage_x,   //$E7      INS
+		&ins_zpage_x,   //$E7       INS
 		&sed,           //$F8       SED           Sets Decimal flag                1       2
 		&sbc_absolute_y,//$F9       SBC $440&invalidY   SuBstract with Carry             3       4+
 		&nop1,          //$FA       NOP
-		&ins_absolute_y,//$EF      INS
+		&ins_absolute_y,//$EF       INS
 		&nop3,          //$FC       NOP
 		&sbc_absolute_x,//$FD       SBC $440&invalidX   SuBstract with Carry             3       4+
-		&inc_mem_absolute_x,//$FE     INC $440&invalidX   INcrement Memory               3       7
-		&ins_absolute_x,//$EF      INS
+		&inc_mem_absolute_x,//$FE   INC $440&invalidX   INcrement Memory               3       7
+		&ins_absolute_x,//$EF       INS
 };
 
 byte cpu_instruction() {

@@ -1,24 +1,25 @@
 #ifndef NESULATOR_NES_H
 #define NESULATOR_NES_H
 
-#include "gui/gui.h"
-#include "utils/log.h"
 #include "cpu.h"
-#include "ppu.h"
 #include "rom.h"
-#include "apu.h"
-#include "stdlib.h"
-#include "stdio.h"
-#include "pthread.h"
+#include "utils/Utils.h"
+#include "utils/log.h"
 
-int stop_emulation(SDL_Event);
+/**
+ * Of course, only one ROM can be in the console at the same time. This is the one
+ */
+extern ROM rom;
 
-//So that SDL stops complaining
-#undef main
+int stop_emulation();
 
-int main();
+int start_emulation();
 
-void register_events();
+/**
+ * Prepares the log levels, log directories and the CPU/PPU/APU for the console to run
+ */
+void configure();
+
 void every_second();
 
 #endif //NESULATOR_NES_H

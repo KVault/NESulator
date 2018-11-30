@@ -850,8 +850,8 @@ void test_NESTEST() {
 	//If we need to initialize anything, it should go here
 
 	//Read the ROM, that we're going to execute and all that stuff
-	ROM *rom = insertCartridge("../../rom/nestest.nes");
-	load_ROM(rom);
+	insertCartridge("../../rom/nestest.nes");
+	load_ROM(get_ROM());
 
 	int isRunning = 1;
 

@@ -35,6 +35,7 @@ byte SP;    // Stack Pointer, from 0x100 to 0x1FF address
  */
 byte P;     // Status register, CPU flags
 int cpu_cyclesThisSec; //Counter of elapsed cycles (Hz) this current second.
+int cpu_cyclesLastSec; //Counter of elapsed cycles last second. Used by the GUI to keep accurate track of the speed
 int cpu_speed;  //Speed of the CPU in Hz. Used to slow down the emulation to match the NES's clock speed
 byte currentOpcode; // The opcode of this cycle
 uint cpu_running;

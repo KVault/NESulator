@@ -2,7 +2,6 @@
 #define NESULATOR_ROM_H
 
 #include "utils/Utils.h"
-#include <stdio.h>
 
 #define PRG_PAGE_SIZE 16384
 #define CHR_PAGE_SIZE 8192
@@ -50,7 +49,7 @@ typedef struct{
  * Loads a ROM from the specified filePath. It simulates what would happen when the cartridge is inserted by copying
  * it into memory. It won't, at this point, load anything into the console's memory
  */
-ROM *insertCartridge(char *filePath);
+void insertCartridge(char *filePath);
 
 /**
  * Begins the copy process from the ROM to the RAM. It will also apply any mappings when necessary

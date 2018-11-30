@@ -3,18 +3,18 @@
 
 #include "Utils.h"
 
-typedef struct pixel{
+typedef struct{
 	byte R;
 	byte G;
 	byte B;
-}pixel;
+} colour;
 
 /**
  * The Colour palette for the NES. The interpretation of the colors may change, but not its positions on it
  *
  * This might seem a bit random but it can be found here (https://wiki.nesdev.com/w/images/5/59/Savtool-swatches.png)
  */
-extern const pixel COLOUR_PALETTE[];
+extern const colour COLOUR_PALETTE[];
 
 
 #endif //NESULATOR_COLOUR_PALETTE_H

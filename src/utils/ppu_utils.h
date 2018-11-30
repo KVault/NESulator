@@ -10,28 +10,46 @@
 
 #define TILE_ROW_SIZE 8
 #define TILE_COLUMN_SIZE 8
-#define TILES_PER_TABLE 0xFF
-#define TILE_SIZE 64
+#define TILES_PER_ROW 0x40  //Basically 0x0F * 2
+#define TILES_PER_COLUMN 0x1E
+#define TILES_TOTAL 0x1FE //Basically 0xFF * 2
 #define PPU_PATTERN_LEFT vram_bank[0x0000]
 #define PPU_PATTERN_RIGHT vram_bank[0x1000]
 
-typedef enum {NT_TOP_LEFT, NT_TOP_RIGHT, NT_BOTTOM_LEFT, NT_BOTTOM_RIGHT} NametableIndex;
+typedef struct {
+	int size;
+	unsigned int *buffer;
 
-struct tile {
+} FrameInfo;
+
+typedef enum {
+	NT_TOP_LEFT, NT_TOP_RIGHT, NT_BOTTOM_LEFT, NT_BOTTOM_RIGHT
+} NametableIndex;
+
+typedef enum {
+	AT_TOP_LEFT, AT_TOP_RIGHT, AT_BOTTOM_LEFT, AT_BOTTOM_RIGHT
+} AttributeTableIndex;
+
+/**
+ * Memory addresses for the Background palettes. These are the entry points and each palette holds 3 colours
+ */
+extern word BACKGROUND_PALETTES[4];
+
+typedef struct{
 	/**
 	 * matrix of numbers from 0 to 3. Defines the shape of the tile
 	 */
 	byte pattern[TILE_ROW_SIZE][TILE_COLUMN_SIZE];
-};
+} tile;
 
 /**
  * Starting at "start_pos" encodes the next "number_tiles" as a pattern table.
  *
  * That is in blocks of 16 bytes and performing the left + right sum to obtain numbers from 0 to 3.
  */
-void encode_as_tiles(byte *mem_addr, byte number_tiles, struct tile *tiles);
+void encode_as_tiles(byte *mem_addr, uint number_tiles, tile *tiles);
 
-struct tile nametable_tile(byte tile_id);
+tile nametable_tile(byte tile_id);
 
 /**
  * Uses the current mirroring to return the start address of the nametable index
@@ -39,6 +57,12 @@ struct tile nametable_tile(byte tile_id);
  */
 word get_nt_start_addr(NametableIndex nametableIndex);
 
-void log_tile(struct tile *tile);
+word get_at_start_addr(AttributeTableIndex attributeTableIndex);
+
+void log_tile(tile *tile);
+
+byte get_attribute(NametableIndex nametableIndex, int row_id, int column_id);
+
+colour *get_background_palette(byte attribute);
 
 #endif //NESULATOR_PPU_UTILS_H

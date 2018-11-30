@@ -1,0 +1,26 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:GUItulator.ViewModels;assembly=GUItulator"
+        Icon="resm:GUItulator.Assets.avalonia-logo.ico"
+        Title="GUItulator">
+
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+
+
+  <DockPanel>
+      <Menu DockPanel.Dock="Top">
+          <MenuItem Header="File">
+              <MenuItem Header="Open" Command="{Binding OpenROM}"></MenuItem>
+              <MenuItem Header="Hardcoded run" Command="{Binding HardcodedRun}" HotKey="Ctrl+F"></MenuItem>
+          </MenuItem>
+          <MenuItem Header="Debug">
+              <MenuItem Header="Pattern table" HotKey="Ctrl+P" Command="{Binding OpenPatterntable}"></MenuItem>
+              <MenuItem Header="Nametable" Command="{Binding OpenNametable}"></MenuItem>
+          </MenuItem>
+      </Menu>
+
+      <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+  </DockPanel>
+</Window>
