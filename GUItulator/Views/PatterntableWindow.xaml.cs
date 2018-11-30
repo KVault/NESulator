@@ -14,6 +14,7 @@ namespace GUItulator.Views
         public PatterntableWindow()
         {
             InitializeComponent();
+            Closed += (e,args) => viewModel.FramesRunning = false;
 #if DEBUG
             this.AttachDevTools();
 #endif
@@ -25,8 +26,9 @@ namespace GUItulator.Views
             patterntableControl = (Image) Content;
             viewModel = new PatterntableWindowViewModel(() =>
                         Dispatcher.UIThread.InvokeAsync(() => patterntableControl.InvalidateVisual()).Wait());
+            viewModel.FramesRunning = true;
             DataContext = viewModel;
-            GotFocus += viewModel.DrawDummyBitmap;
         }
+
     }
 }

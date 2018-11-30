@@ -10,14 +10,15 @@
 
 #define TILE_ROW_SIZE 8
 #define TILE_COLUMN_SIZE 8
-#define TILES_PER_TABLE 0xFF
+#define TILES_PER_ROW 0x40  //Basically 0x0F * 2
+#define TILES_PER_COLUMN 0x1E
 #define TILES_TOTAL 0x1FE //Basically 0xFF * 2
 #define PPU_PATTERN_LEFT vram_bank[0x0000]
 #define PPU_PATTERN_RIGHT vram_bank[0x1000]
 
 typedef struct {
 	int size;
-	byte *buffer;
+	unsigned int *buffer;
 
 } FrameInfo;
 
