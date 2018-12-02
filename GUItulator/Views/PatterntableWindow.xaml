@@ -4,7 +4,10 @@
         Icon="resm:GUItulator.Assets.avalonia-logo.ico"
         Title="Patterntable viewer"
         Width="512"
-        Height="240">
+        Height="256">
 
-        <Image Source="{Binding Patterntable}" Width="512" Height="240"></Image>
+        <Grid>
+                <Image HorizontalAlignment="Left" Source="{Binding LeftPatterntable}" Stretch="Uniform"></Image>
+                <Image HorizontalAlignment="Right" Source="{Binding RightPatterntable}" Stretch="Uniform"></Image>
+        </Grid>
 </Window>

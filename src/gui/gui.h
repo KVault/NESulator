@@ -27,9 +27,13 @@ EXPORT void gui_stop_emulation();
 /**
  * Returns the latest patterntable frame. It only returns a pointer to int. Both the UI and the backend know
  * the dimensions of the patterntable. Another option would be to return a struct or array that holds that info
- *
- * TODO Maybe change that? I just want to get this working right now
  */
-EXPORT FrameInfo gui_patterntable_frame();
+EXPORT FrameInfo gui_right_patterntable();
+
+/**
+ * Returns the latest patterntable frame. It only returns a pointer to int. Both the UI and the backend know
+ * the dimensions of the patterntable. Another option would be to return a struct or array that holds that info
+ */
+EXPORT FrameInfo gui_left_patterntable();
 
 #endif //NESULATOR_GUI_H

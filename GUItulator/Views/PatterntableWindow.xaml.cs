@@ -9,7 +9,8 @@ namespace GUItulator.Views
     public class PatterntableWindow : Window
     {
         private PatterntableWindowViewModel viewModel;
-        private IControl patterntableControl;
+        private IControl leftPatterntableControl;
+        private IControl rightPatterntableControl;
 
         public PatterntableWindow()
         {
@@ -23,9 +24,15 @@ namespace GUItulator.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            patterntableControl = (Image) Content;
+            var rootPanel = (Grid)Content;
+            leftPatterntableControl = rootPanel.Children[0];
+            rightPatterntableControl = rootPanel.Children[1];
             viewModel = new PatterntableWindowViewModel(() =>
-                        Dispatcher.UIThread.InvokeAsync(() => patterntableControl.InvalidateVisual()).Wait());
+                        Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            leftPatterntableControl.InvalidateVisual();
+                            rightPatterntableControl.InvalidateVisual();
+                        }).Wait());
             viewModel.FramesRunning = true;
             DataContext = viewModel;
         }

@@ -1,40 +1,52 @@
 #include "gui_patterntable.h"
 #include "gui.h"
 
-unsigned int back_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
+unsigned int left_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
+unsigned int right_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
 
 
-void render_tiles(tile *tiles, unsigned int *back_buffer) {
-	for (int i = 0; i < TILES_TOTAL; ++i) {
+void render_tiles(tile *tiles, uint *back_buffer) {
+	for (byte i = 0; i < TILES_PER_TABLE; ++i) {
 		for (int j = 0; j < TILE_ROW_SIZE; ++j) {
 			for (int k = 0; k < TILE_COLUMN_SIZE; ++k) {
-				//The 3 is used because every pixel has 3 bytes in it.
-				//A[x,y] would then be mapped to DIM1[x + y * Xn]
-				static int stride;
-				stride = TILE_ROW_SIZE * TILES_PER_ROW;
-				int finalPos = (j + k * stride);
-
-				//TODO remove that magic number. For debug only
-				unsigned int colour = i%2 == 0 ? 0xff000000:0xff000000;//COLOUR_PALETTE[tiles[i].pattern[j][k] + 15].R;
-				back_buffer[finalPos] = colour;//(color << 24) + (color << 16) + (color << 8) + color;
-		 	}
+				int columnIndex = ((i & 0x0F) * TILE_COLUMN_SIZE) + k;
+				int rowIndex = ((i >> 4) * TILE_ROW_SIZE) + j;
+				if (tiles[i].pattern[j][k] != 0) {
+					back_buffer[PATTERNTABLE_TEXTURE_HEIGHT * rowIndex + columnIndex] = 0xffffffff;
+				}else{
+					back_buffer[PATTERNTABLE_TEXTURE_HEIGHT * rowIndex + columnIndex] = 0xff000000;
+				}
+			}
 		}
 	}
 }
 
-FrameInfo patterntable_frame(){
+
+/**
+ * Generic function to be called. It will encode the patterntable, fill in the colours, struct and return it
+ */
+FrameInfo patterntable_frame(byte *mem_addr, unsigned int *buffer){
 	static tile *tiles;
 	static FrameInfo frameInfo = {};
 
 	if (tiles == NULL) {
-		tiles = calloc(TILES_TOTAL + 1, sizeof(tile));
+		tiles = calloc(TILES_PER_TABLE + 1, sizeof(tile));
 	}
 
-	encode_as_tiles(&PPU_PATTERN_LEFT, TILES_TOTAL, tiles);
-	render_tiles(tiles, back_buffer);
+	encode_as_tiles(mem_addr, TILES_PER_TABLE, tiles);
+	render_tiles(tiles, buffer);
 
-	frameInfo.buffer = back_buffer;
+	frameInfo.buffer = buffer;
 	frameInfo.size = PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT;
 
 	return frameInfo;
 }
+
+FrameInfo left_patterntable(){
+	return patterntable_frame(&PPU_PATTERN_LEFT, left_buffer);
+}
+
+FrameInfo right_patterntable(){
+	return patterntable_frame(&PPU_PATTERN_RIGHT, right_buffer);
+}
+
