@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:GUItulator.ViewModels;assembly=GUItulator"
+        Icon="resm:GUItulator.Assets.avalonia-logo.ico"
+        Title="HEX Editor"
+        Width="600"
+        Height="400">
+
+    <StackPanel Orientation="Horizontal">
+        <!-- The Memory Addresses -->
+        <ListBox Items="{Binding TenBytesHeaderCount}" VirtualizationMode="Simple" BorderThickness="0" Width="70">
+            <ListBox.ItemTemplate>
+                <DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+
+        <ListBox Items="{Binding TenBytesHeaderCount}" VirtualizationMode="Simple" BorderThickness="0" Width="300">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal">
+                        <ListBox Items="{Binding WordCodes}"></ListBox>
+                    </VirtualizingStackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <ListBox Items="{Binding TenBytesHeaderCount}" VirtualizationMode="Simple" BorderThickness="0" Width="200">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <VirtualizingStackPanel Orientation="Horizontal">
+                        <ListBox Items="{Binding CharValues}"></ListBox>
+                    </VirtualizingStackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </StackPanel>
+</Window>

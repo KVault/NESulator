@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using GUItulator.ViewModels;
+
 
 namespace GUItulator.Views
 {

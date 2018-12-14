@@ -21,3 +21,15 @@ EXPORT FrameInfo gui_left_patterntable(){
 EXPORT FrameInfo gui_right_patterntable(){
 	return right_patterntable();
 }
+
+EXPORT FrameInfo gui_nametable(NametableIndex index){
+	return nametable(index);
+}
+
+EXPORT MemoryDumpInfo gui_ram_dump(){
+	MemoryDumpInfo info = {};
+	info.size = RAM_MEM_SIZE;
+	info.buffer = ram_bank;
+
+	return info;
+}

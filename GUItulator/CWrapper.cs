@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace GUItulator
 {
@@ -20,11 +21,38 @@ namespace GUItulator
         [DllImport("libNESulator.dll", EntryPoint = "gui_right_patterntable")]
         public static extern FrameInfo RightPatterntable();
 
+        [DllImport("libNESulator.dll", EntryPoint = "gui_nametable")]
+        public static extern FrameInfo Nametable(int nametableIndex);
+
+        [DllImport("libNESulator.dll", EntryPoint = "gui_ram_dump")]
+        public static extern FrameInfo RAMDump();
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public unsafe struct FrameInfo
         {
             public int size;
             public IntPtr buffer;
+
+            public byte[] ToByteArray()
+            {
+                var array = new byte[size];
+                Marshal.Copy(buffer, array, 0, size);
+                return array;
+            }
+
+            public int[] ToIntArray()
+            {
+                var array = new int[size];
+                Marshal.Copy(buffer, array, 0, size);
+                return array;
+            }
+
+            public short[] ToShortArray()
+            {
+                var array = new short[size];
+                Marshal.Copy(buffer, array, 0, size);
+                return array;
+            }
         }
     }
 }
