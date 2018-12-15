@@ -4,13 +4,11 @@
 #include "../utils/ppu_utils.h"
 #include "gui.h"
 
-#define PATTERNTABLE_TEXTURE_WIDTH 512
-#define PATTERNTABLE_TEXTURE_HEIGHT 240
+#define PATTERNTABLE_TEXTURE_WIDTH 128
+#define PATTERNTABLE_TEXTURE_HEIGHT 128
 
-/**
- * Custom implementation for the patterntable. It's in its own file because oh boy this is big and messy....
- * returns the size of the buffer
- */
-FrameInfo patterntable_frame();
+FrameInfo left_patterntable();
+
+FrameInfo right_patterntable();
 
 #endif //NESULATOR_GUI_PATTERNTABLE_H

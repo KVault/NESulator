@@ -9,12 +9,13 @@ namespace GUItulator.Views
     public class PatterntableWindow : Window
     {
         private PatterntableWindowViewModel viewModel;
-        private IControl patterntableControl;
+        private Image leftPatterntableControl;
+        private Image rightPatterntableControl;
 
         public PatterntableWindow()
         {
             InitializeComponent();
-            Closed += (e,args) => viewModel.FramesRunning = false;
+            Closed += (e, args) => viewModel.StopLoop();
 #if DEBUG
             this.AttachDevTools();
 #endif
@@ -23,10 +24,16 @@ namespace GUItulator.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            patterntableControl = (Image) Content;
+            var rootPanel = (Grid)Content;
+            leftPatterntableControl = (Image)rootPanel.Children[0];
+            rightPatterntableControl = (Image)rootPanel.Children[1];
             viewModel = new PatterntableWindowViewModel(() =>
-                        Dispatcher.UIThread.InvokeAsync(() => patterntableControl.InvalidateVisual()).Wait());
-            viewModel.FramesRunning = true;
+                        Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            leftPatterntableControl.InvalidateVisual();
+                            rightPatterntableControl.InvalidateVisual();
+                        }).Wait(), 5);
+            viewModel.StartLoop();
             DataContext = viewModel;
         }
 

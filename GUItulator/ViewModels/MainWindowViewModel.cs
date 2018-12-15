@@ -34,24 +34,17 @@ namespace GUItulator.ViewModels
                 {
                     new FileDialogFilter() {Extensions = {"nes"}}
                 }
-            }.ShowAsync();
+            }.ShowAsync(null);
             if (romFile != null && romFile.Length > 0)
             {
                 StartEmulation(romFile[0]);
             }
         }
 
-        public void HardcodedRun()
-        {
-            StartEmulation(@"C:\dev\NESulator\NESulator\rom\donkey_kong.nes");
-        }
-
+        public void HardcodedRun() => StartEmulation(@"C:\dev\NESulator\NESulator\rom\donkey_kong.nes");
         public void OpenPatterntable() => new PatterntableWindow().Show();
-
-        public void OpenNametable()
-        {
-
-        }
+        public void OpenNametable() => new NametableWindow().Show();
+        public void OpenHexEditor() => new HexEditorWindow().Show();
 
         /// <summary>
         /// Sets up a coroutine that runs once a second. It polls the CPU speed from the backend

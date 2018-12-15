@@ -11,7 +11,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Models\" />
     <Compile Update="**\*.xaml.cs">
       <DependentUpon>%(Filename)</DependentUpon>
     </Compile>
@@ -24,10 +23,25 @@
     <PackageReference Include="Avalonia" Version="0.7.0" />
     <PackageReference Include="Avalonia.Desktop" Version="0.7.0" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.7.0" />
+    <PackageReference Include="Serilog" Version="2.7.2-dev-01033" />
     <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0005" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0005" />
+    <PackageReference Include="SkiaSharp" Version="1.68.0" />
+    <PackageReference Include="Splat" Version="5.1.4" />
+    <PackageReference Include="System.Drawing.Common" Version="4.6.0-preview.18571.3" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10">
+      <HintPath>..\..\..\Avalonia\samples\ControlCatalog.Desktop\bin\Debug\net461\Serilog.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Views\HexEditorWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\NametableWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 </Project>

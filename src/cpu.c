@@ -38,7 +38,7 @@ void reset_pc() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void nop(int cycles, int pcIncrease) {
-	log_instruction(0, "NOP\t\t\t");
+	log_instruction(0, "\tNOP\t\t\t");
 
 	PC += pcIncrease;
 	cpu_cyclesThisSec += cycles;
@@ -1045,7 +1045,7 @@ void lsr_absolute_x() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void rol(byte *value, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "ROL $%02X", value);
+	log_instruction(pcIncrease - 1, "\tROL $%02X", value);
 
 	byte cachedFlagC = (byte) bit_test(P, flagC);
 	byte cached7 = (byte) bit_test(*value, 7);
@@ -1407,7 +1407,7 @@ void ins_indirect_y() {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void aso(word addr, int cycles, int pcIncrease) {
-	log_instruction(pcIncrease - 1, "\tASO $%02X", addr);
+	log_instruction(pcIncrease - 1, "ASO $%02X\t\t", addr);
 
 	//ASL
 	byte value = rmem_b(addr);

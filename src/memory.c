@@ -111,7 +111,7 @@ void wmem(byte *memoryBank, unsigned short amountBytes, uint initialPosition, by
  */
 
 void wmem_ram(unsigned short amountBytes, uint initialPosition, byte *content) {
-	ppu_reg_write(initialPosition, content[0]);
+	ppu_reg_write(initialPosition, *content);
 	wmem(ram_bank, amountBytes, initialPosition, content);
 	ram_mirroring(amountBytes, initialPosition, content);
 }

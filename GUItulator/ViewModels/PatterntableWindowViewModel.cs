@@ -1,63 +1,32 @@
 using System;
-using System.ComponentModel;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Avalonia;
-using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using ReactiveUI;
-using Serilog;
+using GUItulator.Utils;
 
 namespace GUItulator.ViewModels
 {
-    public class PatterntableWindowViewModel
+    public class PatterntableWindowViewModel : FPSWindowBase
     {
-        public WriteableBitmap Patterntable { get;}
-        private readonly Action invalidate;
-        private Task refreshTask;
-        public bool FramesRunning {get; set;}
+        private WriteableBitmap LeftPatterntable {get;}
+        private WriteableBitmap RightPatterntable {get;}
 
-        public PatterntableWindowViewModel(Action invalidate)
+        public PatterntableWindowViewModel(Action invalidate, int fps) : base(invalidate, fps)
         {
-            this.invalidate = invalidate;
-            Patterntable = new WriteableBitmap(new PixelSize(512,240), new Vector(96,96), PixelFormat.Rgba8888);
-            refreshTask = new Task(DrawPatterntable);
-            refreshTask.Start();
+            LeftPatterntable = new WriteableBitmap(new PixelSize(128,128), new Vector(96,96), PixelFormat.Rgba8888);
+            RightPatterntable = new WriteableBitmap(new PixelSize(128,128), new Vector(96,96), PixelFormat.Rgba8888);
         }
 
-        public unsafe void DrawPatterntable()
+        /// <summary>
+        /// Main update function for the window. It renders both patterntables side by side
+        /// </summary>
+        protected override void Update()
         {
-            try
-            {
-                ScheduleNextFrame();
-                if (!FramesRunning) return;
-                var frameInfo = CWrapper.PatterntableFrame();
-                var rawFrame = new int[frameInfo.size];
-                Marshal.Copy(frameInfo.buffer, rawFrame, 0, frameInfo.size);
-
-                using (var l = Patterntable.Lock())
-                {
-                    var ptr = (uint*)l.Address;
-
-                    for (var i = 0; i < l.Size.Width * (l.Size.Height - 1); i++)
-                    {
-                        *(ptr + i) = (uint)rawFrame[i];
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, e.Message);
-            }
-        }
-
-        private void ScheduleNextFrame()
-        {
-            refreshTask.Wait(15); //15 mills. 60FPS
-            refreshTask = new Task(DrawPatterntable);
-            refreshTask.Start();
-            invalidate?.Invoke();
+            //temp variables used because the ref parameter doesn't like it otherwise
+            var leftPatterntable = LeftPatterntable;
+            var rightPatterntable = RightPatterntable;
+            BitmapUtils.DrawBitmap(CWrapper.LeftPatterntable().ToIntArray(), ref leftPatterntable);
+            BitmapUtils.DrawBitmap(CWrapper.RightPatterntable().ToIntArray(), ref rightPatterntable);
         }
     }
 }
