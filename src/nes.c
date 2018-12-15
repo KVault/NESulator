@@ -14,6 +14,7 @@ int stop_emulation() {
 }
 
 int start_emulation(){
+	configure();
 	if(rom.prgROM == NULL){ // No ROM has been loaded. Error and stop the process
 		log_error("No ROM has been loaded. Stopping the emulation. Abort, abort, abort!!");
 		return 1;//Means error?
@@ -34,6 +35,11 @@ void configure(){
 
 	cpu_power_up(1789773);
 	ppu_power_up(3);//TODO this powerup has to wait about 20k cycles. PPU stuff
+
+	//If a ROM was already loaded, do it again, powering up the CPU zeroes the memory
+	if(get_ROM() != NULL){
+		load_ROM(get_ROM());
+	}
 }
 
 void run() {
@@ -55,8 +61,8 @@ void run() {
  * Ticks every second. It's used to keep track of the clock speeds and whatnot
  */
 void every_second() {
-	static long last_second = 0;
-	static long ctime = 0;
+	static time_t last_second = 0;
+	static time_t ctime = 0;
 	ctime = time(NULL);
 
 	//More than one second elapsed

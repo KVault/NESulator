@@ -1,7 +1,6 @@
 ﻿using GUItulator.ViewModels;
 using GUItulator.Views;
 using Avalonia;
-using Avalonia.Logging.Serilog;
 
 namespace GUItulator
 {
