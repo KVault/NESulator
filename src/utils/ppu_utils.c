@@ -2,15 +2,6 @@
 
 word BACKGROUND_PALETTES[4] = {0x3F01, 0x3F05, 0x3F09, 0x3F0D};
 
-void log_tile(tile *tile) {
-	for (int i = 0; i < TILE_ROW_SIZE; ++i) {
-		for (int j = 0; j < TILE_ROW_SIZE; ++j) {
-			tile->pattern[i][j] ? log_info("%i", tile->pattern[i][j]) : log_info(".");
-		}
-		log_info("\n");
-	}
-}
-
 void encode_as_tiles(byte *mem_addr, uint number_tiles, tile *tiles) {
 	for (int i, tile_count = i = 0;
 	     tile_count < number_tiles; i += 16, ++tile_count) { //Each tile is defined by 16 bytes

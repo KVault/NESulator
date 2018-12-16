@@ -16,5 +16,7 @@ typedef struct{
  */
 extern const colour COLOUR_PALETTE[];
 
+uint encode_as_RGBA(colour colour);
+
 
 #endif //NESULATOR_COLOUR_PALETTE_H

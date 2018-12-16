@@ -8,12 +8,12 @@
 
     <Grid>
         <Image VerticalAlignment="Top" HorizontalAlignment="Left" Source="{Binding Nametables[0]}"
-               Stretch="Uniform"></Image>
+               Stretch="Uniform" Width="256" Height="240"></Image>
         <Image VerticalAlignment="Top" HorizontalAlignment="Right" Source="{Binding Nametables[1]}"
-               Stretch="Uniform"></Image>
+               Stretch="Uniform" Width="256" Height="240"></Image>
         <Image VerticalAlignment="Bottom" HorizontalAlignment="Left" Source="{Binding Nametables[2]}"
-               Stretch="Uniform"></Image>
+               Stretch="Uniform" Width="256" Height="240"></Image>
         <Image VerticalAlignment="Bottom" HorizontalAlignment="Right" Source="{Binding Nametables[3]}"
-               Stretch="Uniform"></Image>
+               Stretch="Uniform" Width="256" Height="240"></Image>
     </Grid>
 </Window>
