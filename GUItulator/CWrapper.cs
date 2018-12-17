@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -40,11 +41,11 @@ namespace GUItulator
                 return array;
             }
 
-            public int[] ToIntArray()
+            public uint[] ToUIntArray()
             {
                 var array = new int[size];
                 Marshal.Copy(buffer, array, 0, size);
-                return array;
+                return Array.ConvertAll(array, i => (uint)i);
             }
 
             public short[] ToShortArray()

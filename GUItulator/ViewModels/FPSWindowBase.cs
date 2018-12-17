@@ -10,7 +10,6 @@ namespace GUItulator.ViewModels
     public abstract class FPSWindowBase : ViewModelBase
     {
         private Action invalidate;
-        private bool isRunning;
 
         /// <summary>
         /// This represents how many times it has to tick per second
