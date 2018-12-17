@@ -15,7 +15,7 @@ namespace GUItulator.Views
         public PatterntableWindow()
         {
             InitializeComponent();
-            Closed += (e, args) => viewModel.StopLoop();
+            Closed += (e, args) => viewModel.Stop();
 #if DEBUG
             this.AttachDevTools();
 #endif
@@ -33,7 +33,7 @@ namespace GUItulator.Views
                             leftPatterntableControl.InvalidateVisual();
                             rightPatterntableControl.InvalidateVisual();
                         }).Wait(), 5);
-            viewModel.StartLoop();
+            viewModel.Start();
             DataContext = viewModel;
         }
 

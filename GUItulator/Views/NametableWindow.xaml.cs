@@ -15,7 +15,7 @@ namespace GUItulator.Views
         {
             nametables = new Image[4];
             InitializeComponent();
-            Closed += (e, args) => viewModel.StopLoop();
+            Closed += (e, args) => viewModel.Stop();
         }
 
         private void InitializeComponent()
@@ -35,7 +35,7 @@ namespace GUItulator.Views
                                         nametables[i].InvalidateVisual();
                                     }
                                 }).Wait(),60);
-            viewModel.StartLoop();
+            viewModel.Start();
             DataContext = viewModel;
         }
     }

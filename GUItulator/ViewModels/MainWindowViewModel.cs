@@ -13,7 +13,7 @@ using Serilog;
 
 namespace GUItulator.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase
+    public class MainWindowViewModel : FPSWindowBase
     {
         private string greeting;
         public string Greeting
@@ -23,7 +23,9 @@ namespace GUItulator.ViewModels
         }
 
         private Thread emulatorThread;
-        private bool isCPUPooling;
+
+        public MainWindowViewModel(Action onFrameExecuted, int fps = 60) : base(onFrameExecuted, fps){ }
+        public MainWindowViewModel() : base (() => {}, 60){}
 
         public async void OpenROM()
         {
@@ -46,37 +48,13 @@ namespace GUItulator.ViewModels
         public void OpenNametable() => new NametableWindow().Show();
         public void OpenHexEditor() => new HexEditorWindow().Show();
 
-        /// <summary>
-        /// Sets up a coroutine that runs once a second. It polls the CPU speed from the backend
-        /// </summary>
-        public void StartPollCPUSpeed()
-        {
-            isCPUPooling = true;
-            new Thread(() =>
-            {
-                while (isCPUPooling)
-                {
-                    var mhz = (CWrapper.CPUSpeed() / 1000000.0f).ToString("#.##");
-                    Greeting = $"CPU Speed: {mhz}MHz";
-                    Thread.Sleep(1000);
-                }
-
-            }).Start();
-        }
-
-        /// <summary>
-        /// Simply stops the thread. Will be done in a cleanup area so that no threads persists after the
-        /// main app is killed
-        /// </summary>
-        public void StopPollCPUSpeed()
-        {
-            isCPUPooling = false;
-        }
-
         public void StartEmulation(string fileName)
         {
-            emulatorThread = new Thread(() => CWrapper.StartEmulation(fileName));
-            emulatorThread.Start();
+            if (emulatorThread == null)
+            {
+                emulatorThread = new Thread(() => CWrapper.StartEmulation(fileName));
+                emulatorThread.Start();
+            }
         }
 
         public void StopEmulation()
@@ -89,7 +67,12 @@ namespace GUItulator.ViewModels
             {
                 Log.Error(e, e.Message);
             }
+        }
 
+        protected override void Update()
+        {
+            var mhz = (CWrapper.CPUSpeed() / 1000000.0f).ToString("#.##");
+            Greeting = $"CPU Speed: {mhz}MHz";
         }
     }
 }

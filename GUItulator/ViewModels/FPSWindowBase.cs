@@ -1,6 +1,5 @@
 using System;
-using System.Threading.Tasks;
-using Serilog;
+using GUItulator.Utils;
 
 namespace GUItulator.ViewModels
 {
@@ -12,8 +11,22 @@ namespace GUItulator.ViewModels
     {
         private Action invalidate;
         private bool isRunning;
-        private int waitBetweenFrames;
-        private Task refreshTask;
+
+        /// <summary>
+        /// This represents how many times it has to tick per second
+        /// </summary>
+        private int fps;
+
+        /// <summary>
+        /// FPSLoopManager ticks 60fps, this variable will hold how many ticks it has to wait before actually doing
+        /// an update.
+        /// </summary>
+        private int fpsWaitInterval;
+
+        /// <summary>
+        /// Simply used to keep track of how many frames this window has skipped
+        /// </summary>
+        private int fpsWaitCounter;
 
         /// <summary>
         /// </summary>
@@ -22,19 +35,18 @@ namespace GUItulator.ViewModels
         protected FPSWindowBase(Action onFrameExecuted, int fps = 30)
         {
             invalidate = onFrameExecuted;
-            waitBetweenFrames = 1000 / fps;
+            this.fps = fps;
+            fpsWaitInterval = 60 / this.fps;
         }
 
-        public void StartLoop()
+        public void Start()
         {
-            isRunning = true;
-            refreshTask = new Task(MainUpdateLoop);
-            refreshTask.Start();
+            FPSLoopManager.Instance.OnFrameTick += MainUpdateLoop;
         }
 
-        public void StopLoop()
+        public void Stop()
         {
-            isRunning = false;
+            FPSLoopManager.Instance.OnFrameTick += MainUpdateLoop;
         }
 
         /// <summary>
@@ -45,26 +57,16 @@ namespace GUItulator.ViewModels
 
         private void MainUpdateLoop()
         {
-            try
+            if (fpsWaitCounter < fpsWaitInterval) //Just keep waiting
             {
-                if (isRunning)
-                {
-                    ScheduleNextFrame();
-                    Update();
-                }
+                fpsWaitCounter++;
             }
-            catch (Exception e)
+            else //Now we can run the loop
             {
-                Log.Error(e, e.Message);
+                Update();
+                fpsWaitCounter = 0;
+                invalidate?.Invoke();
             }
-        }
-
-        private void ScheduleNextFrame()
-        {
-            invalidate?.Invoke();
-            refreshTask.Wait(waitBetweenFrames);
-            refreshTask = new Task(MainUpdateLoop);
-            refreshTask.Start();
         }
     }
 }

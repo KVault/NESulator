@@ -29,14 +29,12 @@ namespace GUItulator.Views
         protected override void HandleClosed()
         {
             base.HandleClosed();
-            viewModel.StopPollCPUSpeed();
             viewModel.StopEmulation();
         }
 
         private void OnInitialized(object sender, EventArgs args)
         {
             viewModel = DataContext as MainWindowViewModel;
-            viewModel?.StartPollCPUSpeed();
         }
     }
 }

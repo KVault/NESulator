@@ -13,7 +13,7 @@ namespace GUItulator.Views
         public HexEditorWindow()
         {
             InitializeComponent();
-            Closed += (e, args) => viewModel.StopLoop();
+            Closed += (e, args) => viewModel.Stop();
         }
 
         private void InitializeComponent()
@@ -22,7 +22,7 @@ namespace GUItulator.Views
 
             viewModel = new HexEditorWindowViewModel(() => {}, 30);
             DataContext = viewModel;
-            viewModel.StartLoop();
+            viewModel.Start();
         }
     }
 }
