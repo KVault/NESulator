@@ -41,7 +41,7 @@ namespace GUItulator.ViewModels
                 for (var j = 0; j < RowSize; j++)
                 {
                     row.WordCodes[j] = buffer[(i * RowSize) + j].ToString("X");
-                    row.CharValues[j] = buffer[(i * RowSize) + j].ToString();
+                    row.CharValues[j] = buffer[(i * RowSize) + j].ToString("");
                 }
 
                 TenBytesHeaderCount[i] = row;

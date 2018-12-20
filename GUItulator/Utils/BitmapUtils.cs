@@ -28,7 +28,7 @@ namespace GUItulator.Utils
         /// <summary>
         /// More efficient version (unless the data has been copied to managed memory already) that does essentially
         /// a memcpy from the unmanaged code. All the sizes here have to be in bytes, but the method accepts the
-        /// size in `int` size. so a multiplication to translate it to bytes is necessary 
+        /// size in `int` size. so a multiplication to translate it to bytes is necessary
         /// </summary>
         /// <param name="rawFrame"></param>
         /// <param name="bitmap"></param>

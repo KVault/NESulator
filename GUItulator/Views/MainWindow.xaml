@@ -3,12 +3,6 @@
         xmlns:vm="clr-namespace:GUItulator.ViewModels;assembly=GUItulator"
         Icon="resm:GUItulator.Assets.avalonia-logo.ico"
         Title="GUItulator">
-
-  <Design.DataContext>
-    <vm:MainWindowViewModel/>
-  </Design.DataContext>
-
-
   <DockPanel>
       <Menu DockPanel.Dock="Top">
           <MenuItem Header="File">
@@ -22,6 +16,6 @@
           </MenuItem>
       </Menu>
 
-      <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      <TextBlock Text="{Binding CPUSpeed}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
   </DockPanel>
 </Window>

@@ -34,7 +34,9 @@ namespace GUItulator.Views
 
         private void OnInitialized(object sender, EventArgs args)
         {
-            viewModel = DataContext as MainWindowViewModel;
+            viewModel = new MainWindowViewModel();
+            viewModel.Start();
+            DataContext = viewModel;
         }
     }
 }

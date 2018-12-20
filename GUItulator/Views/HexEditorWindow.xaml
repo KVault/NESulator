@@ -3,36 +3,89 @@
         xmlns:vm="clr-namespace:GUItulator.ViewModels;assembly=GUItulator"
         Icon="resm:GUItulator.Assets.avalonia-logo.ico"
         Title="HEX Editor"
-        Width="600"
+        Width="800"
         Height="400">
 
+    <!--
     <StackPanel Orientation="Horizontal">
-        <!-- The Memory Addresses -->
-        <ListBox Items="{Binding TenBytesHeaderCount}" VirtualizationMode="Simple" BorderThickness="0" Width="70">
-            <ListBox.ItemTemplate>
-                <DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-
-
-        <ListBox Items="{Binding TenBytesHeaderCount}" VirtualizationMode="Simple" BorderThickness="0" Width="300">
+        <ListBox Name="Labels" Items="{Binding TenBytesHeaderCount}"
+                 VirtualizationMode="Simple" BorderThickness="0" Width="70">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <VirtualizingStackPanel Orientation="Horizontal">
-                        <ListBox Items="{Binding WordCodes}"></ListBox>
-                    </VirtualizingStackPanel>
+                    <TextBlock Text="{Binding Label}"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <ListBox Items="{Binding TenBytesHeaderCount}" VirtualizationMode="Simple" BorderThickness="0" Width="200">
+        <ListBox Name="WordCodes" Items="{Binding TenBytesHeaderCount}"
+                 VirtualizationMode="Simple" BorderThickness="0" Width="400">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <VirtualizingStackPanel Orientation="Horizontal">
-                        <ListBox Items="{Binding CharValues}"></ListBox>
-                    </VirtualizingStackPanel>
+                    <ListBox Items="{Binding WordCodes}" BorderThickness="0">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <ListBox Name="CharValues" Items="{Binding TenBytesHeaderCount}"
+                 VirtualizationMode="Simple" BorderThickness="0" Width="400">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <ListBox Items="{Binding CharValues}" BorderThickness="0">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
     </StackPanel>
+    -->
+
+<ListBox Items="{Binding TenBytesHeaderCount}" VirtualizationMode="Simple" BorderThickness="0" Width="800">
+    <ListBox.ItemsPanel>
+        <ItemsPanelTemplate><VirtualizingStackPanel Orientation="Vertical"/></ItemsPanelTemplate>
+    </ListBox.ItemsPanel>
+    <ListBox.ItemTemplate>
+        <DataTemplate>
+            <VirtualizingStackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Label}"/>
+
+                <ListBox Items="{Binding WordCodes}" Width="20">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate><UniformGrid Columns="16"/></ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+
+                <ListBox Items="{Binding CharValues}" Width="200">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate><UniformGrid Columns="16"/></ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
+            </VirtualizingStackPanel>
+        </DataTemplate>
+    </ListBox.ItemTemplate>
+</ListBox>
 </Window>

@@ -15,9 +15,11 @@ namespace GUItulator.ViewModels
 
         public PatterntableWindowViewModel(Action invalidate, int fps) : base(invalidate, fps)
         {
-            LeftPatterntable = new WriteableBitmap(new PixelSize(128,128), new Vector(96,96), PixelFormat.Rgba8888);
+            LeftPatterntable = new WriteableBitmap(new PixelSize(128,128),
+                                                   new Vector(96,96), PixelFormat.Rgba8888);
             LeftSize = LeftPatterntable.Size;
-            RightPatterntable = new WriteableBitmap(new PixelSize(128,128), new Vector(96,96), PixelFormat.Rgba8888);
+            RightPatterntable = new WriteableBitmap(new PixelSize(128,128),
+                                                   new Vector(96,96), PixelFormat.Rgba8888);
             RightSize = RightPatterntable.Size;
         }
 

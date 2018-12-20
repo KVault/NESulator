@@ -15,11 +15,11 @@ namespace GUItulator.ViewModels
 {
     public class MainWindowViewModel : FPSWindowBase
     {
-        private string greeting;
-        public string Greeting
+        private string cpuSpeed;
+        public string CPUSpeed
         {
-            get {return greeting;}
-            set {this.RaiseAndSetIfChanged(ref greeting, value);}
+            get {return cpuSpeed;}
+            set {this.RaiseAndSetIfChanged(ref cpuSpeed, value);}
         }
 
         private Thread emulatorThread;
@@ -72,7 +72,7 @@ namespace GUItulator.ViewModels
         protected override void Update()
         {
             var mhz = (CWrapper.CPUSpeed() / 1000000.0f).ToString("#.##");
-            Greeting = $"CPU Speed: {mhz}MHz";
+            CPUSpeed = $"CPU Speed: {mhz}MHz";
         }
     }
 }
