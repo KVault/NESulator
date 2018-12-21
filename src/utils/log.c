@@ -1,4 +1,5 @@
 #include <malloc.h>
+#include <mem.h>
 #include "log.h"
 
 enum ConsoleLogLevelEnum console_log_level = ConsoleDisabled;
@@ -8,36 +9,44 @@ char *log_file_path;
 int clean_file = 0;
 FILE *file;
 
-/// Number of logs to be stored before triggering a dump to file
-#define FILE_BUFFER_SIZE 100
-/// Max Size in chars that a log can have
-const int log_buffer_size = 1000;
+// Total size in bytes the file buffer has
+#define LOG_BUFFER_SIZE 4096
 /// Used to fill in before dumping to file, avoiding dumping every single log
-char *file_log_buffer[FILE_BUFFER_SIZE];
+char *file_log_buffer;
 /// Next position to be filled by the log
-int buffer_possition = 0;
+int buffer_position = 0;
 int buffer_created = 0;
+int chars_written = 0;
 
 void setup_buffer(){
 	buffer_created = 1;
-	for (int i = 0; i < FILE_BUFFER_SIZE; ++i) {
-		file_log_buffer[i] = malloc(log_buffer_size * sizeof(char));
-	}
+	file_log_buffer = malloc(LOG_BUFFER_SIZE * sizeof(char));
 }
 
-//TODO this isn't really working. change it to use a single buffer and just one write to file
-void buffer_log(const char *format, va_list args){
-	if(buffer_possition < FILE_BUFFER_SIZE){
-		sprintf(file_log_buffer[buffer_possition], format, args);
-		++buffer_possition;
-	}else{
-		for (int i = 0; i < FILE_BUFFER_SIZE; ++i) {
-			fprintf(file, file_log_buffer[i]);
-		}
-		buffer_possition = 0;
+void dump_to_file(){
+	buffer_position = chars_written = 0;
+	fwrite(file_log_buffer, sizeof(char), LOG_BUFFER_SIZE, file);
+}
 
-		//Make a recursive call now to buffer the log again. At this point the log hasn't been buffered
-		buffer_log(format, args);
+/**
+ * Logs to a buffer until it fills, then it dumps the buffer into a file and releases the buffer
+ */
+void buffer_log(const char *format, va_list args){
+	// The buffer is full. Empty it by dumping to file
+	if(buffer_position >=  LOG_BUFFER_SIZE){
+		dump_to_file();
+	}
+
+	//Log to the buffer. Keep track of the position with buffer_position
+	chars_written = vsprintf(&file_log_buffer[buffer_position], format, args);
+
+	/** This means success. sprintf returns characters written on success
+	 *  and there's still more room in the buffer
+	*/
+	if(chars_written >= 0) {
+		buffer_position += chars_written;
+	}else{// Has failed, probably not enough space so dump it to file
+		dump_to_file();
 	}
 }
 
