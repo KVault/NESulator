@@ -4,6 +4,10 @@ int is_running;
 
 void run();
 
+void match_cpu_speed();
+
+unsigned long get_epoch_millisecond();
+
 /**
  * Simply stops the emulation.
  */
@@ -50,25 +54,46 @@ void run() {
 	byte num_cycle;
 	while (is_running) {
 		num_cycle =cpu_instruction();
+		match_cpu_speed();
 		for (int i = 0; i < ppu_cycle_per_cpu_cycle * num_cycle; ++i) {
 			ppu_cycle();
 		}
-		every_second();
 	}
 }
 
 /**
- * Ticks every second. It's used to keep track of the clock speeds and whatnot
+ * Ran every tick. for the current cycle this second it looks how much the original NES should have spent and
+ * how much the host CPU has. Once the host CPU is a bit ahead of the original CPU it'll sleep the CPU until
+ * both match.
  */
-void every_second() {
-	static time_t last_second = 0;
-	static time_t ctime = 0;
-	ctime = time(NULL);
+void match_cpu_speed(){
+	//Long value so that the first run through enters the "every second" condition
+	static unsigned long ctime, last_second = 4294967295;
+	static long should_elapsed, has_elapsed;
 
-	//More than one second elapsed
-	if (ctime - last_second > 1) {
-		last_second = time(NULL);
+	ctime = get_epoch_millisecond();
+
+	//More than one second has passed, so update the CPU speed. if less than 0 means a timer hasn't been initialized.
+	//This will do it
+	if(ctime - last_second > MILLISECOND){
 		cpu_cyclesLastSec = cpu_cyclesThisSec;
 		cpu_cyclesThisSec = 0;
+		last_second = get_epoch_millisecond();
 	}
+
+	//TODO still working on this feature
+	/**
+	should_elapsed = (cpu_cyclesThisSec * nanoseconds_cpu_cycle) / 1000; //convert to microseconds
+	has_elapsed = ctime - last_second;
+
+	if(should_elapsed > has_elapsed){
+		usleep((useconds_t) 1);
+	}
+	 **/
+}
+
+unsigned long get_epoch_millisecond(){
+	static struct timeval tp;
+	mingw_gettimeofday(&tp, NULL);
+	return (unsigned long) (tp.tv_sec * MILLISECOND + tp.tv_usec / MILLISECOND);
 }

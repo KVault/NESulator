@@ -5,6 +5,7 @@
 #include "rom.h"
 #include "utils/Utils.h"
 #include "utils/log.h"
+#include "unistd.h"
 
 /**
  * Of course, only one ROM can be in the console at the same time. This is the one
@@ -19,7 +20,5 @@ int start_emulation();
  * Prepares the log levels, log directories and the CPU/PPU/APU for the console to run
  */
 void configure();
-
-void every_second();
 
 #endif //NESULATOR_NES_H

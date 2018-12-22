@@ -11,8 +11,9 @@ typedef unsigned int uint;
 #define TRUE 1
 #define FALSE 0
 
-#define MILLISECOND 1000.0
-#define NANOSECOND  1000000000.0
+#define MILLISECOND 1000
+#define MICROSECOND 1000000
+#define NANOSECOND  1000000000
 
 /**
  * Return the bitPos'th value of b

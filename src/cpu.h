@@ -37,6 +37,7 @@ byte P;     // Status register, CPU flags
 int cpu_cyclesThisSec; //Counter of elapsed cycles (Hz) this current second.
 int cpu_cyclesLastSec; //Counter of elapsed cycles last second. Used by the GUI to keep accurate track of the speed
 int cpu_speed;  //Speed of the CPU in Hz. Used to slow down the emulation to match the NES's clock speed
+int nanoseconds_cpu_cycle; // Nanoseconds that would take the given CPU per cycle given a certain speed
 byte currentOpcode; // The opcode of this cycle
 uint cpu_running;
 

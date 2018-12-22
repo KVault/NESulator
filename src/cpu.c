@@ -25,6 +25,7 @@ void cpu_power_up(int clock_speed_hertzs) {
 
 	cpu_speed = clock_speed_hertzs;
 	cpu_cyclesThisSec = 0;
+	nanoseconds_cpu_cycle = (int)((1.0 / clock_speed_hertzs) * NANOSECOND);
 	//TODO IRQ stuff
 	//TODO LFSR stuff
 }
