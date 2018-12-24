@@ -53,6 +53,11 @@ void *cpu_run(void *arg);
 void cpu_power_up(int clock_speed);
 
 /**
+ * Modifies the current CPU clock speed
+ */
+void cpu_set_speed(int speed_hertzs);
+
+/**
  * Resets the PC to the value held in the reset vector $FFFC and $FFFD
  */
 void reset_pc();

@@ -53,4 +53,9 @@ EXPORT FrameInfo gui_nametable(NametableIndex index);
  */
 EXPORT MemoryDumpInfo gui_ram_dump();
 
+/**
+ * Performs an internal callback to set the CPU speed
+ */
+EXPORT void gui_cpu_speed(int speed_hertz);
+
 #endif //NESULATOR_GUI_H

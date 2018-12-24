@@ -2,7 +2,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:GUItulator.ViewModels;assembly=GUItulator"
         Icon="resm:GUItulator.Assets.avalonia-logo.ico"
-        Title="GUItulator">
+        Title="GUItulator"
+        Width="256"
+        Height="240">
   <DockPanel>
       <Menu DockPanel.Dock="Top">
           <MenuItem Header="File">
@@ -13,6 +15,16 @@
               <MenuItem Header="Pattern table" HotKey="Ctrl+P" Command="{Binding OpenPatterntable}"></MenuItem>
               <MenuItem Header="Nametable" Command="{Binding OpenNametable}"></MenuItem>
               <MenuItem Header="HEX Editor" HotKey="Ctrl+H" Command="{Binding OpenHexEditor}"></MenuItem>
+              <MenuItem Header="Emulation Speed" HotKey="Ctrl+E">
+                  <MenuItem Header="Pause" CommandParameter="1" Command="{Binding SetCPUSpeed}"></MenuItem>
+                  <MenuItem Header="25%" CommandParameter="447443" Command="{Binding SetCPUSpeed}"></MenuItem>
+                  <MenuItem Header="50%" CommandParameter="894886" Command="{Binding SetCPUSpeed}"></MenuItem>
+                  <MenuItem Header="75%" CommandParameter="1342329" Command="{Binding SetCPUSpeed}"></MenuItem>
+                  <MenuItem Header="100%" CommandParameter="1789773" Command="{Binding SetCPUSpeed}"></MenuItem>
+                  <MenuItem Header="150%" CommandParameter="2684659" Command="{Binding SetCPUSpeed}"></MenuItem>
+                  <MenuItem Header="200%" CommandParameter="3579546" Command="{Binding SetCPUSpeed}"></MenuItem>
+                  <MenuItem Header="Yolo" CommandParameter="2147483647" Command="{Binding SetCPUSpeed}"></MenuItem>
+              </MenuItem>
           </MenuItem>
       </Menu>
 

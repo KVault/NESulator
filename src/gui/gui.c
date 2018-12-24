@@ -33,3 +33,7 @@ EXPORT MemoryDumpInfo gui_ram_dump(){
 
 	return info;
 }
+
+EXPORT void gui_cpu_speed(int speed_hertz){
+	cpu_set_speed(speed_hertz);
+}

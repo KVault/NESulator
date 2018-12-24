@@ -23,11 +23,15 @@ void cpu_power_up(int clock_speed_hertzs) {
 		wmem_b(i, 0);
 	}
 
-	cpu_speed = clock_speed_hertzs;
+	cpu_set_speed(clock_speed_hertzs);
 	cpu_cyclesThisSec = 0;
-	nanoseconds_cpu_cycle = (int)((1.0 / clock_speed_hertzs) * NANOSECOND);
 	//TODO IRQ stuff
 	//TODO LFSR stuff
+}
+
+void cpu_set_speed(int speed_hertzs){
+	cpu_speed = speed_hertzs;
+	nanoseconds_cpu_cycle = (int)((1.0 / speed_hertzs) * NANOSECOND);
 }
 
 void reset_pc() {

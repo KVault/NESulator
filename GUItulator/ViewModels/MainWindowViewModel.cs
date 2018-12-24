@@ -47,6 +47,7 @@ namespace GUItulator.ViewModels
         public void OpenPatterntable() => new PatterntableWindow().Show();
         public void OpenNametable() => new NametableWindow().Show();
         public void OpenHexEditor() => new HexEditorWindow().Show();
+        public void SetCPUSpeed(int speed) => CWrapper.CPUSpeed(speed);
 
         public void StartEmulation(string fileName)
         {
