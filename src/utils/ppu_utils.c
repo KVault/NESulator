@@ -10,8 +10,8 @@ void encode_as_tiles(byte *mem_addr, uint number_tiles, tile *tiles) {
 			for (byte k = 0; k < TILE_COLUMN_SIZE; ++k) {
 				//Get the bit j from the current iteration and 8 positions ahead. Then add those two bits so that
 				//you get one of the following: 00, 01, 10, 11.
-				byte most_sig_bit = (byte) bit_test(mem_addr[j + i], k) << 1;
-				byte least_sig_bit = (byte) bit_test(mem_addr[j + i + TILE_ROW_SIZE], k);
+				byte least_sig_bit = (byte) bit_test(mem_addr[j + i], k);
+				byte most_sig_bit = (byte) bit_test(mem_addr[j + i + TILE_ROW_SIZE], k) << 1;
 
 				//use the abs to flip the tile in the Y component. Otherwise it comes out wrong.
 				tiles[tile_count].pattern[j][abs(k - TILE_COLUMN_SIZE)] = most_sig_bit + least_sig_bit;
@@ -90,14 +90,10 @@ byte get_attribute(NametableIndex nametableIndex, int row_id, int column_id) {
  */
 colour *get_background_palette(byte attribute) {
 	static colour palette[4];
-	static colour universal_background;
-	universal_background = COLOUR_PALETTE[rmem_b_vram(UNIVERSAL_BACKGROUND)];
-	word palette_addr = BACKGROUND_PALETTES[attribute];
+	word palette_addr = (word)(BACKGROUND_PALETTES[attribute] -1); //-1 to include the universal background
 
 	for (uint i = 0; i < 4; ++i) {
 		palette[i] = COLOUR_PALETTE[rmem_b_vram(palette_addr + i)];
 	}
-
-	palette[0] = universal_background;
 	return palette;
 }
