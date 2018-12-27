@@ -1,6 +1,7 @@
 #include "ppu_utils.h"
 
 word BACKGROUND_PALETTES[4] = {0x3F01, 0x3F05, 0x3F09, 0x3F0D};
+word UNIVERSAL_BACKGROUND = 0x3F00;
 
 void encode_as_tiles(byte *mem_addr, uint number_tiles, tile *tiles) {
 	for (int i, tile_count = i = 0;
@@ -90,7 +91,7 @@ byte get_attribute(NametableIndex nametableIndex, int row_id, int column_id) {
 colour *get_background_palette(byte attribute) {
 	static colour palette[4];
 	static colour universal_background;
-	universal_background = COLOUR_PALETTE[rmem_b_vram(0x3F00)];
+	universal_background = COLOUR_PALETTE[rmem_b_vram(UNIVERSAL_BACKGROUND)];
 	word palette_addr = BACKGROUND_PALETTES[attribute];
 
 	for (uint i = 0; i < 4; ++i) {

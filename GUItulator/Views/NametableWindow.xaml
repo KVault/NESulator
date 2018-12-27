@@ -4,7 +4,8 @@
         Icon="resm:GUItulator.Assets.avalonia-logo.ico"
         Title="NametableWindow"
         Height="480"
-        Width="512">
+        Width="512"
+        CanResize="False">
 
     <Grid>
         <Image VerticalAlignment="Top" HorizontalAlignment="Left" Source="{Binding Nametables[0]}"

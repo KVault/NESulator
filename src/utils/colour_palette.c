@@ -69,9 +69,9 @@ const colour  COLOUR_PALETTE[] = {
 
 uint encode_as_RGBA(colour colour){
 	int rgba = 0xff << (8 * 3);//Shift 3 bytes to the left (0xff000000)
-	rgba += (colour.R << (8 * 2));//Shift 2 bytes to the left (0xffRR0000)
-	rgba += (colour.G << 8); //Shift a byte to the left (0xffRRGG00)
-	rgba += (colour.B); //0xffRRGGBB
+	rgba += (colour.B << (8 * 2));//Shift 2 bytes to the left (0xffBB0000)
+	rgba += (colour.G << 8); //Shift a byte to the left (0xffBBGG00)
+	rgba += (colour.R); //0xffBBGGRR
 
 	return (uint)rgba;
 }

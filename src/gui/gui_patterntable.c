@@ -11,11 +11,10 @@ void render_tiles(tile *tiles, uint *back_buffer) {
 			for (int k = 0; k < TILE_COLUMN_SIZE; ++k) {
 				int columnIndex = ((i & 0x0F) * TILE_COLUMN_SIZE) + k;
 				int rowIndex = ((i >> 4) * TILE_ROW_SIZE) + j;
-				if (tiles[i].pattern[j][k] != 0) {
-					back_buffer[PATTERNTABLE_TEXTURE_HEIGHT * rowIndex + columnIndex] = 0xffffffff;
-				}else{
-					back_buffer[PATTERNTABLE_TEXTURE_HEIGHT * rowIndex + columnIndex] = 0xff000000;
-				}
+
+				int colour_index  = rmem_b_vram(UNIVERSAL_BACKGROUND + tiles[i].pattern[j][k]);
+				uint colour = encode_as_RGBA(COLOUR_PALETTE[colour_index]);
+				back_buffer[PATTERNTABLE_TEXTURE_HEIGHT * rowIndex + columnIndex] = colour;
 			}
 		}
 	}

@@ -85,7 +85,11 @@ void finish_vblank() {
 void try_trigger_nmi() {
 	//TODO Docs also say that nmi_output == TRUE? but if I do that, nothing comes up
 	if (nmi_occurred == TRUE) {
-		nmi();
+		//triggering of a NMI can be prevented if bit 7 of PPU Control Register 1 ($2000) is clear.
+		if(bit_test(rmem_b(PPUCTRL), 7) == 1){
+			nmi();
+		}
+
 		nmi_occurred = FALSE;
 	}
 }

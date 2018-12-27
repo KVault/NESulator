@@ -1,7 +1,10 @@
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media.Imaging;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using GUItulator.ViewModels;
 
 namespace GUItulator.Views
@@ -11,6 +14,7 @@ namespace GUItulator.Views
         private PatterntableWindowViewModel viewModel;
         private Image leftPatterntableControl;
         private Image rightPatterntableControl;
+
 
         public PatterntableWindow()
         {
@@ -24,17 +28,36 @@ namespace GUItulator.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            var rootPanel = (Grid)Content;
-            leftPatterntableControl = (Image)rootPanel.Children[0];
-            rightPatterntableControl = (Image)rootPanel.Children[1];
+            var rootPanel = (StackPanel)Content;
+
+            leftPatterntableControl = rootPanel.FindControl<Image>("LeftPatterntable");
+            rightPatterntableControl = rootPanel.FindControl<Image>("RightPatterntable");
+
             viewModel = new PatterntableWindowViewModel(() =>
-                        Dispatcher.UIThread.InvokeAsync(() =>
-                        {
-                            leftPatterntableControl.InvalidateVisual();
-                            rightPatterntableControl.InvalidateVisual();
-                        }).Wait(), 5);
+                        Dispatcher.UIThread.InvokeAsync(InvalidateControls).Wait(), 5);
             viewModel.Start();
             DataContext = viewModel;
+        }
+
+        /// <summary>
+        /// Invalidates all the images in the window. The two patterntables are very straightforward, the palette is
+        /// a bit trickier. We have to access the actual control through the Visual children of the list to be able
+        /// to retrieve an Image instead of a WriteableBitmap
+        /// </summary>
+        private void InvalidateControls()
+        {
+            leftPatterntableControl.InvalidateVisual();
+            rightPatterntableControl.InvalidateVisual();
+
+            var paletteControl= ((StackPanel)Content).FindControl<ItemsControl>("PaletteItems");
+            if (paletteControl.ItemCount > 0)
+            {
+                foreach (var itemContainerInfo in paletteControl.ItemContainerGenerator.Containers)
+                {
+                    var image = itemContainerInfo.ContainerControl.VisualChildren.FirstOrDefault() as Image;
+                    image?.InvalidateVisual();
+                }
+            }
         }
 
     }

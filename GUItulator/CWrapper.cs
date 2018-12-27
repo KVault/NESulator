@@ -31,6 +31,9 @@ namespace GUItulator
         [DllImport("libNESulator.dll", EntryPoint = "gui_cpu_speed")]
         public static extern void CPUSpeed(int speedHertz);
 
+        [DllImport("libNESulator.dll", EntryPoint = "gui_palette_dump")]
+        public static extern FrameInfo PaletteDump();
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public unsafe struct FrameInfo
         {

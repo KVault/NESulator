@@ -5,13 +5,18 @@
 
 #include "../cpu.h"
 #include "../rom.h"
-#include "gui_patterntable.h"
-#include "gui_nametable.h"
+#include "../utils/ppu_utils.h"
 
 typedef struct {
 	int size;
 	byte *buffer;
 } MemoryDumpInfo;
+
+typedef struct {
+	int size;
+	unsigned int *buffer;
+
+} FrameInfo;
 
 /**
  * @return CPU speed since the last second. In Hertzs
@@ -57,5 +62,11 @@ EXPORT MemoryDumpInfo gui_ram_dump();
  * Performs an internal callback to set the CPU speed
  */
 EXPORT void gui_cpu_speed(int speed_hertz);
+
+/**
+ * Returns a buffer with the information of the current background palette
+ * @return
+ */
+EXPORT FrameInfo gui_palette_dump();
 
 #endif //NESULATOR_GUI_H

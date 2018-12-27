@@ -4,10 +4,23 @@
         Icon="resm:GUItulator.Assets.avalonia-logo.ico"
         Title="Patterntable viewer"
         Width="512"
-        Height="256">
+        Height="325">
 
-        <Grid>
-                <Image HorizontalAlignment="Left" Source="{Binding LeftPatterntable}" Stretch="Uniform"></Image>
-                <Image HorizontalAlignment="Right" Source="{Binding RightPatterntable}" Stretch="Uniform"></Image>
-        </Grid>
+        <StackPanel Orientation="Vertical">
+                <UniformGrid Columns="2" MinWidth="512" MinHeight="256" VerticalAlignment="Top">
+                        <Image Name="LeftPatterntable" Source="{Binding LeftPatterntable}" Stretch="Uniform"></Image>
+                        <Image Name="RightPatterntable" Source="{Binding RightPatterntable}" Stretch="Uniform"></Image>
+                </UniformGrid>
+                <Separator Height="5"></Separator>
+                <ItemsControl Name="PaletteItems" Items="{Binding Palettes}" VerticalAlignment="Bottom">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate><UniformGrid Columns="16"></UniformGrid></ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.DataTemplates>
+                        <DataTemplate>
+                            <Image Source="{Binding}" MinWidth="32" MinHeight="32" Stretch="Uniform"></Image>
+                        </DataTemplate>
+                    </ItemsControl.DataTemplates>
+                </ItemsControl>
+        </StackPanel>
 </Window>

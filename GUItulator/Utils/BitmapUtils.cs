@@ -41,5 +41,24 @@ namespace GUItulator.Utils
                 Buffer.MemoryCopy((void *)rawFrame.buffer, (void *)l.Address, bitmapSequentialSize, rawFrame.size * 4);
             }
         }
+
+        /// <summary>
+        /// Fills in the given bitmap with a solid colour passed in as a parameter.
+        /// </summary>
+        /// <param name="solidColour"></param>
+        /// <param name="bitmap"></param>
+        /// <param name="size"></param>
+        public static unsafe void DrawBitmap(uint solidColour, ref WriteableBitmap bitmap, Size size)
+        {
+            var bitmapSequentialSize = size.Width * (size.Height - 1);
+            using (var l = bitmap.Lock())
+            {
+                var ptr = (uint*)l.Address;
+                for (var i = 0; i < bitmapSequentialSize; i++, ptr++)
+                {
+                    *ptr = solidColour;
+                }
+            }
+        }
     }
 }
