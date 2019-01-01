@@ -49,6 +49,8 @@ FrameInfo nametable_frame(NametableIndex index){
 
 	frameInfo.buffer = nametables[index];
 	frameInfo.size = nametable_buffer_size;
+	frameInfo.width = NAMETABLE_TEXTURE_WIDTH;
+	frameInfo.height = NAMETABLE_TEXTURE_HEIGHT;
 
 	return frameInfo;
 }

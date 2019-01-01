@@ -1,6 +1,8 @@
 using System;
 using Avalonia;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
+using InterpolationMode = System.Drawing.Drawing2D.InterpolationMode;
 
 namespace GUItulator.Utils
 {
@@ -12,15 +14,17 @@ namespace GUItulator.Utils
         /// <param name="rawFrame"></param>
         /// <param name="bitmap"></param>
         /// <param name="size"></param>
-        public static unsafe void DrawBitmap(uint[] rawFrame, ref WriteableBitmap bitmap, Size size)
+        /// <param name="antialiassedScale"></param>
+        public static unsafe void DrawBitmap(int[] rawFrame, ref WriteableBitmap bitmap, Size size)
         {
+
             var bitmapSequentialSize = size.Width * (size.Height - 1);
             using (var l = bitmap.Lock())
             {
                 var ptr = (uint*)l.Address;
                 for (var i = 0; i < bitmapSequentialSize; i++, ptr++)
                 {
-                    *ptr = rawFrame[i];
+                    *ptr = (uint)rawFrame[i];
                 }
             }
         }
@@ -36,9 +40,10 @@ namespace GUItulator.Utils
         public static unsafe void DrawBitmap(CWrapper.FrameInfo rawFrame, ref WriteableBitmap bitmap, Size size)
         {
             var bitmapSequentialSize = (long)(size.Width * size.Height * 4);//The 4 to get the size in bytes
-            using (var l = bitmap.Lock())
+            using (var ptr = bitmap.Lock())
             {
-                Buffer.MemoryCopy((void *)rawFrame.buffer, (void *)l.Address, bitmapSequentialSize, rawFrame.size * 4);
+                Buffer.MemoryCopy((void *)rawFrame.buffer, (void *)ptr.Address,
+                                  bitmapSequentialSize, rawFrame.size * 4);
             }
         }
 
@@ -59,6 +64,19 @@ namespace GUItulator.Utils
                     *ptr = solidColour;
                 }
             }
+        }
+
+        public static unsafe Bitmap GetBitmap(CWrapper.FrameInfo rawFrame, Size size)
+        {
+            var bitmapSequentialSize = (long)(size.Width * size.Height * 4);//The 4 to get the size in bytes
+            var bmp = new WriteableBitmap(new PixelSize(128,128),
+                                                   new Vector(96,96), PixelFormat.Rgba8888);
+            using (var ptr = bmp.Lock())
+            {
+                Buffer.MemoryCopy((void *)rawFrame.buffer, (void *)ptr.Address, bitmapSequentialSize, rawFrame.size * 4);
+            }
+
+            return bmp;
         }
     }
 }

@@ -12,7 +12,6 @@ void encode_as_tiles(byte *mem_addr, uint number_tiles, tile *tiles) {
 				//you get one of the following: 00, 01, 10, 11.
 				byte least_sig_bit = (byte) bit_test(mem_addr[j + i], k);
 				byte most_sig_bit = (byte) bit_test(mem_addr[j + i + TILE_ROW_SIZE], k) << 1;
-
 				//use the abs to flip the tile in the Y component. Otherwise it comes out wrong.
 				tiles[tile_count].pattern[j][abs(k - TILE_COLUMN_SIZE)] = most_sig_bit + least_sig_bit;
 			}

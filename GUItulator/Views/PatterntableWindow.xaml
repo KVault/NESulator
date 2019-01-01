@@ -8,8 +8,10 @@
 
         <StackPanel Orientation="Vertical">
                 <UniformGrid Columns="2" MinWidth="512" MinHeight="256" VerticalAlignment="Top">
-                        <Image Name="LeftPatterntable" Source="{Binding LeftPatterntable}" Stretch="Uniform"></Image>
-                        <Image Name="RightPatterntable" Source="{Binding RightPatterntable}" Stretch="Uniform"></Image>
+                        <Image Name="LeftPatterntable" RenderOptions.BitmapInterpolationMode="HighQuality"
+                         Source="{Binding LeftPatterntable}" Stretch="Uniform"></Image>
+                        <Image Name="RightPatterntable" RenderOptions.BitmapInterpolationMode="HighQuality"
+                               Source="{Binding RightPatterntable}" Stretch="Uniform"></Image>
                 </UniformGrid>
                 <Separator Height="5"></Separator>
                 <ItemsControl Name="PaletteItems" Items="{Binding Palettes}" VerticalAlignment="Bottom">

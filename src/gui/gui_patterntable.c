@@ -37,6 +37,8 @@ FrameInfo patterntable_frame(byte *mem_addr, unsigned int *buffer){
 
 	frameInfo.buffer = buffer;
 	frameInfo.size = PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT;
+	frameInfo.width = PATTERNTABLE_TEXTURE_WIDTH;
+	frameInfo.height = PATTERNTABLE_TEXTURE_HEIGHT;
 
 	return frameInfo;
 }

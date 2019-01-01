@@ -1,7 +1,12 @@
 using System;
-using System.Linq;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading;
+using Avalonia;
+using GUItulator.Utils;
+using Bitmap = System.Drawing.Bitmap;
 
 namespace GUItulator
 {
@@ -39,6 +44,8 @@ namespace GUItulator
         {
             public int size;
             public IntPtr buffer;
+            public int width;
+            public int height;
 
             public byte[] ToByteArray()
             {
@@ -47,11 +54,11 @@ namespace GUItulator
                 return array;
             }
 
-            public uint[] ToUIntArray()
+            public int[] ToIntArray()
             {
                 var array = new int[size];
                 Marshal.Copy(buffer, array, 0, size);
-                return Array.ConvertAll(array, i => (uint)i);
+                return array;
             }
 
             public short[] ToShortArray()
@@ -59,6 +66,30 @@ namespace GUItulator
                 var array = new short[size];
                 Marshal.Copy(buffer, array, 0, size);
                 return array;
+            }
+
+            public int[] ToResolution(double destWidth, double destHeight)
+            {
+                return ToResolution((int)destWidth, (int)destHeight);
+            }
+            public int[] ToResolution(int destWidth, int destHeight)
+            {
+                var oldImage = ToIntArray();
+                var newImage = new int[destWidth * destHeight];
+                var xRatio = ((width << 16) / destWidth) + 1;
+                var yRatio = ((height << 16)/ destHeight) + 1;
+
+                for (var i = 0; i < destHeight; i++)
+                {
+                    for (var j = 0; j < destWidth; j++)
+                    {
+                        var xVal = (j * xRatio) >> 16;
+                        var yVal = (i * yRatio) >> 16;
+                        newImage[(i * destWidth) + j] = oldImage[((yVal * width) + xVal)];
+                    }
+                }
+
+                return newImage;
             }
         }
     }

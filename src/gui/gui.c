@@ -49,6 +49,9 @@ EXPORT FrameInfo gui_palette_dump(){
 	static uint palette_buffer[32];
 	info.size = 32;// Two rows of 16. Basically from 0x3F01 to 0x3F1F
 	info.buffer = palette_buffer;
+	info.width = 16;
+	info.height = 16;
+
 	for(uint i = 0; i < info.size; ++i){
 		int colour_index = rmem_b_vram(i + UNIVERSAL_BACKGROUND);
 		palette_buffer[i] = encode_as_RGBA(COLOUR_PALETTE[colour_index]);

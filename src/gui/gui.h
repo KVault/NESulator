@@ -14,7 +14,9 @@ typedef struct {
 
 typedef struct {
 	int size;
-	unsigned int *buffer;
+	uint *buffer;
+	uint width;
+	uint height;
 
 } FrameInfo;
 

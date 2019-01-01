@@ -1,5 +1,6 @@
 using System;
 using Avalonia;
+using Avalonia.Direct2D1.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using GUItulator.Utils;
@@ -24,10 +25,10 @@ namespace GUItulator.ViewModels
 
         public PatterntableWindowViewModel(Action invalidate, int fps) : base(invalidate, fps)
         {
-            LeftPatterntable = new WriteableBitmap(new PixelSize(128,128),
+            LeftPatterntable = new WriteableBitmap(new PixelSize(256,256),
                                                    new Vector(96,96), PixelFormat.Rgba8888);
             LeftSize = LeftPatterntable.Size;
-            RightPatterntable = new WriteableBitmap(new PixelSize(128,128),
+            RightPatterntable = new WriteableBitmap(new PixelSize(256,256),
                                                    new Vector(96,96), PixelFormat.Rgba8888);
             RightSize = RightPatterntable.Size;
 
@@ -49,14 +50,16 @@ namespace GUItulator.ViewModels
             //temp variables used because the ref parameter doesn't like it otherwise
             var leftPatterntable = LeftPatterntable;
             var rightPatterntable = RightPatterntable;
-            BitmapUtils.DrawBitmap(CWrapper.LeftPatterntable(), ref leftPatterntable, LeftSize);
-            BitmapUtils.DrawBitmap(CWrapper.RightPatterntable(), ref rightPatterntable, RightSize);
-            var colours = CWrapper.PaletteDump().ToUIntArray();
+            BitmapUtils.DrawBitmap(CWrapper.LeftPatterntable().ToResolution(LeftSize.Width, LeftSize.Height),
+                                   ref leftPatterntable, LeftSize);
+            BitmapUtils.DrawBitmap(CWrapper.RightPatterntable().ToResolution(RightSize.Width, RightSize.Height),
+                                   ref rightPatterntable, RightSize);
+            var colours = CWrapper.PaletteDump().ToIntArray();
 
             for (var i = 0; i < Palettes.Length; i++)
             {
                 var bmp = Palettes[i];
-                BitmapUtils.DrawBitmap(colours[i], ref bmp, PaletteSize);
+                BitmapUtils.DrawBitmap((uint)colours[i], ref bmp, PaletteSize);
             }
         }
     }
