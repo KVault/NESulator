@@ -31,14 +31,11 @@ namespace GUItulator.ViewModels
         {
             var romFile = await new OpenFileDialog()
             {
-                AllowMultiple = false,
-                Filters = new List<FileDialogFilter>()
-                {
-                    new FileDialogFilter() {Extensions = {"nes"}}
-                }
-            }.ShowAsync(null);
+                AllowMultiple = false
+            }.ShowAsync();
             if (romFile != null && romFile.Length > 0)
             {
+                StopEmulation();
                 StartEmulation(romFile[0]);
             }
         }

@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using GUItulator.Utils;
 using Bitmap = System.Drawing.Bitmap;
+using Size = Avalonia.Size;
 
 namespace GUItulator
 {
@@ -68,11 +69,16 @@ namespace GUItulator
                 return array;
             }
 
-            public int[] ToResolution(double destWidth, double destHeight)
+            public int[] Resize(Size size)
             {
-                return ToResolution((int)destWidth, (int)destHeight);
+                return Resize(size.Width, size.Height);
             }
-            public int[] ToResolution(int destWidth, int destHeight)
+
+            public int[] Resize(double destWidth, double destHeight)
+            {
+                return Resize((int)destWidth, (int)destHeight);
+            }
+            public int[] Resize(int destWidth, int destHeight)
             {
                 var oldImage = ToIntArray();
                 var newImage = new int[destWidth * destHeight];

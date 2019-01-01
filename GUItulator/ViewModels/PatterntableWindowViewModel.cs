@@ -50,10 +50,8 @@ namespace GUItulator.ViewModels
             //temp variables used because the ref parameter doesn't like it otherwise
             var leftPatterntable = LeftPatterntable;
             var rightPatterntable = RightPatterntable;
-            BitmapUtils.DrawBitmap(CWrapper.LeftPatterntable().ToResolution(LeftSize.Width, LeftSize.Height),
-                                   ref leftPatterntable, LeftSize);
-            BitmapUtils.DrawBitmap(CWrapper.RightPatterntable().ToResolution(RightSize.Width, RightSize.Height),
-                                   ref rightPatterntable, RightSize);
+            BitmapUtils.DrawBitmap(CWrapper.LeftPatterntable(), ref leftPatterntable, LeftSize);
+            BitmapUtils.DrawBitmap(CWrapper.RightPatterntable(), ref rightPatterntable, RightSize);
             var colours = CWrapper.PaletteDump().ToIntArray();
 
             for (var i = 0; i < Palettes.Length; i++)
