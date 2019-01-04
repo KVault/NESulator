@@ -34,7 +34,8 @@ namespace GUItulator.Views
 
         private void OnInitialized(object sender, EventArgs args)
         {
-            viewModel = new MainWindowViewModel();
+            var imageControl= ((DockPanel)Content).FindControl<Image>("BackBuffer");
+            viewModel = new MainWindowViewModel(() => imageControl.InvalidateVisual());
             viewModel.Start();
             DataContext = viewModel;
         }

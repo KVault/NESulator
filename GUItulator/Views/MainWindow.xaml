@@ -4,7 +4,7 @@
         Icon="resm:GUItulator.Assets.avalonia-logo.ico"
         Title="GUItulator"
         Width="256"
-        Height="240">
+        Height="300">
   <DockPanel>
       <Menu DockPanel.Dock="Top">
           <MenuItem Header="File">
@@ -27,7 +27,12 @@
               </MenuItem>
           </MenuItem>
       </Menu>
-
-      <TextBlock Text="{Binding CPUSpeed}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+      <StackPanel Orientation="Vertical">
+          <Image MinWidth="256" MinHeight="240" Name="BackBuffer" Source="{Binding BackBuffer}" Stretch="Uniform"></Image>
+          <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding CPUSpeed}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              <TextBlock Text="{Binding FPSCounter}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </StackPanel>
+      </StackPanel>
   </DockPanel>
 </Window>

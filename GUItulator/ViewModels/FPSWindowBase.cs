@@ -16,6 +16,8 @@ namespace GUItulator.ViewModels
         /// </summary>
         private int fps;
 
+        public int FpsLastSecond {get; private set;}
+
         /// <summary>
         /// FPSLoopManager ticks 60fps, this variable will hold how many ticks it has to wait before actually doing
         /// an update.

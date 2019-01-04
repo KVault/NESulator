@@ -22,6 +22,9 @@ namespace GUItulator
         [DllImport("libNESulator.dll", EntryPoint = "gui_stop_emulation")]
         public static extern int StopEmulation();
 
+        [DllImport("libNESulator.dll", EntryPoint = "gui_frame")]
+        public static extern FrameInfo BackBuffer();
+
         [DllImport("libNESulator.dll", EntryPoint = "gui_left_patterntable")]
         public static extern FrameInfo LeftPatterntable();
 

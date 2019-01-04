@@ -1,8 +1,8 @@
 #include "gui_patterntable.h"
 #include "gui.h"
 
-unsigned int left_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
-unsigned int right_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
+uint left_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
+uint right_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
 
 
 void render_tiles(tile *tiles, uint *back_buffer) {

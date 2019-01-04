@@ -38,19 +38,24 @@ EXPORT void gui_start_emulation(char *rom_path);
 EXPORT void gui_stop_emulation();
 
 /**
- * Returns the latest patterntable frame. It only returns a pointer to int. Both the UI and the backend know
+ * @return The latest back buffer for the NES main window (The game)
+ */
+EXPORT FrameInfo gui_frame();
+
+/**
+ * @return the latest patterntable frame. It only returns a pointer to int. Both the UI and the backend know
  * the dimensions of the patterntable. Another option would be to return a struct or array that holds that info
  */
 EXPORT FrameInfo gui_right_patterntable();
 
 /**
- * Returns the latest patterntable frame. It only returns a pointer to int. Both the UI and the backend know
+ * @return the latest patterntable frame. It only returns a pointer to int. Both the UI and the backend know
  * the dimensions of the patterntable. Another option would be to return a struct or array that holds that info
  */
 EXPORT FrameInfo gui_left_patterntable();
 
 /**
- * Returns the latest nametable frame for the given index (TL, TR, BL, BR). It returns it in the same manner as the
+ * @return the latest nametable frame for the given index (TL, TR, BL, BR). It returns it in the same manner as the
  * patterntable. That is with a FrameInfo that then the UI can make use of
  */
 EXPORT FrameInfo gui_nametable(NametableIndex index);
@@ -66,8 +71,7 @@ EXPORT MemoryDumpInfo gui_ram_dump();
 EXPORT void gui_cpu_speed(int speed_hertz);
 
 /**
- * Returns a buffer with the information of the current background palette
- * @return
+ * @return a buffer with the information of the current background palette
  */
 EXPORT FrameInfo gui_palette_dump();
 

@@ -4,6 +4,7 @@
 typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int uint;
+typedef int bool;
 
 #define BYTE 1
 #define WORD 2

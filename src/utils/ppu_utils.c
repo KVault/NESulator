@@ -4,8 +4,8 @@ word BACKGROUND_PALETTES[4] = {0x3F01, 0x3F05, 0x3F09, 0x3F0D};
 word UNIVERSAL_BACKGROUND = 0x3F00;
 
 void encode_as_tiles(byte *mem_addr, uint number_tiles, tile *tiles) {
-	for (int i, tile_count = i = 0;
-	     tile_count < number_tiles; i += 16, ++tile_count) { //Each tile is defined by 16 bytes
+	//Each tile is defined by 16 bytes
+	for (int i, tile_count = i = 0; tile_count < number_tiles; i += 16, ++tile_count) {
 		for (int j = 0; j < TILE_ROW_SIZE; ++j) { //And each byte defines a row of pixels with a value from 0 to 3
 			for (byte k = 0; k < TILE_COLUMN_SIZE; ++k) {
 				//Get the bit j from the current iteration and 8 positions ahead. Then add those two bits so that

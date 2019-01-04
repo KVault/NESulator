@@ -15,6 +15,8 @@
 #define PPU_SCANLINES 261
 #define PPU_VISIBLE_SCANLINES 240
 #define PPU_POINT_PER_SCANLINE 340
+#define NES_PPU_TEXTURE_HEIGHT 240
+#define NES_PPU_TEXTURE_WIDTH 256
 
 static enum {
 	PPUCTRL_N = 0, PPUCTRL_I = 2, PPUCTRL_S = 3, PPUCTRL_B = 4, PPUCTRL_H = 5, PPUCTRL_P = 6, PPUCTRL_V = 7
@@ -29,9 +31,16 @@ int ppu_cycle_per_cpu_cycle;  //Speed of the PPU in Hz. Used to slow down the em
 static int ppu_cycles_this_sec;
 static int current_scanline;
 static int current_cycle_scanline;
-static int in_vblank;
-static int nmi_occurred;
-static int nmi_output;
+extern uint ppu_back_buffer[];
+
+//PPU latches and flags
+static bool render_enabled;
+static bool in_vblank;
+static bool nmi_occurred;
+static bool nmi_output;
+static bool showBackground = TRUE;
+static bool showSprites = TRUE;
+
 
 
 
@@ -60,6 +69,8 @@ void write_PPUCTRL(byte value);
 
 byte read_PPUDATA();
 
+byte read_PPUSTATUS();
+
 void start_vblank();
 
 void finish_vblank();
@@ -68,5 +79,15 @@ void finish_vblank();
  * Checks for the correct conditions to trigger an nmi. If they are met, then it triggers it
  */
 void try_trigger_nmi();
+
+/**
+ * @return whether the current scanline is visible (Projected to the screen) or if it's a v-blank scanline
+ */
+bool visible_scanline();
+
+/**
+ * @return whether the current cycle is visible (Only the first 256 are.)
+ */
+bool visible_cycle();
 
 #endif //NESULATOR_PPU_H

@@ -50,7 +50,6 @@ void wmem_vram(unsigned short amountBytes, uint initialPosition, byte *content);
  * Handle the different operations with the PPU
  */
 void ppu_reg_write(uint initialPosition, byte content);
-
 void ppu_reg_read(uint initialPosition);
 
 /**
@@ -137,11 +136,19 @@ void ppu_reg_write(uint initialPosition, byte content) {
 	}
 }
 
+/**
+ * No need to return anything here since the functions should do any prework
+ * necessary before hand and store it in the register. So that when the actual
+ * read happens, the correct value will be in there
+ */
 void ppu_reg_read(uint initialPosition) {
 	// TODO Check the mirroring
 	switch (initialPosition) {
 		case PPUDATA:
 			read_PPUDATA();
+			break;
+		case PPUSTATUS:
+			read_PPUSTATUS();
 			break;
 		default:break;
 	}

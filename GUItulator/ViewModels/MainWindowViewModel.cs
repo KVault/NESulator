@@ -6,7 +6,10 @@ using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using Avalonia.Threading;
+using GUItulator.Utils;
 using GUItulator.Views;
 using ReactiveUI;
 using Serilog;
@@ -23,8 +26,15 @@ namespace GUItulator.ViewModels
         }
 
         private Thread emulatorThread;
+        private WriteableBitmap BackBuffer {get;}
+        private Size BackBufferSize {get;}
+        public MainWindowViewModel(Action onFrameExecuted, int fps = 60) : base(onFrameExecuted, fps)
+        {
+            BackBuffer = new WriteableBitmap(new PixelSize(256,240),
+                                             new Vector(96,96), PixelFormat.Rgba8888);
+            BackBufferSize = BackBuffer.Size;
+        }
 
-        public MainWindowViewModel(Action onFrameExecuted, int fps = 60) : base(onFrameExecuted, fps){ }
         public MainWindowViewModel() : base (() => {}, 60){}
 
         public async void OpenROM()
@@ -71,6 +81,8 @@ namespace GUItulator.ViewModels
         {
             var mhz = (CWrapper.CPUSpeed() / 1000000.0f).ToString("#.##");
             CPUSpeed = $"CPU Speed: {mhz}MHz";
+            var backBuffer = BackBuffer;//So that we can use `ref`
+            BitmapUtils.DrawBitmap(CWrapper.BackBuffer(), ref backBuffer, BackBufferSize);
         }
     }
 }

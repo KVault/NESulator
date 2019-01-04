@@ -16,6 +16,16 @@ EXPORT void gui_stop_emulation() {
 	stop_emulation();
 }
 
+EXPORT FrameInfo gui_frame(){
+	FrameInfo frameInfo = {};
+	frameInfo.width = NES_PPU_TEXTURE_WIDTH;
+	frameInfo.height = NES_PPU_TEXTURE_HEIGHT;
+	frameInfo.size = frameInfo.height * frameInfo.width;
+	frameInfo.buffer = ppu_back_buffer;
+
+	return frameInfo;
+}
+
 EXPORT FrameInfo gui_left_patterntable(){
 	return left_patterntable();
 }
