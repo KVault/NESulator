@@ -1,4 +1,6 @@
+#include <stdlib.h>
 #include "gui_nametable.h"
+#include "../memory.h"
 
 /**
  * Holds a pointer to each nametable back buffer
@@ -6,10 +8,10 @@
 uint *nametables[4];
 
 void render_tile(NametableIndex nametableIndex, tile *tile, uint row_id, uint column_id) {
-	for (int i = 0; i < TILE_ROW_SIZE; ++i) {
-		for (int j = 0; j < TILE_COLUMN_SIZE; ++j) {
-			int row = row_id * TILE_ROW_SIZE + i;
-			int col = column_id * TILE_COLUMN_SIZE + j;
+	for (int i = 0; i < TILE_WIDTH; ++i) {
+		for (int j = 0; j < TILE_HEIGHT; ++j) {
+			int row = row_id * TILE_WIDTH + i;
+			int col = column_id * TILE_HEIGHT + j;
 			byte attribute = get_attribute(nametableIndex, row_id, column_id);
 			colour *palette = get_background_palette(attribute);
 			colour draw_colour = palette[tile->pattern[i][j]];

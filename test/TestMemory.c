@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "TestMemory.h"
+#include "../src/cpu.h"
 
 /**
  * Tests how the system writes to memory. in order to actually only test the writing, we have to compare

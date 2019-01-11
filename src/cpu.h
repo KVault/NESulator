@@ -1,11 +1,7 @@
 #ifndef NESULATOR_CPU_H
 #define NESULATOR_CPU_H
 
-#include "nes.h"
 #include "utils/Utils.h"
-#include "utils/log.h"
-#include "memory.h"
-#include "time.h"
 
 #define OPCODE_COUNT 256
 

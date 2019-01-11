@@ -1,4 +1,9 @@
+#include <time.h>
+#include <zconf.h>
 #include "nes.h"
+#include "ppu.h"
+#include "utils/log.h"
+#include "cpu.h"
 
 int is_running;
 
@@ -74,7 +79,7 @@ void match_cpu_speed(){
 	static long should_elapsed, has_elapsed;
 
 	mingw_gettimeofday(&ctime, NULL);
-	//More than one second has passed, so update the CPU speed. if less than 0 means a timer hasn't been initialized.
+	//More than one second has passed, so update the CPU speed. if less than 0 means a timer hasn't_vram been initialized.
 	//This will do it
 	if(ctime.tv_sec > last_second.tv_sec){
 		cpu_cyclesLastSec = cpu_cyclesThisSec;

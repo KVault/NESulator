@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//Create the struct outside so that when we fill it in and exit the function, we don't lose the reference
+//Create the struct outside so that when we fill it in and exit the function, we don't_vram lose the reference
 //The emulator can run only one ROM at a time, so this also makes sense (I think)
 
 ROM rom = {};

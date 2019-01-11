@@ -1,6 +1,11 @@
 #include "gui.h"
+#include "../cpu.h"
+#include "../rom.h"
+#include "../nes.h"
 #include "gui_patterntable.h"
 #include "gui_nametable.h"
+#include "../memory.h"
+#include "../ppu.h"
 
 EXPORT int last_cpu_speed() {
 	return cpu_cyclesLastSec;

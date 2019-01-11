@@ -1,5 +1,6 @@
-#include "nes.h"
 #include "memory.h"
+#include "cpu.h"
+#include "ppu.h"
 
 ////// This functions are defined here so that when other file includes the .h, they won't be able to see this ones
 

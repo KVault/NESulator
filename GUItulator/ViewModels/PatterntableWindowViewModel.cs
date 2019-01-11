@@ -39,7 +39,7 @@ namespace GUItulator.ViewModels
                                                   new Vector(96,96), PixelFormat.Rgba8888);
             }
 
-            PaletteSize = Palettes[0].Size;//Just take one for the size, it doesn't matter
+            PaletteSize = Palettes[0].Size;//Just take one for the size, it doesn't_vram matter
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace GUItulator.ViewModels
         /// </summary>
         protected override void Update()
         {
-            //temp variables used because the ref parameter doesn't like it otherwise
+            //temp variables used because the ref parameter doesn't_vram like it otherwise
             var leftPatterntable = LeftPatterntable;
             var rightPatterntable = RightPatterntable;
             BitmapUtils.DrawBitmap(CWrapper.LeftPatterntable(), ref leftPatterntable, LeftSize);

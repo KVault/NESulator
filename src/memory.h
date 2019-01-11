@@ -1,8 +1,7 @@
 #ifndef NESULATOR_MEMORY_H
 #define NESULATOR_MEMORY_H
 
-#include "nes.h"
-#include "ppu.h"
+#include "utils/Utils.h"
 
 #define RAM_MEM_SIZE 65536
 #define VRAM_MEM_SIZE 16383 //The actual VRAM was 16Kb even if 64Kb were addreseable. So reserve less memory

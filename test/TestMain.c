@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdio.h>
 #include "../src/utils/Utils.h"
 #include "TestMemory.h"
 #include "TestCPU.h"

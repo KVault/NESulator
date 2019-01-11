@@ -1,4 +1,5 @@
 #include "CNROM.h"
+#include "../memory.h"
 
 static uint first_rom_page = 0x8000;
 static uint second_rom_page = 0xC000;

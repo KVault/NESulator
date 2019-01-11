@@ -4,13 +4,15 @@
 typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int uint;
-typedef int bool;
+typedef enum {false, true} bool;
+typedef struct{
+	byte R;
+	byte G;
+	byte B;
+} colour;
 
 #define BYTE 1
 #define WORD 2
-
-#define TRUE 1
-#define FALSE 0
 
 #define MILLISECOND 1000
 #define MICROSECOND 1000000
@@ -35,5 +37,15 @@ void bit_clear(byte *b, byte bitPos);
  * Set or clear (based on value) the bitPos'th bit of b
  */
 void bit_val(byte *b, byte bitPos, int value);
+
+/**
+ * The Colour palette for the NES. The interpretation of the colors may change, but not its positions on it
+ *
+ * This might seem a bit random but it can be found here (https://wiki.nesdev.com/w/images/5/59/Savtool-swatches.png)
+ */
+extern const colour COLOUR_PALETTE[];
+
+uint encode_as_RGBA(colour colour);
+
 
 #endif //NESULATOR_TYPES_H

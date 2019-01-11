@@ -1,7 +1,6 @@
 #ifndef NESULATOR_GUI_NAMETABLE_H
 #define NESULATOR_GUI_NAMETABLE_H
 
-#include "../utils/ppu_utils.h"
 #include "gui.h"
 
 #define NAMETABLE_TEXTURE_WIDTH 256

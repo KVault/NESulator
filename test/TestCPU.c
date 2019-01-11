@@ -1,4 +1,5 @@
 #include "TestCPU.h"
+#include "../src/utils/log.h"
 
 /**
  * Simply calls each function to test. It's going to get messy but what the hell!....
@@ -205,7 +206,7 @@ void test_PLA() {
 	//Test Zero flag
 	byte testValue = A = 0b00000000;
 	push_b(A);
-	A = 0x05;//Overwrite with a random value. It doesn't matter
+	A = 0x05;//Overwrite with a random value. It doesn't_vram matter
 	wmem_b(PC, 0x68);//Inject the opcode
 	cachedSP = SP;
 	cpu_instruction();
@@ -223,7 +224,7 @@ void test_PLA() {
 	cachedCyclesThisSec = cpu_cyclesThisSec;
 	testValue = A = 0b11001001;
 	push_b(A);
-	A = 0x05;//Overwrite with a random value. It doesn't matter
+	A = 0x05;//Overwrite with a random value. It doesn't_vram matter
 	wmem_b(PC, 0x68);
 	cachedSP = SP;
 	cpu_instruction();

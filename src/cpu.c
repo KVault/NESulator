@@ -1,4 +1,8 @@
 #include "cpu.h"
+#include "memory.h"
+#include "nes.h"
+#include "utils/log.h"
+#include "time.h"
 
 /**
  * More info here http://wiki.nesdev.com/w/index.php/CPU_power_up_state
@@ -1979,7 +1983,7 @@ void log_instruction(int num_params, const char *mnemonic, ...) {
 	//Now for the status register. A bit of dirty code but the logs will be much clearer
 	log_debug("P:");
 	log_debug(bit_test(P, flagN) ? "N" : "n");
-	log_debug(bit_test(P, flagV) ? "V" : "v");
+	log_debug(bit_test(P, flagV) ? "V" : "c_vram");
 	log_debug(bit_test(P, flagUnused) ? "U" : "u");
 	log_debug(bit_test(P, flagB) ? "B" : "b");
 	log_debug(bit_test(P, flagD) ? "D" : "d");

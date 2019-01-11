@@ -1,5 +1,7 @@
+#include <stdlib.h>
 #include "gui_patterntable.h"
 #include "gui.h"
+#include "../memory.h"
 
 uint left_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
 uint right_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
@@ -7,10 +9,10 @@ uint right_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
 
 void render_tiles(tile *tiles, uint *back_buffer) {
 	for (byte i = 0; i < TILES_PER_TABLE; ++i) {
-		for (int j = 0; j < TILE_ROW_SIZE; ++j) {
-			for (int k = 0; k < TILE_COLUMN_SIZE; ++k) {
-				int columnIndex = ((i & 0x0F) * TILE_COLUMN_SIZE) + k;
-				int rowIndex = ((i >> 4) * TILE_ROW_SIZE) + j;
+		for (int j = 0; j < TILE_WIDTH; ++j) {
+			for (int k = 0; k < TILE_HEIGHT; ++k) {
+				int columnIndex = ((i & 0x0F) * TILE_HEIGHT) + k;
+				int rowIndex = ((i >> 4) * TILE_WIDTH) + j;
 
 				int colour_index  = rmem_b_vram(UNIVERSAL_BACKGROUND + tiles[i].pattern[j][k]);
 				uint colour = encode_as_RGBA(COLOUR_PALETTE[colour_index]);

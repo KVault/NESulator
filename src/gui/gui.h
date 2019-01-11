@@ -1,11 +1,10 @@
 #ifndef NESULATOR_GUI_H
 #define NESULATOR_GUI_H
 
-#define EXPORT __declspec(dllexport)
+#include "../utils/Utils.h"
+#include "../ppu.h"
 
-#include "../cpu.h"
-#include "../rom.h"
-#include "../utils/ppu_utils.h"
+#define EXPORT __declspec(dllexport)
 
 typedef struct {
 	int size;
