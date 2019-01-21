@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "ppu.h"
 #include "cpu.h"
 #include "rom.h"
@@ -20,10 +21,6 @@ void step();
 
 word BACKGROUND_PALETTES[4] = {0x3F01, 0x3F05, 0x3F09, 0x3F0D};
 word UNIVERSAL_BACKGROUND = 0x3F00;
-
-void yolo(){
-
-}
 
 void encode_as_tiles(byte *mem_addr, uint number_tiles, tile *tiles) {
 	//Each tile is defined by 16 bytes
@@ -151,13 +148,34 @@ void ppu_cycle() {
 /////////////////////////////REGISTERS/////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 void write_PPUADDR(byte value) {
-	if (w == 0) {
+	if (!w) {
 		t_vram = value << 8;
-		w = 1;
+		w = true;
 	} else {
 		t_vram += value;
 		c_vram = t_vram;
-		w = 0;
+		w = false;
+	}
+	return;
+	if (!w) {
+		/**
+         * t: .FEDCBA ........ = d: ..FEDCBA
+	 	 * t: X...... ........ = 0
+         * w:                  = 1
+	 	*/
+	 	word val = (word) ((value % 0b00111111) << 8);// extract FEDCBA
+		t_vram = (word) ((t_vram & ~0b011111100000000) | (val & 0b011111100000000));
+		t_vram &= 0b0111111111111111;// for the X
+		w = true;
+	} else {
+		/**
+		 * t: ....... HGFEDCBA = d: HGFEDCBA
+		 * v                   = t
+		 * w:                  = 0
+		 */
+		t_vram = (word) ((t_vram & ~0b0000000011111111) | (value));
+		c_vram = t_vram;
+		w = false;
 	}
 }
 
@@ -173,6 +191,41 @@ byte read_PPUDATA() {
 
 void write_PPUCTRL(byte value) {
 	nmi_output = bit_test(value, 7);
+	/** from here:
+	 * https://stackoverflow.com/questions/4439078/how-do-you-set-only-certain-bits-of-a-byte-in-c-without-affecting-the-rest
+	 * value = (value & ~mask) | (newvalue & mask);
+	 */
+	byte t_val = (byte) (value & 0x0003);
+	t_vram = (word) ((t_val & ~0b0000110000000000) | (t_val & 0b0000110000000000));
+}
+
+/**
+ * 2005 first write:
+ * t: ....... ...HGFED = d: HGFED...
+ * x:              CBA = d: .....CBA
+ * w:                  = 1
+ *
+ * 2005 second write:
+ *      t: CBA..HG FED..... = d: HGFEDCBA
+ *      w:                  = 0
+ */
+void write_PPUSCROLL(byte d){
+	static byte val;
+	if(!w){
+		val = d >> 3; // extract HGFED...
+		t_vram = (word) ((t_vram & ~0x001F) | (val & 0x0001F));
+		x = (byte) (d & 0x07);
+		w = true;
+	}else{
+		//We have to do it in two steps. One for CBA and the other one for HGFED
+		w = false;
+		val = (byte) (d & 0x7);// extract CBA
+		t_vram = (word) ((t_vram & ~0x7000) | (val & 0x7000));// CBA
+
+		val = d >> 3;// extract HGFED
+		t_vram = (word) ((t_vram & 0x001F) | (val & 0x0001F));// HGFED
+	}
+
 }
 
 byte read_PPUSTATUS(){
@@ -181,13 +234,13 @@ byte read_PPUSTATUS(){
 	bit_val(&status, 7, nmi_occurred);
 	nmi_occurred = false;
 	wmem_b(PPUSTATUS, status);
+	w = 0; //Reading from STATUS resets the (shared) latch w
 	return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 ////////////////////////END OF REGISTERS///////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-
 
 void start_vblank() {
 	in_vblank = true;
@@ -213,7 +266,8 @@ void try_trigger_nmi() {
 
 void fetch_nt_byte(){
 	// Because NT addresses only go 0x2000 - 0x2FFF. So this is a "wraparound"
-	uint addr = (uint) (0x2000 | (c_vram & 0x0FFF));
+	uint addr = (uint) ((c_vram & 0x0C00) | 0x2000) + (c_vram & 0x0FFF);
+	//printf("0x%X \n", c_vram);
 	nt_byte = rmem_b_vram(addr);
 }
 
@@ -225,12 +279,12 @@ void fetch_at_byte(){
 
 void fetch_bg_tile(bg_byte high_low){
 	int patterntable = bit_test(rmem_b(PPUCTRL), PPUCTRL_B); //0x0000 or 0x1000
-	uint addr = (uint) ((0x1000 * patterntable) + nt_byte) * 16;// * 16 because each tile is 16 bytes long
+	uint addr = (uint) ((0x1000 * patterntable) + (nt_byte * 16));// * 16 because each tile is 16 bytes long
 
 	if(high_low == high){
-		high_bg_byte = rmem_b_vram(addr);
+		high_bg_byte = (byte) ((addr >> 8) & 0xff);
 	}else{
-		low_bg_byte = rmem_b_vram(addr);
+		low_bg_byte = (byte) (addr & 0xff);
 	}
 }
 
@@ -238,11 +292,12 @@ void store_tile_data(){
 	static tile tile;
 	uint bg_addr = (high_bg_byte << 8 ) + low_bg_byte;
 	encode_as_tiles(&vram_bank[bg_addr], 1, &tile);
-	yolo();
+	colour *palette = get_background_palette(at_byte);
+
 	for (int i = 0; i < TILE_WIDTH; ++i) {
 		for (int j = 0; j < TILE_HEIGHT; ++j) {
-			colour *palette = get_background_palette(at_byte);
-			colour draw_colour = palette[tile.pattern[i][j]];
+			static colour draw_colour;
+			draw_colour = palette[tile.pattern[i][j]];
 			current_bg_data[TILE_WIDTH * i + j] = encode_as_RGBA(draw_colour);
 		}
 	}
@@ -302,6 +357,13 @@ void step(){
 			switch (current_cycle_scanline % 8){
 				case 1: // NT byte
 					fetch_nt_byte();
+
+					//If rendering is enabled, the PPU copies all bits related to horizontal position from t to v:
+					//v: ....F.. ...EDCBA = t: ....F.. ...EDCBA
+					if(current_cycle_scanline == 257){
+						word val = (word) (t_vram & 0b000010000011111); // extract ....F.. ...EDCBA
+						//c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
+					}
 					break;
 				case 3: // AT byte
 					fetch_at_byte();
@@ -314,6 +376,12 @@ void step(){
 					break;
 				case 0: // Store tile data
 					store_tile_data();
+
+					//If rendering is enabled, the PPU increments the vertical position in v.
+					if(current_cycle_scanline == 256){
+						//incrementY();
+					}
+
 					break;
 				default:
 					break;

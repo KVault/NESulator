@@ -8,7 +8,7 @@ typedef enum bg_byte{low, high} bg_byte;
 word c_vram; /** Current vram address */
 word t_vram; /** Temporary vram address aka address of the top left onscreen tile */
 byte x; /** Fine X scroll, 3 bits */
-byte w; /** Latch, 1 bit */
+bool w; /** Latch, 1 bit */
 uint ppu_running;
 int ppu_cycle_per_cpu_cycle;  //Speed of the PPU in Hz. Used to slow down the emulation to match the NES's clock speed
 static int ppu_cycles_this_sec;
@@ -118,6 +118,8 @@ void write_PPUADDR(byte value);
 void write_PPUDATA(byte value);
 
 void write_PPUCTRL(byte value);
+
+void write_PPUSCROLL(byte value);
 
 byte read_PPUDATA();
 
