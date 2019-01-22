@@ -149,23 +149,14 @@ void ppu_cycle() {
 ///////////////////////////////////////////////////////////////////////////
 void write_PPUADDR(byte value) {
 	if (!w) {
-		t_vram = value << 8;
-		w = true;
-	} else {
-		t_vram += value;
-		c_vram = t_vram;
-		w = false;
-	}
-	return;
-	if (!w) {
 		/**
          * t: .FEDCBA ........ = d: ..FEDCBA
 	 	 * t: X...... ........ = 0
          * w:                  = 1
 	 	*/
-	 	word val = (word) ((value % 0b00111111) << 8);// extract FEDCBA
+	 	word val = (word) ((value & 0b00111111) << 8);// extract FEDCBA
 		t_vram = (word) ((t_vram & ~0b011111100000000) | (val & 0b011111100000000));
-		t_vram &= 0b0111111111111111;// for the X
+		//t_vram &= 0b0111111111111111;// for the X
 		w = true;
 	} else {
 		/**
