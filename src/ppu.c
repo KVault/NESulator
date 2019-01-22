@@ -186,7 +186,7 @@ void write_PPUCTRL(byte value) {
 	 * https://stackoverflow.com/questions/4439078/how-do-you-set-only-certain-bits-of-a-byte-in-c-without-affecting-the-rest
 	 * value = (value & ~mask) | (newvalue & mask);
 	 */
-	byte t_val = (byte) (value & 0x0003);
+	word t_val = (word) (value & 0x0003) << 8;
 	t_vram = (word) ((t_val & ~0b0000110000000000) | (t_val & 0b0000110000000000));
 }
 
@@ -201,22 +201,21 @@ void write_PPUCTRL(byte value) {
  *      w:                  = 0
  */
 void write_PPUSCROLL(byte d){
-	static byte val;
+	static word val;
 	if(!w){
-		val = d >> 3; // extract HGFED...
+		val = (d >> 3) << 8; // extract HGFED... //TODO is this right?
 		t_vram = (word) ((t_vram & ~0x001F) | (val & 0x0001F));
 		x = (byte) (d & 0x07);
 		w = true;
 	}else{
 		//We have to do it in two steps. One for CBA and the other one for HGFED
 		w = false;
-		val = (byte) (d & 0x7);// extract CBA
+		val = (word) (d & 0x7) << 8;// extract CBA //TODO is this right?
 		t_vram = (word) ((t_vram & ~0x7000) | (val & 0x7000));// CBA
 
 		val = d >> 3;// extract HGFED
 		t_vram = (word) ((t_vram & 0x001F) | (val & 0x0001F));// HGFED
 	}
-
 }
 
 byte read_PPUSTATUS(){
@@ -257,13 +256,15 @@ void try_trigger_nmi() {
 
 void fetch_nt_byte(){
 	// Because NT addresses only go 0x2000 - 0x2FFF. So this is a "wraparound"
-	uint addr = (uint) ((c_vram & 0x0C00) | 0x2000) + (c_vram & 0x0FFF);
+	uint addr = (uint) (0x2000 | (c_vram & 0x0FFF));
+	printf("0x%X \n", addr);
 	//printf("0x%X \n", c_vram);
 	nt_byte = rmem_b_vram(addr);
 }
 
 void fetch_at_byte(){
 	//I don't understand this. Why?
+	//nvm. It comes from the wiki so it's probably ok
 	uint addr = (uint) (0x23C0 | (c_vram & 0xC00) | ((c_vram & 0x380) >> 4) | ((c_vram & 0x1C) >> 2));
 	at_byte = rmem_b_vram(addr);
 }
@@ -307,6 +308,46 @@ void render_pixel(){
 	ppu_back_buffer[NES_PPU_TEXTURE_HEIGHT * current_scanline + current_cycle_scanline] = colour;
 }
 
+void increment_horizontally(){
+	//Got to the end of the nametable
+	if((c_vram & 0x001F) == 31){
+		// coarse X = 0
+		c_vram &= 0xFFE0;
+		// switch horizontal nametable
+		c_vram ^= 0x0400;
+	}else{
+		++c_vram;
+	}
+}
+
+void increment_vertically(){
+	// increment vert(c_vram)
+	// if fine Y < 7
+	if(c_vram & 0x7000 != 0x7000) {
+		// increment fine Y
+		c_vram += 0x1000;
+	} else {
+		// fine Y = 0
+		c_vram &= 0x8FFF;
+		// let y = coarse Y
+		int y = (c_vram & 0x03E0) >> 5;
+		if (y == 29 ){
+			// coarse Y = 0
+			y = 0;
+			// switch vertical nametable
+			c_vram ^= 0x0800;
+		} else if (y == 31) {
+			// coarse Y = 0, nametable not switched
+			y = 0;
+		} else {
+			// increment coarse Y
+			y++;
+		}
+		// put coarse Y back into c_vram
+		c_vram = (word) ((c_vram & 0xFC1F) | (y << 5));
+	}
+}
+
 
 void tick(){
 	//h-blank
@@ -342,19 +383,12 @@ void step(){
 		}
 
 		// Execute logic if visible scanline or if on the pre-render scanline (The latest one)
-		if(current_scanline == PPU_SCANLINES || visible_scanline()){
+		if(visible_scanline() && visible_cycle()){
 
 			//The pattern for the background repeats every 8 cycles. So doing the mod will work just fine :D
 			switch (current_cycle_scanline % 8){
 				case 1: // NT byte
 					fetch_nt_byte();
-
-					//If rendering is enabled, the PPU copies all bits related to horizontal position from t to v:
-					//v: ....F.. ...EDCBA = t: ....F.. ...EDCBA
-					if(current_cycle_scanline == 257){
-						word val = (word) (t_vram & 0b000010000011111); // extract ....F.. ...EDCBA
-						//c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
-					}
 					break;
 				case 3: // AT byte
 					fetch_at_byte();
@@ -367,15 +401,29 @@ void step(){
 					break;
 				case 0: // Store tile data
 					store_tile_data();
-
-					//If rendering is enabled, the PPU increments the vertical position in v.
-					if(current_cycle_scanline == 256){
-						//incrementY();
-					}
-
 					break;
 				default:
 					break;
+			}
+
+			if (cpu_cyclesThisSec != 256) {
+				increment_horizontally();
+			} else {
+				increment_vertically();
+			}
+
+
+			if(current_cycle_scanline > 280 && current_cycle_scanline <= 304){
+				//v: IHGF.ED CBA..... = t: IHGF.ED CBA.....
+				word val = (word) (t_vram & 0b111101111100000); // extract IHGF.ED CBA.....
+				c_vram = (word) ((c_vram & ~0b111101111100000) | (val & 0b111101111100000));
+			}
+
+			//If rendering is enabled, the PPU copies all bits related to horizontal position from t to v:
+			//v: ....F.. ...EDCBA = t: ....F.. ...EDCBA
+			if(current_cycle_scanline == 257){
+				word val = (word) (t_vram & 0b000010000011111); // extract ....F.. ...EDCBA
+				c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
 			}
 		}
 
