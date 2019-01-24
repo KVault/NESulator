@@ -6,6 +6,7 @@
 #include "memory.h"
 
 uint ppu_back_buffer[NES_PPU_TEXTURE_WIDTH * NES_PPU_TEXTURE_HEIGHT];
+uint ppu_front_buffer[NES_PPU_TEXTURE_WIDTH * NES_PPU_TEXTURE_HEIGHT];
 uint current_bg_data[TILE_WIDTH * TILE_HEIGHT];
 
 /**
@@ -155,7 +156,7 @@ void write_PPUADDR(byte value) {
          * w:                  = 1
 	 	*/
 	 	word val = (word) ((value & 0b00111111) << 8);// extract FEDCBA
-		t_vram = (word) ((t_vram & ~0b011111100000000) | (val & 0b011111100000000));
+	 	t_vram = word_mask(t_vram, 0b011111100000000, val);
 		//t_vram &= 0b0111111111111111;// for the X
 		w = true;
 	} else {
@@ -182,12 +183,8 @@ byte read_PPUDATA() {
 
 void write_PPUCTRL(byte value) {
 	nmi_output = bit_test(value, 7);
-	/** from here:
-	 * https://stackoverflow.com/questions/4439078/how-do-you-set-only-certain-bits-of-a-byte-in-c-without-affecting-the-rest
-	 * value = (value & ~mask) | (newvalue & mask);
-	 */
 	word t_val = (word) (value & 0x0003) << 8;
-	t_vram = (word) ((t_val & ~0b0000110000000000) | (t_val & 0b0000110000000000));
+	t_vram = word_mask(t_vram, 0b0000110000000000, t_val);
 }
 
 /**
@@ -204,17 +201,17 @@ void write_PPUSCROLL(byte d){
 	static word val;
 	if(!w){
 		val = (d >> 3) << 8; // extract HGFED... //TODO is this right?
-		t_vram = (word) ((t_vram & ~0x001F) | (val & 0x0001F));
+		t_vram = word_mask(t_vram, 0x0001F, val);
 		x = (byte) (d & 0x07);
 		w = true;
 	}else{
 		//We have to do it in two steps. One for CBA and the other one for HGFED
 		w = false;
 		val = (word) (d & 0x7) << 8;// extract CBA //TODO is this right?
-		t_vram = (word) ((t_vram & ~0x7000) | (val & 0x7000));// CBA
+		t_vram = word_mask(t_vram, 0x7000, val);
 
 		val = d >> 3;// extract HGFED
-		t_vram = (word) ((t_vram & 0x001F) | (val & 0x0001F));// HGFED
+		t_vram = word_mask(t_vram, 0x0001F, val);
 	}
 }
 
@@ -253,6 +250,7 @@ void try_trigger_nmi() {
 		nmi_occurred = false;
 	}
 }
+/**
 
 void fetch_nt_byte(){
 	// Because NT addresses only go 0x2000 - 0x2FFF. So this is a "wraparound"
@@ -295,6 +293,8 @@ void store_tile_data(){
 	}
 }
 
+ */
+
 /**
  * So here's the deal. We've got a array representing the current background data, I know it's 8x8 and it doesn't need
  * to be since it only represents a scanline....  but hey, ship it :D
@@ -308,43 +308,44 @@ void render_pixel(){
 	ppu_back_buffer[NES_PPU_TEXTURE_HEIGHT * current_scanline + current_cycle_scanline] = colour;
 }
 
-void increment_horizontally(){
-	//Got to the end of the nametable
-	if((c_vram & 0x001F) == 31){
-		// coarse X = 0
-		c_vram &= 0xFFE0;
-		// switch horizontal nametable
-		c_vram ^= 0x0400;
-	}else{
-		++c_vram;
+/**
+ * Given a certain tile_id, reconstructs the pattern, attributes and draws the specific scanline onto the back buffer
+ */
+void render_tile_scanline(byte tile_id, int tile_counter, colour c){
+	tile tile = nametable_tile(tile_id);
+	//To extract the latest two bits, which indicates the nametable id VPHB SINN
+	int nametable_id = rmem_b(PPUCTRL) & 0x0003;
+	//Divide by 8 to get the tile column and tile row for the pattern (The nametable works in tiles)
+	byte attribute = get_attribute(nametable_id, current_scanline/8, current_cycle_scanline/8);
+	colour *palette = get_background_palette(attribute);
+
+	//And now just send put in the back buffer the current "scan-tile"
+	for(int i = 0; i < 8; ++i){
+		colour draw_colour = palette[tile.pattern[current_scanline%8][i]];
+		ppu_back_buffer[NES_PPU_TEXTURE_WIDTH * current_scanline + ((tile_counter * TILE_WIDTH) + i)] = encode_as_RGBA(draw_colour);
 	}
 }
 
-void increment_vertically(){
-	// increment vert(c_vram)
-	// if fine Y < 7
-	if(c_vram & 0x7000 != 0x7000) {
-		// increment fine Y
-		c_vram += 0x1000;
-	} else {
-		// fine Y = 0
-		c_vram &= 0x8FFF;
-		// let y = coarse Y
-		int y = (c_vram & 0x03E0) >> 5;
-		if (y == 29 ){
-			// coarse Y = 0
-			y = 0;
-			// switch vertical nametable
-			c_vram ^= 0x0800;
-		} else if (y == 31) {
-			// coarse Y = 0, nametable not switched
-			y = 0;
-		} else {
-			// increment coarse Y
-			y++;
-		}
-		// put coarse Y back into c_vram
-		c_vram = (word) ((c_vram & 0xFC1F) | (y << 5));
+/**
+ * Draws a single background scanline
+ */
+void background_scanline(){
+	byte tile_id;
+	for(byte i = 0; i < 32; ++i){
+		// Because NT addresses only go 0x2000 - 0x2FFF. So this is a "wraparound"
+		uint addr = (uint) (0x2000 | (c_vram+i & 0x0FFF));
+		tile_id = rmem_b_vram(addr);
+		colour c;
+		render_tile_scanline(tile_id, i);
+	}
+}
+
+/**
+ * Copy the back buffer into the front buffer. Done once per frame to avoid tearing
+ */
+void present(){
+	for(int i = 0; i < NES_PPU_TEXTURE_WIDTH * NES_PPU_TEXTURE_HEIGHT; ++i){
+		ppu_front_buffer[i] = ppu_back_buffer[i];
 	}
 }
 
@@ -360,6 +361,7 @@ void tick(){
 	//c_vram-blank
 	if (!visible_scanline() && !in_vblank) {
 		start_vblank();
+		present();
 	}
 
 	//Finish the c_vram-blank!
@@ -374,61 +376,9 @@ void tick(){
 }
 
 void step(){
-	if(render_enabled || true){
-
-		/** For the Background */
-		if(visible_scanline() && visible_cycle()){
-			//TODO Render the pixel
-			render_pixel();
-		}
-
-		// Execute logic if visible scanline or if on the pre-render scanline (The latest one)
-		if(visible_scanline() && visible_cycle()){
-
-			//The pattern for the background repeats every 8 cycles. So doing the mod will work just fine :D
-			switch (current_cycle_scanline % 8){
-				case 1: // NT byte
-					fetch_nt_byte();
-					break;
-				case 3: // AT byte
-					fetch_at_byte();
-					break;
-				case 5: // Low BG tile byte
-					fetch_bg_tile(low);
-					break;
-				case 7: // High BG tile byte
-					fetch_bg_tile(high);
-					break;
-				case 0: // Store tile data
-					store_tile_data();
-					break;
-				default:
-					break;
-			}
-
-			if (cpu_cyclesThisSec != 256) {
-				increment_horizontally();
-			} else {
-				increment_vertically();
-			}
-
-
-			if(current_cycle_scanline > 280 && current_cycle_scanline <= 304){
-				//v: IHGF.ED CBA..... = t: IHGF.ED CBA.....
-				word val = (word) (t_vram & 0b111101111100000); // extract IHGF.ED CBA.....
-				c_vram = (word) ((c_vram & ~0b111101111100000) | (val & 0b111101111100000));
-			}
-
-			//If rendering is enabled, the PPU copies all bits related to horizontal position from t to v:
-			//v: ....F.. ...EDCBA = t: ....F.. ...EDCBA
-			if(current_cycle_scanline == 257){
-				word val = (word) (t_vram & 0b000010000011111); // extract ....F.. ...EDCBA
-				c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
-			}
-		}
-
-		/** For the Sprites */
-
+	//Basically ignore all the cycles that aren't the first one since we're attempting the scanline-based approach
+	if(current_cycle_scanline == 1){
+		background_scanline();
+		//sprite_scanline();
 	}
-
 }

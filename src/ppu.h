@@ -15,6 +15,7 @@ static int ppu_cycles_this_sec;
 static int current_scanline;
 static int current_cycle_scanline;
 extern uint ppu_back_buffer[];
+extern uint ppu_front_buffer[];
 
 //PPU latches and flags
 static bool render_enabled;
@@ -160,5 +161,10 @@ void fetch_at_byte();
 void fetch_bg_tile(bg_byte high_low);
 
 void store_tile_data();
+
+/**
+ * Presents the current back buffer to be displayed
+ */
+void present();
 
 #endif //NESULATOR_PPU_H

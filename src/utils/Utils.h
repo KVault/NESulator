@@ -39,6 +39,24 @@ void bit_clear(byte *b, byte bitPos);
 void bit_val(byte *b, byte bitPos, int value);
 
 /**
+ * Applies the given mask to change the bits set to 1 in that mask to the value passed in
+ * @param source Initial value to be changed
+ * @param mask Mask with all the bits to be changed set to 1
+ * @param value New value to be applied to the mask and therefore to the old value
+ * @return
+ */
+byte byte_mask(byte source, byte mask, byte value);
+
+/**
+ * Applies the given mask to change the bits set to 1 in that mask to the value passed in
+ * @param source Initial value to be changed
+ * @param mask Mask with all the bits to be changed set to 1
+ * @param value New value to be applied to the mask and therefore to the old value
+ * @return
+ */
+word word_mask(word source, word mask, word value);
+
+/**
  * The Colour palette for the NES. The interpretation of the colors may change, but not its positions on it
  *
  * This might seem a bit random but it can be found here (https://wiki.nesdev.com/w/images/5/59/Savtool-swatches.png)

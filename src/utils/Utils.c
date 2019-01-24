@@ -17,6 +17,21 @@ void bit_val(byte *b, byte bitPos, int value) {
 	(value) ? bit_set(b, bitPos) : bit_clear(b, bitPos);
 }
 
+/** from here:
+ * https://stackoverflow.com/questions/4439078/how-do-you-set-only-certain-bits-of-a-byte-in-c-without-affecting-the-rest
+ * value = (value & ~mask) | (newvalue & mask);
+ */
+byte byte_mask(byte source, byte mask, byte value) {
+	return (source & ~mask) | (value & mask);
+}
+
+/** from here:
+ * https://stackoverflow.com/questions/4439078/how-do-you-set-only-certain-bits-of-a-byte-in-c-without-affecting-the-rest
+ * value = (value & ~mask) | (newvalue & mask);
+ */
+word word_mask(word source, word mask, word value) {
+	return (source & ~mask) | (value & mask);
+}
 
 const colour  COLOUR_PALETTE[] = {
 		{0x75, 0x75, 0x75}, //00
