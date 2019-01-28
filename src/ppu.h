@@ -4,6 +4,7 @@
 #include "utils/Utils.h"
 
 typedef enum bg_byte{low, high} bg_byte;
+typedef enum scanline_type { Visible, NMI, Pre, Post } scanline_type;
 
 word c_vram; /** Current vram address */
 word t_vram; /** Temporary vram address aka address of the top left onscreen tile */
@@ -30,11 +31,9 @@ static byte at_byte;
 static byte low_bg_byte;
 static byte high_bg_byte;
 
-
 //int speed = 0; // the speed of the PPU
 //int scanline_ptr = 0; // in which scanline the PPU is currently. From 0 to 261
 //int cycle_ptr = 0; // the cycle within the scanline. From 0 to 340
-
 
 #define PPUCTRL 0x2000
 #define PPUMASK 0x2001
@@ -103,8 +102,6 @@ byte get_attribute(NametableIndex nametableIndex, int row_id, int column_id);
 
 colour *get_background_palette(byte attribute);
 
-void yolo();
-
 /**
  * Executes an instruction on the PPU.
  * Still to be defined what it means and what it needs to be happen on each cycle
@@ -125,24 +122,10 @@ byte read_PPUDATA();
 
 byte read_PPUSTATUS();
 
-void start_vblank();
-
-void finish_vblank();
-
 /**
  * Checks for the correct conditions to trigger an nmi. If they are met, then it triggers it
  */
 void try_trigger_nmi();
-
-/**
- * @return whether the current scanline is visible (Projected to the screen) or if it's a v-blank scanline
- */
-bool visible_scanline();
-
-/**
- * @return whether the current cycle is visible (Only the first 256 are.)
- */
-bool visible_cycle();
 
 /**
  * Fetches the current Nametable Byte. Places it into the internal latch nt_byte
@@ -160,5 +143,10 @@ void fetch_at_byte();
 void fetch_bg_tile(bg_byte high_low);
 
 void store_tile_data();
+
+/**
+ * Executes the actual PPU logic for the current cycle.
+ */
+void step(scanline_type s_type);
 
 #endif //NESULATOR_PPU_H

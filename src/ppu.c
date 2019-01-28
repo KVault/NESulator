@@ -8,17 +8,6 @@
 uint ppu_back_buffer[NES_PPU_TEXTURE_WIDTH * NES_PPU_TEXTURE_HEIGHT];
 uint current_bg_data[TILE_WIDTH * TILE_HEIGHT];
 
-/**
- * Executes internal "housekeeping" operations such as frame increase, cycle increase and nmi trigger
- */
-void tick();
-
-/**
- * Executes the actual PPU logic for the current cycle.
- */
-void step();
-
-
 word BACKGROUND_PALETTES[4] = {0x3F01, 0x3F05, 0x3F09, 0x3F0D};
 word UNIVERSAL_BACKGROUND = 0x3F00;
 
@@ -117,14 +106,6 @@ colour *get_background_palette(byte attribute) {
 	return palette;
 }
 
-bool visible_scanline(){
-	return current_scanline < PPU_VISIBLE_SCANLINES;
-}
-
-bool visible_cycle(){
-	return current_cycle_scanline >= 1 && current_cycle_scanline <= 256;
-}
-
 void ppu_power_up(int clock_speed) {
 	ppu_cycle_per_cpu_cycle = clock_speed;
 	wmem_b(PPUCTRL, 0);
@@ -138,10 +119,24 @@ void ppu_power_up(int clock_speed) {
 	wmem_b(OAMDMA, 0); // Undefined default value
 }
 
-
 void ppu_cycle() {
-	tick(); // PPU internal counters and frame update
-	step(); // PPU actual logic and execution
+	switch (current_scanline){
+		case 0 ... 239:	step(Visible);	break;
+		case 240: step(Post); break;
+		case 241: step(NMI); break;
+		case 261: step(Pre); break;
+		default:break;
+	}
+
+	// Update dot and scanline counters:
+	if (++current_cycle_scanline > 340)
+	{
+		current_cycle_scanline %= 341;
+		if (++current_scanline> 261)
+		{
+			current_scanline= 0;
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -232,33 +227,21 @@ byte read_PPUSTATUS(){
 ////////////////////////END OF REGISTERS///////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-void start_vblank() {
-	in_vblank = true;
-	nmi_occurred = true;
-}
-
-void finish_vblank() {
-	in_vblank = false;
-	nmi_occurred = false;
-	current_scanline = 0;
-}
-
 void try_trigger_nmi() {
-	if (nmi_occurred == true && nmi_output == true) {
+	if (nmi_occurred == true ){//&& nmi_output == true) {
 		//triggering of a NMI can be prevented if bit 7 of PPU Control Register 1 ($2000) is clear.
 		if(bit_test(rmem_b(PPUCTRL), 7) == 1){
 			nmi();
+			nmi_occurred = true;
 		}
-
+	}else{
 		nmi_occurred = false;
 	}
 }
 
 void fetch_nt_byte(){
 	// Because NT addresses only go 0x2000 - 0x2FFF. So this is a "wraparound"
-	uint addr = (uint) (0x2000 | (c_vram & 0x0FFF));
-	printf("0x%X \n", addr);
-	//printf("0x%X \n", c_vram);
+	uint addr = (uint) (0x2000 | (c_vram  & 0x0FFF));
 	nt_byte = rmem_b_vram(addr);
 }
 
@@ -304,8 +287,10 @@ void store_tile_data(){
  */
 void render_pixel(){
 	static uint colour;
-	colour = current_bg_data[TILE_WIDTH * (current_scanline % TILE_WIDTH ) + current_cycle_scanline % TILE_WIDTH];
-	ppu_back_buffer[NES_PPU_TEXTURE_HEIGHT * current_scanline + current_cycle_scanline] = colour;
+	if(current_scanline < 240) {
+		colour = current_bg_data[TILE_WIDTH * (current_scanline % TILE_WIDTH) + current_cycle_scanline % TILE_WIDTH];
+		ppu_back_buffer[NES_PPU_TEXTURE_WIDTH * current_scanline + current_cycle_scanline] = colour;
+	}
 }
 
 void increment_horizontally(){
@@ -349,86 +334,76 @@ void increment_vertically(){
 }
 
 
-void tick(){
-	//h-blank
-	//TODO how long does it take to reset to 0? Take that time into account
-	if (current_cycle_scanline > PPU_POINT_PER_SCANLINE) {
-		current_cycle_scanline = 0;
-		++current_scanline;
+void step(scanline_type s_type){
+	/** For the Background */
+
+	if(s_type == NMI && !in_vblank){
+		nmi_occurred = in_vblank = true;
+		try_trigger_nmi();
 	}
 
-	//c_vram-blank
-	if (!visible_scanline() && !in_vblank) {
-		start_vblank();
-	}
+	if(s_type == Visible || s_type == Pre) {
+		switch (current_cycle_scanline) {
+			case 1:
+				if (s_type == Pre && in_vblank)
+					nmi_occurred = in_vblank = false;
+				break;
+			case 2 ... 255:
+			case 322 ...337:
+				render_pixel();
+				//The pattern for the background repeats every 8 cycles. So doing the mod will work just fine :D
+				switch (current_cycle_scanline % 8) {
+					case 1: // NT byte
+						fetch_nt_byte();
+						break;
+					case 3: // AT byte
+						fetch_at_byte();
+						break;
+					case 5: // Low BG tile byte
+						fetch_bg_tile(low);
+						break;
+					case 7: // High BG tile byte
+						fetch_bg_tile(high);
+						break;
+					case 0: // Store tile data
+						store_tile_data();
+						break;
+					default:
+						break;
+				}
+				break;
 
-	//Finish the c_vram-blank!
-	if (current_scanline > PPU_SCANLINES) {
-		finish_vblank();
-	}
-
-	try_trigger_nmi();
-
-	++current_cycle_scanline;
-	++ppu_cycles_this_sec;
-}
-
-void step(){
-	if(render_enabled || true){
-
-		/** For the Background */
-		if(visible_scanline() && visible_cycle()){
-			//TODO Render the pixel
-			render_pixel();
-		}
-
-		// Execute logic if visible scanline or if on the pre-render scanline (The latest one)
-		if(visible_scanline() && visible_cycle()){
-
-			//The pattern for the background repeats every 8 cycles. So doing the mod will work just fine :D
-			switch (current_cycle_scanline % 8){
-				case 1: // NT byte
-					fetch_nt_byte();
-					break;
-				case 3: // AT byte
-					fetch_at_byte();
-					break;
-				case 5: // Low BG tile byte
-					fetch_bg_tile(low);
-					break;
-				case 7: // High BG tile byte
-					fetch_bg_tile(high);
-					break;
-				case 0: // Store tile data
-					store_tile_data();
-					break;
-				default:
-					break;
-			}
-
-			if (cpu_cyclesThisSec != 256) {
-				increment_horizontally();
-			} else {
+			case 256:
+				render_pixel();
 				increment_vertically();
-			}
+				//Update vertical
+				break;
 
+			case 257:
+				render_pixel();
+				//Increment horizontal position
+				break;
+			case 280 ... 304:
+				//increment vertical position
+				break;
 
-			if(current_cycle_scanline > 280 && current_cycle_scanline <= 304){
-				//v: IHGF.ED CBA..... = t: IHGF.ED CBA.....
-				word val = (word) (t_vram & 0b111101111100000); // extract IHGF.ED CBA.....
-				c_vram = (word) ((c_vram & ~0b111101111100000) | (val & 0b111101111100000));
-			}
-
-			//If rendering is enabled, the PPU copies all bits related to horizontal position from t to v:
-			//v: ....F.. ...EDCBA = t: ....F.. ...EDCBA
-			if(current_cycle_scanline == 257){
-				word val = (word) (t_vram & 0b000010000011111); // extract ....F.. ...EDCBA
-				c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
-			}
+			default:
+				break;
+		}
+	}
+		/**
+		if(current_cycle_scanline > 280 && current_cycle_scanline <= 304){
+			//v: IHGF.ED CBA..... = t: IHGF.ED CBA.....
+			word val = (word) (t_vram & 0b111101111100000); // extract IHGF.ED CBA.....
+			c_vram = (word) ((c_vram & ~0b111101111100000) | (val & 0b111101111100000));
 		}
 
+		//If rendering is enabled, the PPU copies all bits related to horizontal position from t to v:
+		//v: ....F.. ...EDCBA = t: ....F.. ...EDCBA
+		if(current_cycle_scanline == 257){
+			word val = (word) (t_vram & 0b000010000011111); // extract ....F.. ...EDCBA
+			c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
+		}
+		*/
 		/** For the Sprites */
-
-	}
-
 }
