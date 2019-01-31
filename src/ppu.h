@@ -24,12 +24,13 @@ static bool nmi_occurred;
 static bool nmi_output;
 static bool showBackground = true;
 static bool showSprites = true;
+static bool frameOdd;
 
 //These are the latches
-static byte nt_byte;
-static byte at_byte;
-static byte low_bg_byte;
-static byte high_bg_byte;
+static byte nt;
+static byte at;
+static byte low_bg;
+static byte high_bg;
 
 //int speed = 0; // the speed of the PPU
 //int scanline_ptr = 0; // in which scanline the PPU is currently. From 0 to 261
@@ -128,9 +129,9 @@ byte read_PPUSTATUS();
 void try_trigger_nmi();
 
 /**
- * Fetches the current Nametable Byte. Places it into the internal latch nt_byte
+ * Fetches the current Nametable Byte. Returns the addr to find the nt_byte
  */
-void fetch_nt_byte();
+word nt_byte();
 
 /**
  * Fetches the current Attribute Table byte. Places it into the internal latch at_byte

@@ -135,6 +135,7 @@ void ppu_cycle() {
 		if (++current_scanline> 261)
 		{
 			current_scanline= 0;
+			frameOdd ^= 1;
 		}
 	}
 }
@@ -239,35 +240,22 @@ void try_trigger_nmi() {
 	}
 }
 
-void fetch_nt_byte(){
+word nt_byte(){
 	// Because NT addresses only go 0x2000 - 0x2FFF. So this is a "wraparound"
-	uint addr = (uint) (0x2000 | (c_vram  & 0x0FFF));
-	nt_byte = rmem_b_vram(addr);
+	return (word) (0x2000 | (c_vram & 0x0FFF));
 }
 
-void fetch_at_byte(){
+word at_byte(){
 	//I don't understand this. Why?
 	//nvm. It comes from the wiki so it's probably ok
-	uint addr = (uint) (0x23C0 | (c_vram & 0xC00) | ((c_vram & 0x380) >> 4) | ((c_vram & 0x1C) >> 2));
-	at_byte = rmem_b_vram(addr);
-}
-
-void fetch_bg_tile(bg_byte high_low){
-	int patterntable = bit_test(rmem_b(PPUCTRL), PPUCTRL_B); //0x0000 or 0x1000
-	uint addr = (uint) ((0x1000 * patterntable) + (nt_byte * 16));// * 16 because each tile is 16 bytes long
-
-	if(high_low == high){
-		high_bg_byte = (byte) ((addr >> 8) & 0xff);
-	}else{
-		low_bg_byte = (byte) (addr & 0xff);
-	}
+	return (word) (0x23C0 | (c_vram & 0xC00) | ((c_vram & 0x380) >> 4) | ((c_vram & 0x1C) >> 2));
 }
 
 void store_tile_data(){
 	static tile tile;
-	uint bg_addr = (high_bg_byte << 8 ) + low_bg_byte;
+	uint bg_addr = (high_bg << 8 ) + low_bg;
 	encode_as_tiles(&vram_bank[bg_addr], 1, &tile);
-	colour *palette = get_background_palette(at_byte);
+	colour *palette = get_background_palette(at);
 
 	for (int i = 0; i < TILE_WIDTH; ++i) {
 		for (int j = 0; j < TILE_HEIGHT; ++j) {
@@ -295,10 +283,9 @@ void render_pixel(){
 
 void increment_horizontally(){
 	//Got to the end of the nametable
-	if((c_vram & 0x001F) == 31){
-		// coarse X = 0
-		c_vram &= 0xFFE0;
+	if((c_vram & 0x001F) == 31){;
 		// switch horizontal nametable
+		c_vram &= ~0x001F;          // coarse X = 0
 		c_vram ^= 0x0400;
 	}else{
 		++c_vram;
@@ -335,8 +322,9 @@ void increment_vertically(){
 
 
 void step(scanline_type s_type){
-	/** For the Background */
+	static word addr;// Temp addr that everything will read from (from the PPU cycle that is ofc)
 
+	/** For the Background */
 	if(s_type == NMI && !in_vblank){
 		nmi_occurred = in_vblank = true;
 		try_trigger_nmi();
@@ -353,20 +341,29 @@ void step(scanline_type s_type){
 				render_pixel();
 				//The pattern for the background repeats every 8 cycles. So doing the mod will work just fine :D
 				switch (current_cycle_scanline % 8) {
-					case 1: // NT byte
-						fetch_nt_byte();
+					// For the Nametable
+					case 1:	addr = nt_byte(); break;
+					case 2: nt = rmem_b_vram(addr); break;
+
+					// For the Attribute Table
+					case 3:	addr = at_byte(); break;
+					case 4: at = rmem_b_vram(addr);	break;
+
+					// For the background data
+					case 5:
+					{
+						int patterntable = bit_test(rmem_b(PPUCTRL), PPUCTRL_B); //0x0000 or 0x1000
+						addr = (word) ((0x1000 * patterntable) + (nt * 16));// * 16 because each tile is 16 bytes long
+					}
 						break;
-					case 3: // AT byte
-						fetch_at_byte();
-						break;
-					case 5: // Low BG tile byte
-						fetch_bg_tile(low);
-						break;
-					case 7: // High BG tile byte
-						fetch_bg_tile(high);
+					case 6: low_bg = rmem_b_vram(addr); break;
+					case 7:
+						addr += 8;//Just to get a byte higher
 						break;
 					case 0: // Store tile data
+						high_bg = rmem_b_vram(addr);
 						store_tile_data();
+						increment_horizontally();
 						break;
 					default:
 						break;
@@ -376,34 +373,38 @@ void step(scanline_type s_type){
 			case 256:
 				render_pixel();
 				increment_vertically();
+				high_bg = rmem_b_vram(addr);
 				//Update vertical
 				break;
 
 			case 257:
+			{
 				render_pixel();
 				//Increment horizontal position
+				word val = (word) (t_vram & 0b000010000011111); // extract ....F.. ...EDCBA
+				c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
+			}
+
 				break;
 			case 280 ... 304:
 				//increment vertical position
+				if(s_type == Pre){
+					word val = (word) (t_vram & 0b111101111100000); // extract IHGF.ED CBA.....
+					c_vram = (word) ((c_vram & ~0b111101111100000) | (val & 0b111101111100000));
+				}
 				break;
+
+			case 321: case 339:  addr = nt_byte(); break;
+			case 338: nt = rmem_b_vram(addr); break;
+			case 340:
+			{
+				nt =rmem_b_vram(addr);
+				if(frameOdd && s_type == Pre)
+					++current_cycle_scanline;
+			}
 
 			default:
 				break;
 		}
 	}
-		/**
-		if(current_cycle_scanline > 280 && current_cycle_scanline <= 304){
-			//v: IHGF.ED CBA..... = t: IHGF.ED CBA.....
-			word val = (word) (t_vram & 0b111101111100000); // extract IHGF.ED CBA.....
-			c_vram = (word) ((c_vram & ~0b111101111100000) | (val & 0b111101111100000));
-		}
-
-		//If rendering is enabled, the PPU copies all bits related to horizontal position from t to v:
-		//v: ....F.. ...EDCBA = t: ....F.. ...EDCBA
-		if(current_cycle_scanline == 257){
-			word val = (word) (t_vram & 0b000010000011111); // extract ....F.. ...EDCBA
-			c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
-		}
-		*/
-		/** For the Sprites */
 }
