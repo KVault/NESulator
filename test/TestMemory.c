@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "TestMemory.h"
 #include "../src/cpu.h"
+#include "stdio.h"
 
 /**
  * Tests how the system writes to memory. in order to actually only test the writing, we have to compare
@@ -145,7 +146,7 @@ void testAbsoluteAddr() {
 	zero_ram();
 	word param2 = 0x6959;
 	X = 0x10;
-	addr = absolutex_addr(param2);
+	addr = absolutex_addr(param2, false);
 	assert(addr == 0x6969);
 
 	//Third test. Absolute Y

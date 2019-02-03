@@ -1,4 +1,8 @@
 #include "Utils.h"
+#include "log.h"
+#include "../cpu.h"
+#include "../memory.h"
+#include "../ppu.h"
 
 int bit_test(byte b, byte bitPos) {
 	byte bitSet = (b >> (bitPos));
@@ -15,6 +19,49 @@ void bit_clear(byte *b, byte bitPos) {
 
 void bit_val(byte *b, byte bitPos, int value) {
 	(value) ? bit_set(b, bitPos) : bit_clear(b, bitPos);
+}
+
+bool page_crossed(word addr1, word addr2){
+	return (addr1 & 0xFF00) != (addr2 & 0xFF00);
+}
+
+
+void log_instruction(int num_params, const char *mnemonic, ...) {
+/**
+	log_debug("%02X %02X ", PC, currentOpcode);
+	for (uint i = 1; i <= num_params; i++) {
+		log_debug("%02X ", rmem_b(PC + i));
+	}
+	log_debug("\t");
+	if (num_params == 0) {
+		log_debug("\t");
+	}
+	va_list args;
+	va_start(args, mnemonic);
+	vlog(mnemonic, ConsoleDebug, FileDebug, args);
+	va_end(args);
+	log_debug("\t\t\t");
+	log_debug("A:%02X X:%02X Y:%02X ", A, X, Y);
+
+	//Now for the status register. A bit of dirty code but the logs will be much clearer
+	log_debug("P:");
+	log_debug(bit_test(P, flagN) ? "N" : "n");
+	log_debug(bit_test(P, flagV) ? "V" : "c_vram");
+	log_debug(bit_test(P, flagUnused) ? "U" : "u");
+	log_debug(bit_test(P, flagB) ? "B" : "b");
+	log_debug(bit_test(P, flagD) ? "D" : "d");
+	log_debug(bit_test(P, flagI) ? "I" : "i");
+	log_debug(bit_test(P, flagZ) ? "Z" : "z");
+	log_debug(bit_test(P, flagC) ? "C" : "c");
+
+	log_debug(" ");
+
+	//And the rest of the registers
+	log_debug("SP:%02X CPU_CYC:%d", SP, cpu_cyclesThisSec);
+	log_debug(" ");
+*/
+	log_debug("CYC:%3d", current_cycle_scanline);
+	log_debug("\n");
 }
 
 

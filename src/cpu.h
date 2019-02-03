@@ -93,7 +93,7 @@ byte absolute_param();
 /**
  * Returns a byte by reading the PC + 1 and treating it as a absolute X parameter. See addressing modes
  */
-byte absolutex_param();
+byte absolutex_param(bool check_page_crossed);
 
 /**
  * Returns a byte by reading the PC + 1 and treating it as a absolute Y parameter. See addressing modes

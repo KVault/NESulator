@@ -127,7 +127,6 @@ void ppu_cycle() {
 		case 261: step(Pre); break;
 		default:break;
 	}
-
 	// Update dot and scanline counters:
 	if (++current_cycle_scanline > 340)
 	{
@@ -342,7 +341,7 @@ void step(scanline_type s_type){
 				//The pattern for the background repeats every 8 cycles. So doing the mod will work just fine :D
 				switch (current_cycle_scanline % 8) {
 					// For the Nametable
-					case 1:	addr = nt_byte(); break;
+					case 1:	addr = nt_byte(); store_tile_data(); break;
 					case 2: nt = rmem_b_vram(addr); break;
 
 					// For the Attribute Table
@@ -362,7 +361,6 @@ void step(scanline_type s_type){
 						break;
 					case 0: // Store tile data
 						high_bg = rmem_b_vram(addr);
-						store_tile_data();
 						increment_horizontally();
 						break;
 					default:
@@ -382,7 +380,7 @@ void step(scanline_type s_type){
 				render_pixel();
 				//Increment horizontal position
 				word val = (word) (t_vram & 0b000010000011111); // extract ....F.. ...EDCBA
-				c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
+				//c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
 			}
 
 				break;
@@ -390,7 +388,7 @@ void step(scanline_type s_type){
 				//increment vertical position
 				if(s_type == Pre){
 					word val = (word) (t_vram & 0b111101111100000); // extract IHGF.ED CBA.....
-					c_vram = (word) ((c_vram & ~0b111101111100000) | (val & 0b111101111100000));
+					//c_vram = (word) ((c_vram & ~0b111101111100000) | (val & 0b111101111100000));
 				}
 				break;
 

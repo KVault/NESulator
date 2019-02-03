@@ -58,11 +58,11 @@ void nop1() {
 }
 
 void nop2() {
-	nop(2, 2);
+	nop(3, 2);
 }
 
 void nop3() {
-	nop(3, 3);
+	nop(4, 3);
 }
 
 void breakpoint() {
@@ -101,7 +101,6 @@ void ora(byte b, int cycles, int pcIncrease) {
 	//Update cycles and pc
 	cpu_cyclesThisSec += cycles;
 	PC += pcIncrease;
-
 }
 
 void ora_ind_x() {
@@ -114,7 +113,7 @@ void ora_ind_y() {
 }
 
 void ora_zpage() {
-	ora(zpage_param(), 2, 2);
+	ora(zpage_param(), 3, 2);
 }
 
 void ora_zpage_x() {
@@ -130,7 +129,7 @@ void ora_absolute() {
 }
 
 void ora_absolute_x() {
-	ora(absolutex_param(), 4, 3);
+	ora(absolutex_param(false), 4, 3);
 }
 
 void ora_absolute_y() {
@@ -187,7 +186,7 @@ void asl_absolute() {
 
 
 void asl_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
+	word addr = absolutex_addr(rmem_w(PC + 1), false);
 	byte data = rmem_b(addr);
 	asl(&data, 7, 3);
 	wmem_w(addr, data);
@@ -316,8 +315,7 @@ void and_absolute() {
 }
 
 void and_absolute_x() {
-	and(absolutex_param(), 4, 3);
-	//TODO +1 cycle if page crossed
+	and(absolutex_param(true), 4, 3);
 }
 
 void and_absolute_y() {
@@ -542,8 +540,7 @@ void adc_absolute() {
 }
 
 void adc_absolute_x() {
-	adc(absolutex_param(), 4, 3);
-	//TODO +1 cycle if page crossed
+	adc(absolutex_param(true), 4, 3);
 }
 
 void adc_absolute_y() {
@@ -642,8 +639,7 @@ void sbc_absolute() {
 }
 
 void sbc_absolute_x() {
-	//TODO +1 cycle if page crossed
-	sbc(absolutex_param(), 4, 3);
+	sbc(absolutex_param(true), 4, 3);
 }
 
 void sbc_absolute_y() {
@@ -705,7 +701,7 @@ void inc_mem_absolute() {
 }
 
 void inc_mem_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
+	word addr = absolutex_addr(rmem_w(PC + 1), false);
 	inc_mem(addr, 7, 3);
 }
 
@@ -725,7 +721,7 @@ void dec_mem_absolute() {
 }
 
 void dec_mem_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
+	word addr = absolutex_addr(rmem_w(PC + 1), false);
 	dec_mem(addr, 7, 3);
 }
 
@@ -761,7 +757,7 @@ void lda_absolute() {
 }
 
 void lda_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
+	word addr = absolutex_addr(rmem_w(PC + 1), true);
 	load_register(&A, rmem_b(addr), 4, 3, "LDA #$%02X\t");
 	// TODO +1 if page crossed
 }
@@ -818,8 +814,7 @@ void ldy_absolute() {
 }
 
 void ldy_absolute_x() {
-	load_register(&Y, absolutex_param(), 4, 3, "\tLDY #$%02X\t");
-	// TODO +1 if page crossed
+	load_register(&Y, absolutex_param(true), 4, 3, "\tLDY #$%02X\t");
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -850,7 +845,7 @@ void sta_absolute() {
 }
 
 void sta_absolute_x() {
-	store_register(A, absolutex_addr(rmem_w(PC + 1)), 5, 3, "STA $%02X = %02X");
+	store_register(A, absolutex_addr(rmem_w(PC + 1), false), 5, 3, "STA $%02X = %02X");
 }
 
 void sta_absolute_y() {
@@ -946,8 +941,7 @@ void cmp_absolute() {
 }
 
 void cmp_absolute_x() {
-	compare_register(&A, absolutex_param(), 4, 3, "\tCMP #$%02X\t");
-	//TODO +1 if page crossed
+	compare_register(&A, absolutex_param(true), 4, 3, "\tCMP #$%02X\t");
 }
 
 void cmp_absolute_y() {
@@ -1043,7 +1037,7 @@ void lsr_absolute() {
 
 
 void lsr_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
+	word addr = absolutex_addr(rmem_w(PC + 1), false);
 	byte data = rmem_b(addr);
 	lsr(&data, 7, 3);
 	wmem_w(addr, data);
@@ -1097,7 +1091,7 @@ void rol_absolute() {
 }
 
 void rol_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
+	word addr = absolutex_addr(rmem_w(PC + 1), false);
 	byte data = rmem_b(addr);
 	rol(&data, 7, 3);
 	wmem_w(addr, data);
@@ -1154,7 +1148,7 @@ void ror_absolute() {
 
 
 void ror_absolute_x() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
+	word addr = absolutex_addr(rmem_w(PC + 1), false);
 	byte data = rmem_b(addr);
 	ror(&data, 7, 3);
 	wmem_w(addr, data);
@@ -1199,8 +1193,7 @@ void eor_absolute() {
 }
 
 void eor_absolute_x() {
-	eor(absolutex_param(), 4, 3);
-	//TODO +1 if page crossed
+	eor(absolutex_param(true), 4, 3);
 }
 
 void eor_absolute_y() {
@@ -1339,7 +1332,7 @@ void dcm_absolute() {
 }
 
 void dcm_absolute_x() {
-	dcm(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+	dcm(absolutex_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void dcm_absolute_y() {
@@ -1388,7 +1381,7 @@ void ins_absolute() {
 }
 
 void ins_absolute_x() {
-	ins(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+	ins(absolutex_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void ins_absolute_y() {
@@ -1441,7 +1434,7 @@ void aso_absolute() {
 }
 
 void aso_absolute_x() {
-	aso(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+	aso(absolutex_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void aso_absolute_y() {
@@ -1498,7 +1491,7 @@ void rla_absolute() {
 }
 
 void rla_absolute_x() {
-	rla(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+	rla(absolutex_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void rla_absolute_y() {
@@ -1543,7 +1536,7 @@ void lse_absolute() {
 }
 
 void lse_absolute_x() {
-	lse(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+	lse(absolutex_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void lse_absolute_y() {
@@ -1591,7 +1584,7 @@ void rra_absolute() {
 }
 
 void rra_absolute_x() {
-	rra(absolutex_addr(rmem_w(PC + 1)), 7, 3);
+	rra(absolutex_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void rra_absolute_y() {
@@ -1929,8 +1922,8 @@ byte absolute_param() {
 	return rmem_b(addr);
 }
 
-byte absolutex_param() {
-	word addr = absolutex_addr(rmem_w(PC + 1));
+byte absolutex_param(bool check_page_crossed) {
+	word addr = absolutex_addr(rmem_w(PC + 1), check_page_crossed);
 	return rmem_b(addr);
 }
 
@@ -1962,38 +1955,4 @@ word indirect_param() {
 	}
 
 	return targetAddr;
-}
-
-void log_instruction(int num_params, const char *mnemonic, ...) {
-	log_debug("%02X %02X ", PC, currentOpcode);
-	for (uint i = 1; i <= num_params; i++) {
-		log_debug("%02X ", rmem_b(PC + i));
-	}
-	log_debug("\t");
-	if (num_params == 0) {
-		log_debug("\t");
-	}
-	va_list args;
-	va_start(args, mnemonic);
-	vlog(mnemonic, ConsoleDebug, FileDebug, args);
-	va_end(args);
-	log_debug("\t\t\t");
-	log_debug("A:%02X X:%02X Y:%02X ", A, X, Y);
-
-	//Now for the status register. A bit of dirty code but the logs will be much clearer
-	log_debug("P:");
-	log_debug(bit_test(P, flagN) ? "N" : "n");
-	log_debug(bit_test(P, flagV) ? "V" : "c_vram");
-	log_debug(bit_test(P, flagUnused) ? "U" : "u");
-	log_debug(bit_test(P, flagB) ? "B" : "b");
-	log_debug(bit_test(P, flagD) ? "D" : "d");
-	log_debug(bit_test(P, flagI) ? "I" : "i");
-	log_debug(bit_test(P, flagZ) ? "Z" : "z");
-	log_debug(bit_test(P, flagC) ? "C" : "c");
-
-	log_debug(" ");
-
-	//And the rest of the registers
-	log_debug("SP:%02X CYC:%d", SP, cpu_cyclesThisSec);
-	log_debug("\n");
 }

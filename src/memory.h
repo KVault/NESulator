@@ -136,7 +136,7 @@ word absolute_addr(word w);
  * The address to be accessed by an instruction using X register indexed absolute addressing
  * is computed by taking the 16 bit address from the instruction and added the contents of the X register.
  */
-word absolutex_addr(word w);
+word absolutex_addr(word w, bool check_page_cross);
 
 /**Y
  * The address to be accessed by an instruction using Y register indexed absolute addressing

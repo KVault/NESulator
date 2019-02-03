@@ -39,6 +39,16 @@ void bit_clear(byte *b, byte bitPos);
 void bit_val(byte *b, byte bitPos, int value);
 
 /**
+ * Check if a two memory addresses are one page apart.
+ * @param addr1
+ * @param addr2
+ * @return
+ */
+bool page_crossed(word addr1, word addr2);
+
+void log_instruction(int num_params, const char *mnemonic, ...);
+
+/**
  * The Colour palette for the NES. The interpretation of the colors may change, but not its positions on it
  *
  * This might seem a bit random but it can be found here (https://wiki.nesdev.com/w/images/5/59/Savtool-swatches.png)

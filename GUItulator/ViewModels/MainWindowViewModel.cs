@@ -51,6 +51,7 @@ namespace GUItulator.ViewModels
         }
 
         public void HardcodedRun() => StartEmulation(@"C:\dev\NESulator\NESulator\rom\donkey_kong.nes");
+        public void Nestest() => StartEmulation(@"C:\dev\NESulator\NESulator\rom\nestest.nes");
         public void OpenPatterntable() => new PatterntableWindow().Show();
         public void OpenNametable() => new NametableWindow().Show();
         public void OpenHexEditor() => new HexEditorWindow().Show();

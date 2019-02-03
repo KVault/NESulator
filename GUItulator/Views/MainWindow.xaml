@@ -10,6 +10,7 @@
           <MenuItem Header="File">
               <MenuItem Header="Open" Command="{Binding OpenROM}"></MenuItem>
               <MenuItem Header="Hardcoded run" Command="{Binding HardcodedRun}" HotKey="Ctrl+F"></MenuItem>
+              <MenuItem Header="Nestest" Command="{Binding Nestest}" HotKey="Ctrl+F"></MenuItem>
           </MenuItem>
           <MenuItem Header="Debug">
               <MenuItem Header="Pattern table" HotKey="Ctrl+P" Command="{Binding OpenPatterntable}"></MenuItem>
