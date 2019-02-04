@@ -152,22 +152,7 @@ void nmi();
 /**
  * The generic nop
  */
-void nop(int cycles, int pcIncrease);
-
-/**
- * Valid NOP opcode
- */
-void nop1();
-
-/**
- * Invalid NOP opcode
- */
-void nop2();
-
-/**
- * Invalid NOP opcode
- */
-void nop3();
+void nop();
 
 //////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////ORA REGION////////////////////////////////////////////
