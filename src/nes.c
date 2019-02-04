@@ -38,12 +38,11 @@ int start_emulation(){
 void configure(){
 	//LOGS
 	set_console_log_level(ConsoleDisabled);
-	set_file_log_level(FileDebug);
+	set_file_log_level(FileError);
 	set_clear_log_file();
 	set_log_path("../../logs/NESulator.log");
 
-	//cpu_power_up(1789773);
-	cpu_power_up(17897);
+	cpu_power_up(1789773);
 	ppu_power_up(3);//TODO this powerup has to wait about 20k cycles. PPU stuff
 
 	//If a ROM was already loaded, do it again, powering up the CPU zeroes the memory
@@ -54,10 +53,6 @@ void configure(){
 
 void run() {
 	is_running = 1;
-
-
-	//TODO remove this, this is purely for Nestest automatic test
-	PC = 0xC000;
 
 	//Main loop. Keeps the emulator running forever more. In the future we'll be able to
 	//control this with a debugger, or an UI. But for now, it simply runs forever

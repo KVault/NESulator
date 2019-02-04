@@ -110,7 +110,7 @@ word indirectx_addr(byte b);
  *  To calculate the target address, the CPU will first fetch the address stored at zero page location $XX.
  *  That address will be added to register Y to get the final target address
  */
-word indirecty_addr(byte b);
+word indirecty_addr(byte b, bool check_page_cross);
 
 /**
  * This works just like absolute indexed, but the target address is limited to the first 0xFF bytes.
@@ -142,7 +142,7 @@ word absolutex_addr(word w, bool check_page_cross);
  * The address to be accessed by an instruction using Y register indexed absolute addressing
  * is computed by taking the 16 bit address from the instruction and added the contents of the Y register.
  */
-word absolutey_addr(word w);
+word absolutey_addr(word w, bool check_page_cross) ;
 
 
 #endif //NESULATOR_MEMORY_H

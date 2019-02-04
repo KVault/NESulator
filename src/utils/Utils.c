@@ -27,7 +27,6 @@ bool page_crossed(word addr1, word addr2){
 
 
 void log_instruction(int num_params, const char *mnemonic, ...) {
-/**
 	log_debug("%02X %02X ", PC, currentOpcode);
 	for (uint i = 1; i <= num_params; i++) {
 		log_debug("%02X ", rmem_b(PC + i));
@@ -59,8 +58,7 @@ void log_instruction(int num_params, const char *mnemonic, ...) {
 	//And the rest of the registers
 	log_debug("SP:%02X CPU_CYC:%d", SP, cpu_cyclesThisSec);
 	log_debug(" ");
-*/
-	log_debug("CYC:%3d", current_cycle_scanline);
+	log_debug("PPU_CYC:%3d", current_cycle_scanline);
 	log_debug("\n");
 }
 

@@ -71,7 +71,12 @@ void nop() {
 		PC += 2;
 		cpu_cyclesThisSec += 3;
 	break;
-		//case 0x14: case 0x34 case 0x54 dd, $74 dd, $D4 dd, $F4 dd; 4 cycles)
+	case 0x14: case 0x34: case 0x54:  case 0x74: case 0xD4: case 0xF4:
+		PC += 2;
+		cpu_cyclesThisSec += 4;
+	break;
+
+
 	default:
 		log_error("Invalid Opcode: %02X", rmem_b(PC));
 	break;
@@ -578,7 +583,7 @@ void try_branch(byte flag, int req_flag_val, const char *mnemonic) {
 	PC += 2;
 	if (bit_test(P, flag) == req_flag_val) {
 		if(page_crossed(PC + value, PC)){
-			cpu_cyclesThisSec+=2;
+			cpu_cyclesThisSec++;
 		}
 		PC += value;
 		cpu_cyclesThisSec++;
@@ -854,7 +859,7 @@ void sta_absolute_x() {
 }
 
 void sta_absolute_y() {
-	store_register(A, absolutey_addr(rmem_w(PC + 1)), 5, 3, "STA $%02X = %02X");
+	store_register(A, absolutey_addr(rmem_w(PC + 1), false), 5, 3, "STA $%02X = %02X");
 }
 
 void sta_indirect_x() {
@@ -862,7 +867,7 @@ void sta_indirect_x() {
 }
 
 void sta_indirect_y() {
-	store_register(A, indirecty_addr(rmem_b(PC + 1)), 6, 2, "\tSTA $%02X = %02X");
+	store_register(A, indirecty_addr(rmem_b(PC + 1), false), 6, 2, "\tSTA $%02X = %02X");
 }
 
 void stx_zpage() {
@@ -1335,7 +1340,7 @@ void dcm_absolute_x() {
 }
 
 void dcm_absolute_y() {
-	dcm(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+	dcm(absolutey_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void dcm_zpage() {
@@ -1351,7 +1356,7 @@ void dcm_indirect_x() {
 }
 
 void dcm_indirect_y() {
-	dcm(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+	dcm(indirecty_addr(rmem_b(PC + 1), false), 8, 2);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1384,7 +1389,7 @@ void ins_absolute_x() {
 }
 
 void ins_absolute_y() {
-	ins(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+	ins(absolutey_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void ins_zpage() {
@@ -1400,7 +1405,7 @@ void ins_indirect_x() {
 }
 
 void ins_indirect_y() {
-	ins(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+	ins(indirecty_addr(rmem_b(PC + 1), false), 8, 2);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1437,7 +1442,7 @@ void aso_absolute_x() {
 }
 
 void aso_absolute_y() {
-	aso(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+	aso(absolutey_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void aso_zpage() {
@@ -1453,7 +1458,7 @@ void aso_indirect_x() {
 }
 
 void aso_indirect_y() {
-	aso(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+	aso(indirecty_addr(rmem_b(PC + 1), false), 8, 2);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1494,7 +1499,7 @@ void rla_absolute_x() {
 }
 
 void rla_absolute_y() {
-	rla(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+	rla(absolutey_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void rla_zpage() {
@@ -1510,7 +1515,7 @@ void rla_indirect_x() {
 }
 
 void rla_indirect_y() {
-	rla(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+	rla(indirecty_addr(rmem_b(PC + 1), false), 8, 2);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1539,7 +1544,7 @@ void lse_absolute_x() {
 }
 
 void lse_absolute_y() {
-	lse(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+	lse(absolutey_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void lse_zpage() {
@@ -1555,7 +1560,7 @@ void lse_indirect_x() {
 }
 
 void lse_indirect_y() {
-	lse(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+	lse(indirecty_addr(rmem_b(PC + 1), false), 8, 2);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1587,7 +1592,7 @@ void rra_absolute_x() {
 }
 
 void rra_absolute_y() {
-	rra(absolutey_addr(rmem_w(PC + 1)), 7, 3);
+	rra(absolutey_addr(rmem_w(PC + 1), false), 7, 3);
 }
 
 void rra_zpage() {
@@ -1603,7 +1608,7 @@ void rra_indirect_x() {
 }
 
 void rra_indirect_y() {
-	rra(indirecty_addr(rmem_b(PC + 1)), 8, 2);
+	rra(indirecty_addr(rmem_b(PC + 1), false), 8, 2);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1846,7 +1851,7 @@ gen_opcode_func opcodeFunctions[OPCODE_COUNT] = {
 		&cld,               //$D8   CLD           CLear Decimal flag                1       2
 		&cmp_absolute_y,    //$D9   CMP $440&invalidY   Compare                          3       4+
 		&nop,          //$DA       NOP
-		&dcm_absolute_y,//$DF       DCM $4400     Decrement and CoMpare
+		&dcm_absolute_y,//$DB       DCM $4400     Decrement and CoMpare
 		&nop,          //$DC       NOP
 		&cmp_absolute_x,    //$DD   CMP $440&invalidX   Compare                          3       4+
 		&dec_mem_absolute_x,//$DE   DEC $440&invalidX   DEcrement Memory                 3       7
@@ -1927,7 +1932,7 @@ byte absolutex_param(bool check_page_crossed) {
 }
 
 byte absolutey_param() {
-	word addr = absolutey_addr(rmem_w(PC + 1));
+	word addr = absolutey_addr(rmem_w(PC + 1), true);
 	return rmem_b(addr);
 }
 
@@ -1937,7 +1942,7 @@ byte indirectx_param() {
 }
 
 byte indirecty_param() {
-	word addr = indirecty_addr(rmem_b(PC + 1));
+	word addr = indirecty_addr(rmem_b(PC + 1), true);
 	return rmem_b(addr);
 }
 

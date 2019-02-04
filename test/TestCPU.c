@@ -80,7 +80,7 @@ void test_ORA() {
 	word param = 0x6959;
 	wmem_w(PC + 1, 0x6959);
 	Y = 0x10;
-	addr = absolutey_addr(param);
+	addr = absolutey_addr(param, false);
 	wmem_w(addr, 0x0058);
 	A = 0x80;
 	cpu_instruction();
@@ -648,7 +648,7 @@ void test_STOREREGISTER() {
 	wmem_b(PC, 0x91);
 	wmem_b(PC + 1, 0x69);
 	Y = 0x42;
-	word addr = indirecty_addr(0x69);
+	word addr = indirecty_addr(0x69, false);
 	A = 0x23;
 	cpu_instruction();
 	assert(rmem_b(addr) == A);

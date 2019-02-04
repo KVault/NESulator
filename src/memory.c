@@ -286,7 +286,7 @@ word indirectx_addr(byte b) {
 	return to_mem_addr(memContent);
 }
 
-word indirecty_addr(byte b) {
+word indirecty_addr(byte b, bool check_page_cross) {
 	byte memContent[2] = {0};
 
 	if (b == 0xFF) {
@@ -298,8 +298,10 @@ word indirecty_addr(byte b) {
 
 	word addr = to_mem_addr(memContent);
 
-	//Check if a pagged has been crossed. If it has, then increment a cycle
-	cpu_cyclesThisSec += page_crossed(addr + Y, addr);
+	if(check_page_cross){
+		//Check if a pagged has been crossed. If it has, then increment a cycle
+		cpu_cyclesThisSec += page_crossed(addr + Y, addr);
+	}
 
 	return addr + Y;
 }
@@ -334,9 +336,11 @@ word absolutex_addr(word w, bool check_page_cross) {
 	return w;
 }
 
-word absolutey_addr(word w) {
-	//Check if a pagged has been crossed. If it has, then increment a cycle
-	cpu_cyclesThisSec += page_crossed(w + Y, w);
+word absolutey_addr(word w, bool check_page_cross) {
+	if(check_page_cross){
+		//Check if a pagged has been crossed. If it has, then increment a cycle
+		cpu_cyclesThisSec += page_crossed(w + Y, w);
+	}
 	w += Y;
 	return w;
 }

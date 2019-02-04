@@ -106,7 +106,7 @@ void testIndirectYAddr() {
 	zero_ram();
 	wmem_w(0x86, 0x4028);
 	Y = 0x10;
-	word addr = indirecty_addr(0x86);
+	word addr = indirecty_addr(0x86, false);
 	assert(addr == 0x4038);
 	printf("Test IndirectYAddr passed!\n");
 }
@@ -153,7 +153,7 @@ void testAbsoluteAddr() {
 	zero_ram();
 	word param3 = 0x6949;
 	Y = 0x20;
-	addr = absolutey_addr(param3);
+	addr = absolutey_addr(param3, false);
 	assert(addr == 0x6969);
 
 	printf("Test AbsoluteAddr passed! \n");
