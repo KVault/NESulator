@@ -150,8 +150,8 @@ void write_PPUADDR(byte value) {
          * w:                  = 1
 	 	*/
 	 	word val = (word) ((value & 0b00111111) << 8);// extract FEDCBA
-		t_vram = (word) ((t_vram & ~0b011111100000000) | (val & 0b011111100000000));
-		//t_vram &= 0b0111111111111111;// for the X
+	 	t_vram = mask_word(t_vram, 0b011111100000000, val);
+		t_vram &= 0b0111111111111111;// for the X
 		w = true;
 	} else {
 		/**
@@ -177,12 +177,10 @@ byte read_PPUDATA() {
 
 void write_PPUCTRL(byte value) {
 	nmi_output = bit_test(value, 7);
-	/** from here:
-	 * https://stackoverflow.com/questions/4439078/how-do-you-set-only-certain-bits-of-a-byte-in-c-without-affecting-the-rest
-	 * value = (value & ~mask) | (newvalue & mask);
-	 */
-	word t_val = (word) (value & 0x0003) << 8;
-	t_vram = (word) ((t_val & ~0b0000110000000000) | (t_val & 0b0000110000000000));
+
+	// t: ... AB.. .... .... = value: .... ..AB
+	word val = (word) (value & 0x03) << 8;
+	t_vram = mask_word(t_vram, 0b0001100000000000, val);
 }
 
 /**
@@ -198,18 +196,18 @@ void write_PPUCTRL(byte value) {
 void write_PPUSCROLL(byte d){
 	static word val;
 	if(!w){
-		val = (d >> 3) << 8; // extract HGFED... //TODO is this right?
-		t_vram = (word) ((t_vram & ~0x001F) | (val & 0x0001F));
+		val = (word) (d & 0xF8); // extract HGFED...
+		t_vram = mask_word(t_vram, 0x0001F, val);
 		x = (byte) (d & 0x07);
 		w = true;
 	}else{
 		//We have to do it in two steps. One for CBA and the other one for HGFED
 		w = false;
-		val = (word) (d & 0x7) << 8;// extract CBA //TODO is this right?
-		t_vram = (word) ((t_vram & ~0x7000) | (val & 0x7000));// CBA
+		val = (word) (d & 0x7) << 8;// extract CBA
+		t_vram = mask_word(t_vram, 0x7000, val);
 
 		val = d >> 3;// extract HGFED
-		t_vram = (word) ((t_vram & 0x001F) | (val & 0x0001F));// HGFED
+		t_vram = mask_word(t_vram, 0x0001F, val);
 	}
 }
 
@@ -380,7 +378,8 @@ void step(scanline_type s_type){
 				render_pixel();
 				//Increment horizontal position
 				word val = (word) (t_vram & 0b000010000011111); // extract ....F.. ...EDCBA
-				//c_vram = (word) ((c_vram & ~0x041F) | (val & 0x041F));
+				c_vram = mask_word(c_vram, 0x041F, val);
+				store_tile_data();
 			}
 
 				break;
@@ -388,7 +387,7 @@ void step(scanline_type s_type){
 				//increment vertical position
 				if(s_type == Pre){
 					word val = (word) (t_vram & 0b111101111100000); // extract IHGF.ED CBA.....
-					//c_vram = (word) ((c_vram & ~0b111101111100000) | (val & 0b111101111100000));
+					c_vram = mask_word(c_vram, 0b111101111100000, val);
 				}
 				break;
 

@@ -25,6 +25,14 @@ bool page_crossed(word addr1, word addr2){
 	return (addr1 & 0xFF00) != (addr2 & 0xFF00);
 }
 
+byte mask_byte(byte original_value, byte mask, byte mask_value){
+	return (original_value & ~mask) | (mask_value & mask);
+}
+
+word mask_word(word original_value, word mask, word mask_value){
+	return (original_value & ~mask) | (mask_value & mask);
+}
+
 
 void log_instruction(int num_params, const char *mnemonic, ...) {
 	log_debug("%02X %02X ", PC, currentOpcode);

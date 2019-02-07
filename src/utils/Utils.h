@@ -48,6 +48,18 @@ bool page_crossed(word addr1, word addr2);
 
 void log_instruction(int num_params, const char *mnemonic, ...);
 
+/** from here:
+ * https://stackoverflow.com/questions/4439078/how-do-you-set-only-certain-bits-of-a-byte-in-c-without-affecting-the-rest
+ * value = (value & ~mask) | (newvalue & mask);
+ */
+byte mask_byte(byte original_value, byte mask, byte mask_value);
+
+/** from here:
+ * https://stackoverflow.com/questions/4439078/how-do-you-set-only-certain-bits-of-a-byte-in-c-without-affecting-the-rest
+ * value = (value & ~mask) | (newvalue & mask);
+ */
+word mask_word(word original_value, word mask, word mask_value);
+
 /**
  * The Colour palette for the NES. The interpretation of the colors may change, but not its positions on it
  *
