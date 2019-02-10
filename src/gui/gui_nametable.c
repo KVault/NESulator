@@ -5,7 +5,7 @@
 /**
  * Holds a pointer to each nametable back buffer
  */
-uint *nametables[4];
+static uint *nametables[4];
 
 void render_tile(NametableIndex nametableIndex, tile *tile, uint row_id, uint column_id) {
 	for (int i = 0; i < TILE_WIDTH; ++i) {

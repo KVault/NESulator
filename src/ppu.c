@@ -11,6 +11,35 @@ uint current_bg_data[TILE_WIDTH * TILE_HEIGHT];
 word BACKGROUND_PALETTES[4] = {0x3F01, 0x3F05, 0x3F09, 0x3F0D};
 word UNIVERSAL_BACKGROUND = 0x3F00;
 
+
+
+word c_vram; /** Current vram address */
+word t_vram; /** Temporary vram address aka address of the top left onscreen tile */
+byte x; /** Fine X scroll, 3 bits */
+bool w; /** Latch, 1 bit */
+uint ppu_running;
+int ppu_cycle_per_cpu_cycle;  //Speed of the PPU in Hz. Used to slow down the emulation to match the NES's clock speed
+int current_scanline = 0;
+int current_cycle_scanline = 0;
+int warmup_cycles_count;
+
+//PPU latches and flags
+bool render_enabled;
+bool in_vblank;
+bool nmi_occurred;
+bool nmi_output;
+bool showBackground = true;
+bool showSprites = true;
+bool frameOdd;
+
+//These are the latches
+byte nt;
+byte at;
+byte low_bg;
+byte high_bg;
+
+
+
 void encode_as_tiles(byte *mem_addr, uint number_tiles, tile *tiles) {
 	//Each tile is defined by 16 bytes
 	for (int i, tile_count = i = 0; tile_count < number_tiles; i += 16, ++tile_count) {
@@ -108,6 +137,7 @@ colour *get_background_palette(byte attribute) {
 
 void ppu_power_up(int clock_speed) {
 	ppu_cycle_per_cpu_cycle = clock_speed;
+	warmup_cycles_count = 29658/3;//Because the big number is CPU clock cycles, not PPU
 	wmem_b(PPUCTRL, 0);
 	wmem_b(PPUMASK, 0);
 	wmem_b(PPUSTATUS, 0xA0);
@@ -117,9 +147,17 @@ void ppu_power_up(int clock_speed) {
 	wmem_b(PPUDATA, 0);
 	wmem_b(OAMDATA, 0); // Undefined default value
 	wmem_b(OAMDMA, 0); // Undefined default value
+	c_vram = t_vram = 0;
+	current_cycle_scanline = current_scanline = 0;
+
 }
 
 void ppu_cycle() {
+	if(warmup_cycles_count > 0){
+		--warmup_cycles_count;
+		//return;
+	}
+
 	switch (current_scanline){
 		case 0 ... 239:	step(Visible);	break;
 		case 240: step(Post); break;
@@ -289,10 +327,10 @@ void increment_horizontally(){
 	}
 }
 
+// increment vert(c_vram)
 void increment_vertically(){
-	// increment vert(c_vram)
 	// if fine Y < 7
-	if(c_vram & 0x7000 != 0x7000) {
+	if((c_vram & 0x7000) != 0x7000) {
 		// increment fine Y
 		c_vram += 0x1000;
 	} else {
@@ -332,7 +370,6 @@ void step(scanline_type s_type){
 			case 1:
 				if (s_type == Pre && in_vblank)
 					nmi_occurred = in_vblank = false;
-				break;
 			case 2 ... 255:
 			case 322 ...337:
 				render_pixel();

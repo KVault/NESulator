@@ -6,30 +6,31 @@
 typedef enum bg_byte{low, high} bg_byte;
 typedef enum scanline_type { Visible, NMI, Pre, Post } scanline_type;
 
-word c_vram; /** Current vram address */
-word t_vram; /** Temporary vram address aka address of the top left onscreen tile */
-byte x; /** Fine X scroll, 3 bits */
-bool w; /** Latch, 1 bit */
-uint ppu_running;
-int ppu_cycle_per_cpu_cycle;  //Speed of the PPU in Hz. Used to slow down the emulation to match the NES's clock speed
-static int current_scanline;
-int current_cycle_scanline;
+extern word c_vram; /** Current vram address */
+extern word t_vram; /** Temporary vram address aka address of the top left onscreen tile */
+extern byte x; /** Fine X scroll, 3 bits */
+extern bool w; /** Latch, 1 bit */
+extern uint ppu_running;
+extern int ppu_cycle_per_cpu_cycle;  //Speed of the PPU in Hz. Used to slow down the emulation to match the NES's clock speed
+extern int current_scanline;
+extern int current_cycle_scanline;
+extern int warmup_cycles_count;
 extern uint ppu_back_buffer[];
 
 //PPU latches and flags
-static bool render_enabled;
-static bool in_vblank;
-static bool nmi_occurred;
-static bool nmi_output;
-static bool showBackground = true;
-static bool showSprites = true;
-static bool frameOdd;
+extern bool render_enabled;
+extern bool in_vblank;
+extern bool nmi_occurred;
+extern bool nmi_output;
+extern bool showBackground;
+extern bool showSprites;
+extern bool frameOdd;
 
 //These are the latches
-static byte nt;
-static byte at;
-static byte low_bg;
-static byte high_bg;
+extern byte nt;
+extern byte at;
+extern byte low_bg;
+extern byte high_bg;
 
 //int speed = 0; // the speed of the PPU
 //int scanline_ptr = 0; // in which scanline the PPU is currently. From 0 to 261
