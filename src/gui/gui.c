@@ -51,6 +51,14 @@ EXPORT MemoryDumpInfo gui_ram_dump(){
 	return info;
 }
 
+EXPORT MemoryDumpInfo gui_vram_dump(){
+	MemoryDumpInfo info = {};
+	info.size = VRAM_MEM_SIZE;
+	info.buffer = vram_bank;
+
+	return info;
+}
+
 EXPORT void gui_cpu_speed(int speed_hertz){
 	cpu_set_speed(speed_hertz);
 }

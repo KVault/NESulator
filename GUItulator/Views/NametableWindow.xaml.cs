@@ -34,7 +34,7 @@ namespace GUItulator.Views
                                     {
                                         nametables[i].InvalidateVisual();
                                     }
-                                }).Wait(),60);
+                                }).Wait(),20);
             viewModel.Start();
             DataContext = viewModel;
         }

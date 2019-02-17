@@ -21,7 +21,7 @@ namespace GUItulator.ViewModels
 
         protected override void Update()
         {
-            var dump = CWrapper.RAMDump().ToShortArray();
+            var dump = CWrapper.VRAMDump().ToShortArray();
             PopulateByteRows(ref dump);
         }
 
@@ -40,7 +40,7 @@ namespace GUItulator.ViewModels
                 var row = new HexEditorRowModel(counter.ToString("X"));
                 for (var j = 0; j < RowSize; j++)
                 {
-                    row.WordCodes[j] = buffer[(i * RowSize) + j].ToString("X");
+                    row.ByteValues[j] = buffer[(i * RowSize) + j].ToString("X");
                     row.CharValues[j] = buffer[(i * RowSize) + j].ToString("");
                 }
 
@@ -53,13 +53,13 @@ namespace GUItulator.ViewModels
     public class HexEditorRowModel
     {
         public string Label {get; set;}
-        public string[] WordCodes {get; set;}
+        public string[] ByteValues {get; set;}
         public string[] CharValues {get; set;}
 
         public HexEditorRowModel(string label)
         {
             Label = label;
-            WordCodes = new string[HexEditorWindowViewModel.RowSize];
+            ByteValues = new string[HexEditorWindowViewModel.RowSize];
             CharValues = new string[HexEditorWindowViewModel.RowSize];
         }
     }

@@ -62,8 +62,14 @@ void run() {
 		if(num_cycle % 10000){
 			match_cpu_speed();
 		}
-		for (int i = 0; i < ppu_cycle_per_cpu_cycle * num_cycle; ++i) {
-			ppu_cycle();
+		int cycles_to_exe = ppu_cycle_per_cpu_cycle * num_cycle;
+
+		/**
+		 * Do it with a while instead of a for. This is because if there's an odd frame, the PPU will do an extra cycle
+		 * So a for wouldn't take that into account. This will
+		 */
+		while(cycles_to_exe > 0){
+			cycles_to_exe -= ppu_cycle();
 		}
 	}
 }

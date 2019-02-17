@@ -11,25 +11,19 @@ uint current_bg_data[TILE_WIDTH * TILE_HEIGHT];
 word BACKGROUND_PALETTES[4] = {0x3F01, 0x3F05, 0x3F09, 0x3F0D};
 word UNIVERSAL_BACKGROUND = 0x3F00;
 
-
-
 word c_vram; /** Current vram address */
 word t_vram; /** Temporary vram address aka address of the top left onscreen tile */
 byte x; /** Fine X scroll, 3 bits */
 bool w; /** Latch, 1 bit */
-uint ppu_running;
 int ppu_cycle_per_cpu_cycle;  //Speed of the PPU in Hz. Used to slow down the emulation to match the NES's clock speed
 int current_scanline = 0;
 int current_cycle_scanline = 0;
 int warmup_cycles_count;
 
 //PPU latches and flags
-bool render_enabled;
 bool in_vblank;
 bool nmi_occurred;
 bool nmi_output;
-bool showBackground = true;
-bool showSprites = true;
 bool frameOdd;
 
 //These are the latches
@@ -37,8 +31,6 @@ byte nt;
 byte at;
 byte low_bg;
 byte high_bg;
-
-
 
 void encode_as_tiles(byte *mem_addr, uint number_tiles, tile *tiles) {
 	//Each tile is defined by 16 bytes
@@ -150,31 +142,6 @@ void ppu_power_up(int clock_speed) {
 	c_vram = t_vram = 0;
 	current_cycle_scanline = current_scanline = 0;
 
-}
-
-void ppu_cycle() {
-	if(warmup_cycles_count > 0){
-		--warmup_cycles_count;
-		//return;
-	}
-
-	switch (current_scanline){
-		case 0 ... 239:	step(Visible);	break;
-		case 240: step(Post); break;
-		case 241: step(NMI); break;
-		case 261: step(Pre); break;
-		default:break;
-	}
-	// Update dot and scanline counters:
-	if (++current_cycle_scanline > 340)
-	{
-		current_cycle_scanline %= 341;
-		if (++current_scanline> 261)
-		{
-			current_scanline= 0;
-			frameOdd ^= 1;
-		}
-	}
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -311,7 +278,7 @@ void store_tile_data(){
 void render_pixel(){
 	static uint colour;
 	if(current_scanline < 240) {
-		colour = current_bg_data[TILE_WIDTH * (current_scanline % TILE_WIDTH) + current_cycle_scanline % TILE_WIDTH];
+		colour = current_bg_data[(TILE_WIDTH * (current_scanline % TILE_WIDTH)) + (current_cycle_scanline % TILE_WIDTH)];
 		ppu_back_buffer[NES_PPU_TEXTURE_WIDTH * current_scanline + current_cycle_scanline] = colour;
 	}
 }
@@ -356,9 +323,48 @@ void increment_vertically(){
 }
 
 
-void step(scanline_type s_type){
-	static word addr;// Temp addr that everything will read from (from the PPU cycle that is ofc)
+int ppu_cycle() {
+	static int prev_ppu_cycles;
+	static int elapsed_ppu_cycles;
+	prev_ppu_cycles = current_cycle_scanline;
 
+	if(warmup_cycles_count > 0){
+		--warmup_cycles_count;
+		//return;
+	}
+
+	switch (current_scanline){
+		case 0 ... 239:	step(Visible);	break;
+		case 240: step(Post); break;
+		case 241: step(NMI); break;
+		case 261: step(Pre); break;
+		default:break;
+	}
+
+	elapsed_ppu_cycles = (current_cycle_scanline + 1) - prev_ppu_cycles;
+
+	// Update dot and scanline counters:
+	if (++current_cycle_scanline > 340)
+	{
+		//printf("Scanline: %i, C_VRAM: %04X \n", current_scanline, c_vram);
+		current_cycle_scanline %= 341;
+		if (++current_scanline > 261)
+		{
+			current_scanline= 0;
+			frameOdd ^= 1;
+		}
+	}
+
+	return elapsed_ppu_cycles;
+}
+
+
+
+void step(scanline_type s_type){
+	if(current_scanline  == 222){
+		printf("Cycle: %i C_VRAM: %02X \n", current_cycle_scanline, c_vram);
+	}
+	static word addr;// Temp addr that everything will read from (from the PPU cycle that is ofc)
 	/** For the Background */
 	if(s_type == NMI && !in_vblank){
 		nmi_occurred = in_vblank = true;
@@ -370,13 +376,13 @@ void step(scanline_type s_type){
 			case 1:
 				if (s_type == Pre && in_vblank)
 					nmi_occurred = in_vblank = false;
-			case 2 ... 255:
-			case 322 ...337:
+			case 2 ... 256:
+			case 322 ...336:
 				render_pixel();
 				//The pattern for the background repeats every 8 cycles. So doing the mod will work just fine :D
 				switch (current_cycle_scanline % 8) {
 					// For the Nametable
-					case 1:	addr = nt_byte(); store_tile_data(); break;
+					case 1:	addr = nt_byte(); break;
 					case 2: nt = rmem_b_vram(addr); break;
 
 					// For the Attribute Table
@@ -396,18 +402,18 @@ void step(scanline_type s_type){
 						break;
 					case 0: // Store tile data
 						high_bg = rmem_b_vram(addr);
-						increment_horizontally();
+						store_tile_data();
+
+						if(current_cycle_scanline == 256){
+							increment_vertically();
+						}else{
+							increment_horizontally();
+						}
+
 						break;
 					default:
 						break;
 				}
-				break;
-
-			case 256:
-				render_pixel();
-				increment_vertically();
-				high_bg = rmem_b_vram(addr);
-				//Update vertical
 				break;
 
 			case 257:
@@ -423,8 +429,8 @@ void step(scanline_type s_type){
 			case 280 ... 304:
 				//increment vertical position
 				if(s_type == Pre){
-					word val = (word) (t_vram & 0b111101111100000); // extract IHGF.ED CBA.....
-					c_vram = mask_word(c_vram, 0b111101111100000, val);
+					word val = (word) (t_vram & 0x7BE0); // extract IHGF.ED CBA.....
+					c_vram = mask_word(c_vram, 0x7BE0, val);
 				}
 				break;
 

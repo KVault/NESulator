@@ -17,25 +17,6 @@ extern int current_cycle_scanline;
 extern int warmup_cycles_count;
 extern uint ppu_back_buffer[];
 
-//PPU latches and flags
-extern bool render_enabled;
-extern bool in_vblank;
-extern bool nmi_occurred;
-extern bool nmi_output;
-extern bool showBackground;
-extern bool showSprites;
-extern bool frameOdd;
-
-//These are the latches
-extern byte nt;
-extern byte at;
-extern byte low_bg;
-extern byte high_bg;
-
-//int speed = 0; // the speed of the PPU
-//int scanline_ptr = 0; // in which scanline the PPU is currently. From 0 to 261
-//int cycle_ptr = 0; // the cycle within the scanline. From 0 to 340
-
 #define PPUCTRL 0x2000
 #define PPUMASK 0x2001
 #define PPUSTATUS 0x2002
@@ -107,7 +88,7 @@ colour *get_background_palette(byte attribute);
  * Executes an instruction on the PPU.
  * Still to be defined what it means and what it needs to be happen on each cycle
  */
-void ppu_cycle();
+int ppu_cycle();
 
 void ppu_power_up(int clock_speed);
 

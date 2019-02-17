@@ -65,6 +65,11 @@ EXPORT FrameInfo gui_nametable(NametableIndex index);
 EXPORT MemoryDumpInfo gui_ram_dump();
 
 /**
+ * @return an array with the contents of the VRAM at that point
+ */
+EXPORT MemoryDumpInfo gui_vram_dump();
+
+/**
  * Performs an internal callback to set the CPU speed
  */
 EXPORT void gui_cpu_speed(int speed_hertz);
