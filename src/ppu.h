@@ -10,11 +10,9 @@ extern word c_vram; /** Current vram address */
 extern word t_vram; /** Temporary vram address aka address of the top left onscreen tile */
 extern byte x; /** Fine X scroll, 3 bits */
 extern bool w; /** Latch, 1 bit */
-extern uint ppu_running;
-extern int ppu_cycle_per_cpu_cycle;  //Speed of the PPU in Hz. Used to slow down the emulation to match the NES's clock speed
 extern int current_scanline;
-extern int current_cycle_scanline;
-extern int warmup_cycles_count;
+extern int ppu_cycle_per_cpu_cycle;
+//extern int warmup_cycles_count;
 extern uint ppu_back_buffer[];
 
 #define PPUCTRL 0x2000
@@ -28,7 +26,8 @@ extern uint ppu_back_buffer[];
 #define OAMDMA 0x4014
 #define PPU_SCANLINES 261
 #define PPU_VISIBLE_SCANLINES 240
-#define PPU_POINT_PER_SCANLINE 340
+#define TILES_PER_SCANLINE 32
+#define PPU_CYCLES_PER_SCANLINE 341
 #define NES_PPU_TEXTURE_HEIGHT 240
 #define NES_PPU_TEXTURE_WIDTH 256
 
@@ -107,7 +106,7 @@ byte read_PPUSTATUS();
 /**
  * Checks for the correct conditions to trigger an nmi. If they are met, then it triggers it
  */
-void try_trigger_nmi();
+void trigger_nmi();
 
 /**
  * Fetches the current Nametable Byte. Returns the addr to find the nt_byte
@@ -124,11 +123,18 @@ void fetch_at_byte();
  */
 void fetch_bg_tile(bg_byte high_low);
 
-void store_tile_data();
+void store_tile_data(word addr, word at_addr);
 
 /**
  * Executes the actual PPU logic for the current cycle.
  */
 void step(scanline_type s_type);
+
+/**
+ * Runs a single PPU Scanline
+ */
+void ppu_scanline();
+
+void ppu_run(int cpu_cycles_since_last_tick);
 
 #endif //NESULATOR_PPU_H

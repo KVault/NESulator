@@ -230,15 +230,10 @@ byte read_PPUSTATUS(){
 ////////////////////////END OF REGISTERS///////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-void try_trigger_nmi() {
-	if (nmi_occurred == true ){//&& nmi_output == true) {
-		//triggering of a NMI can be prevented if bit 7 of PPU Control Register 1 ($2000) is clear.
-		if(bit_test(rmem_b(PPUCTRL), 7) == 1){
-			nmi();
-			nmi_occurred = true;
-		}
-	}else{
-		nmi_occurred = false;
+void trigger_nmi() {
+	//triggering of a NMI can be prevented if bit 7 of PPU Control Register 1 ($2000) is clear.
+	if(bit_test(rmem_b(PPUCTRL), 7) == 1){
+		nmi();
 	}
 }
 
@@ -253,11 +248,10 @@ word at_byte(){
 	return (word) (0x23C0 | (c_vram & 0xC00) | ((c_vram & 0x380) >> 4) | ((c_vram & 0x1C) >> 2));
 }
 
-void store_tile_data(){
+void store_tile_data(word addr, word at_addr){
 	static tile tile;
-	uint bg_addr = (high_bg << 8 ) + low_bg;
-	encode_as_tiles(&vram_bank[bg_addr], 1, &tile);
-	colour *palette = get_background_palette(at);
+	encode_as_tiles(&vram_bank[addr], 1, &tile);
+	colour *palette = get_background_palette(at_addr);
 
 	for (int i = 0; i < TILE_WIDTH; ++i) {
 		for (int j = 0; j < TILE_HEIGHT; ++j) {
@@ -322,6 +316,55 @@ void increment_vertically(){
 	}
 }
 
+void ppu_background_scanline(){
+	for(int i = 0; i < TILES_PER_SCANLINE; ++i){
+		increment_horizontally();
+		word nt = nt_byte();
+		word at = at_byte();
+		int patterntable = bit_test(rmem_b(PPUCTRL), PPUCTRL_B); //0x0000 or 0x1000
+		word addr = rmem_w_vram((uint) ((0x1000 * patterntable) + (nt * 16)));// * 16 because each tile is 16 bytes long
+		store_tile_data(addr, at);
+
+		if(current_scanline < 240){
+			//Use it to render it
+			for(int j = 0; j < TILE_WIDTH; ++j){
+				uint colour = current_bg_data[(TILE_WIDTH * (current_scanline % TILE_WIDTH)) + (j)];
+				ppu_back_buffer[NES_PPU_TEXTURE_WIDTH * current_scanline + ((i*j) + j)] = colour;
+			}
+		}
+	}
+
+	increment_vertically();
+}
+
+
+void ppu_scanline(){
+	ppu_background_scanline();
+	//ppu_sprites_scanline()
+}
+
+void ppu_run(int cpu_cycles_since_last_tick){
+	static int cycles_since_last_scanline;
+	cycles_since_last_scanline -= ppu_cycle_per_cpu_cycle * cpu_cycles_since_last_tick;
+
+	if(cycles_since_last_scanline <= 0){
+		cycles_since_last_scanline = PPU_CYCLES_PER_SCANLINE;
+		//ppu_scanline();
+
+		current_scanline++;
+
+		if(current_scanline == 241){
+			//trigger_nmi();
+			nmi();
+		}
+
+		if(current_scanline == 261){
+			current_scanline= -1;
+		}
+	}
+}
+
+/**
 
 int ppu_cycle() {
 	static int prev_ppu_cycles;
@@ -365,7 +408,6 @@ void step(scanline_type s_type){
 		printf("Cycle: %i C_VRAM: %02X \n", current_cycle_scanline, c_vram);
 	}
 	static word addr;// Temp addr that everything will read from (from the PPU cycle that is ofc)
-	/** For the Background */
 	if(s_type == NMI && !in_vblank){
 		nmi_occurred = in_vblank = true;
 		try_trigger_nmi();
@@ -448,3 +490,4 @@ void step(scanline_type s_type){
 		}
 	}
 }
+ **/
