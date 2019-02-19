@@ -2,7 +2,7 @@
 file(GLOB_RECURSE SRC_FILES "*.h" "*.c")
 
 # Make a DLL with all the files
-add_library(NESulator SHARED ${SRC_FILES})
+add_library(NESulator SHARED ${SRC_FILES} utils/ppu_utils.c utils/ppu_utils.h ppu.c)
 
 # Run this script that calls the dotnet compiler to build the GUItulator
 # add_custom_command(TARGET NESulator PRE_BUILD COMMAND cmd //C ../../scripts/build_guitulator.bat WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})

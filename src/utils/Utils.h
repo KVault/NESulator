@@ -5,11 +5,14 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int uint;
 typedef enum {false, true} bool;
+
+#define UNIVERSAL_BACKGROUND_ADDR 0x3F00
 typedef struct{
 	byte R;
 	byte G;
 	byte B;
 } colour;
+
 
 #define BYTE 1
 #define WORD 2

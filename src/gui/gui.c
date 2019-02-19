@@ -23,8 +23,8 @@ EXPORT void gui_stop_emulation() {
 
 EXPORT FrameInfo gui_frame(){
 	FrameInfo frameInfo = {};
-	frameInfo.width = NES_PPU_TEXTURE_WIDTH;
-	frameInfo.height = NES_PPU_TEXTURE_HEIGHT;
+	frameInfo.width = NES_SCREEN_WIDTH;
+	frameInfo.height = NES_SCREEN_HEIGHT;
 	frameInfo.size = frameInfo.height * frameInfo.width;
 	frameInfo.buffer = ppu_back_buffer;
 
@@ -76,7 +76,7 @@ EXPORT FrameInfo gui_palette_dump(){
 	info.height = 16;
 
 	for(uint i = 0; i < info.size; ++i){
-		int colour_index = rmem_b_vram(i + UNIVERSAL_BACKGROUND);
+		int colour_index = rmem_b_vram(i + UNIVERSAL_BACKGROUND_ADDR);
 		palette_buffer[i] = encode_as_RGBA(COLOUR_PALETTE[colour_index]);
 	}
 

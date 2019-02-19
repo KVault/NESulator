@@ -2,7 +2,7 @@
 #define NESULATOR_GUI_H
 
 #include "../utils/Utils.h"
-#include "../ppu.h"
+#include "../utils/ppu_utils.h"
 
 #define EXPORT __declspec(dllexport)
 
