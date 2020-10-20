@@ -74,16 +74,6 @@ byte read_PPUSTATUS(){
 	return status;
 }
 
-void write_PPUDATA(byte value) {
-	wmem_b_vram(c_vram, value);
-	c_vram += bit_test(rmem_b(PPUCTRL), 2) ? 32 : 1;
-}
-
-byte read_PPUDATA() {
-	c_vram += bit_test(rmem_b(PPUCTRL), 2) ? 32 : 1;
-	return rmem_b_vram(c_vram);
-}
-
 void write_PPUCTRL(byte value) {
 	nmi_output = bit_test(value, 7);
 

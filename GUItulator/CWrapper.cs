@@ -13,37 +13,37 @@ namespace GUItulator
 {
     public class CWrapper
     {
-        [DllImport("libNESulator.dll", EntryPoint = "last_cpu_speed")]
+        [DllImport("libNESulator.dylib", EntryPoint = "last_cpu_speed")]
         public static extern int CPUSpeed();
 
-        [DllImport("libNESulator.dll", EntryPoint = "gui_start_emulation")]
+        [DllImport("libNESulator.dylib", EntryPoint = "gui_start_emulation")]
         public static extern void StartEmulation(string o);
 
-        [DllImport("libNESulator.dll", EntryPoint = "gui_stop_emulation")]
+        [DllImport("libNESulator.dylib", EntryPoint = "gui_stop_emulation")]
         public static extern int StopEmulation();
 
-        [DllImport("libNESulator.dll", EntryPoint = "gui_frame")]
+        [DllImport("libNESulator.dylib", EntryPoint = "gui_frame")]
         public static extern FrameInfo BackBuffer();
 
-        [DllImport("libNESulator.dll", EntryPoint = "gui_left_patterntable")]
+        [DllImport("libNESulator.dylib", EntryPoint = "gui_left_patterntable")]
         public static extern FrameInfo LeftPatterntable();
 
-        [DllImport("libNESulator.dll", EntryPoint = "gui_right_patterntable")]
+        [DllImport("libNESulator.dylib", EntryPoint = "gui_right_patterntable")]
         public static extern FrameInfo RightPatterntable();
 
-        [DllImport("libNESulator.dll", EntryPoint = "gui_nametable")]
+        [DllImport("libNESulator.dylib", EntryPoint = "gui_nametable")]
         public static extern FrameInfo Nametable(int nametableIndex);
 
-        [DllImport("libNESulator.dll", EntryPoint = "gui_ram_dump")]
+        [DllImport("libNESulator.dylib", EntryPoint = "gui_ram_dump")]
         public static extern FrameInfo RAMDump();
 
-        [DllImport("libNESulator.dll", EntryPoint = "gui_vram_dump")]
+        [DllImport("libNESulator.dylib", EntryPoint = "gui_vram_dump")]
         public static extern FrameInfo VRAMDump();
 
-        [DllImport("libNESulator.dll", EntryPoint = "gui_cpu_speed")]
+        [DllImport("libNESulator.dylib", EntryPoint = "gui_cpu_speed")]
         public static extern void CPUSpeed(int speedHertz);
 
-        [DllImport("libNESulator.dll", EntryPoint = "gui_palette_dump")]
+        [DllImport("libNESulator.dylib", EntryPoint = "gui_palette_dump")]
         public static extern FrameInfo PaletteDump();
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]

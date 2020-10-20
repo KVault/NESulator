@@ -7,21 +7,21 @@
 #include "../memory.h"
 #include "../ppu.h"
 
-EXPORT int last_cpu_speed() {
+ int last_cpu_speed() {
 	return cpu_cyclesLastSec;
 }
 
-EXPORT void gui_start_emulation(char *rom_path) {
+ void gui_start_emulation(char *rom_path) {
 	insertCartridge(rom_path);
 	load_ROM(get_ROM());
 	start_emulation();
 }
 
-EXPORT void gui_stop_emulation() {
+ void gui_stop_emulation() {
 	stop_emulation();
 }
 
-EXPORT FrameInfo gui_frame(){
+ FrameInfo gui_frame(){
 	FrameInfo frameInfo = {};
 	frameInfo.width = NES_SCREEN_WIDTH;
 	frameInfo.height = NES_SCREEN_HEIGHT;
@@ -31,19 +31,19 @@ EXPORT FrameInfo gui_frame(){
 	return frameInfo;
 }
 
-EXPORT FrameInfo gui_left_patterntable(){
+ FrameInfo gui_left_patterntable(){
 	return left_patterntable();
 }
 
-EXPORT FrameInfo gui_right_patterntable(){
+ FrameInfo gui_right_patterntable(){
 	return right_patterntable();
 }
 
-EXPORT FrameInfo gui_nametable(NametableIndex index){
+ FrameInfo gui_nametable(NametableIndex index){
 	return nametable(index);
 }
 
-EXPORT MemoryDumpInfo gui_ram_dump(){
+ MemoryDumpInfo gui_ram_dump(){
 	MemoryDumpInfo info = {};
 	info.size = RAM_MEM_SIZE;
 	info.buffer = ram_bank;
@@ -51,7 +51,7 @@ EXPORT MemoryDumpInfo gui_ram_dump(){
 	return info;
 }
 
-EXPORT MemoryDumpInfo gui_vram_dump(){
+ MemoryDumpInfo gui_vram_dump(){
 	MemoryDumpInfo info = {};
 	info.size = VRAM_MEM_SIZE;
 	info.buffer = vram_bank;
@@ -59,7 +59,7 @@ EXPORT MemoryDumpInfo gui_vram_dump(){
 	return info;
 }
 
-EXPORT void gui_cpu_speed(int speed_hertz){
+ void gui_cpu_speed(int speed_hertz){
 	cpu_set_speed(speed_hertz);
 }
 
@@ -67,7 +67,7 @@ EXPORT void gui_cpu_speed(int speed_hertz){
  * Iterates through the VRAM, where the colour palette information is stored and fills in a FrameInfo struct
  * with the RGBA colour of each position. The UI will take care of creating the images and fill them in with the colour.
  */
-EXPORT FrameInfo gui_palette_dump(){
+ FrameInfo gui_palette_dump(){
 	FrameInfo info = {};
 	static uint palette_buffer[32];
 	info.size = 32;// Two rows of 16. Basically from 0x3F01 to 0x3F1F

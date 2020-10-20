@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/jose/Developer/src/github.com/NESulator/gui_runtime/startup.c
+stdlib.h
+-
+stdio.h
+-
+unistd.h
+-
+

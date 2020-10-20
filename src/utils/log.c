@@ -1,5 +1,5 @@
-#include <malloc.h>
-#include <mem.h>
+#include <stdlib.h>
+#include <memory.h>
 #include "log.h"
 
 enum ConsoleLogLevelEnum console_log_level = ConsoleDisabled;

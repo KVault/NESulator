@@ -2,6 +2,7 @@
 #include "gui_patterntable.h"
 #include "gui.h"
 #include "../memory.h"
+#include "../ppu.h"
 
 uint left_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];
 uint right_buffer[PATTERNTABLE_TEXTURE_WIDTH * PATTERNTABLE_TEXTURE_HEIGHT];

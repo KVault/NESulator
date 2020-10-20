@@ -1,4 +1,4 @@
-#include <time.h>
+#include <sys/time.h>
 #include <zconf.h>
 #include "nes.h"
 #include "ppu.h"
@@ -69,7 +69,8 @@ void run() {
 		 * So a for wouldn't take that into account. This will
 		 */
 		while(cycles_to_exe > 0){
-			cycles_to_exe -= ppu_cycle();
+			ppu_cycle();
+			cycles_to_exe -= 1;
 		}
 	}
 }
@@ -84,13 +85,13 @@ void match_cpu_speed(){
 	static struct timeval ctime, last_second;
 	static long should_elapsed, has_elapsed;
 
-	mingw_gettimeofday(&ctime, NULL);
+    gettimeofday(&ctime, NULL);
 	//More than one second has passed, so update the CPU speed. if less than 0 means a timer hasn't_vram been initialized.
 	//This will do it
 	if(ctime.tv_sec > last_second.tv_sec){
 		cpu_cyclesLastSec = cpu_cyclesThisSec;
 		cpu_cyclesThisSec = 0;
-		mingw_gettimeofday(&last_second, NULL);
+        gettimeofday(&last_second, NULL);
 		ctime = last_second;
 	}
 

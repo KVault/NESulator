@@ -21,7 +21,7 @@ namespace GUItulator.Views
             var rootPanel = (StackPanel)Content;
             var labelsList = rootPanel.FindControl<ListBox>("Labels");
             var byteValues = rootPanel.FindControl<ListBox>("ByteValues");
-            labelsList. += (sender, args) => byteValues.Scroll.Offset = labelsList.Scroll.Offset;
+            //labelsList. += (sender, args) => byteValues.Scroll.Offset = labelsList.Scroll.Offset;
             byteValues.PointerWheelChanged += (sender, args) => labelsList.Scroll.Offset = byteValues.Scroll.Offset;
 
             viewModel = new HexEditorWindowViewModel(() => {}, 30);

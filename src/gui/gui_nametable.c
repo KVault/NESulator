@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "gui_nametable.h"
 #include "../memory.h"
+#include "../ppu.h"
 
 /**
  * Holds a pointer to each nametable back buffer
